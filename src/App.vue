@@ -1,0 +1,254 @@
+<template>
+  <v-app id="app">
+    <template v-if="!loginChecked">
+      <v-progress-circular indeterminate color="primary" class="ma-5"></v-progress-circular>
+    </template>
+    <template v-if="loginChecked && !loggedIn">
+      <Login @login-success="handleLoginSuccess" />
+    </template>
+    <template v-else-if="loginChecked && loggedIn">
+      <v-app-bar v-if="!$route.meta.hideAppBar" :color="appBarColor" app>
+        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
+        <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
+        <v-btn icon variant="text" class="ml-4" @click="changeDarkMode()">
+          <v-icon>
+            {{ theme.global.name.value === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
+          </v-icon>
+        </v-btn>
+        <v-btn icon="mdi-account-circle" variant="text" to="/profile"></v-btn>
+      </v-app-bar>
+      <v-navigation-drawer v-if="!$route.meta.hideAppBar" v-model="drawer">
+        <v-list>
+          <v-list-item to="/dashboard" :class="{ 'bg-grey-lighten-3': tab === 'dashboard' }" prepend-icon="mdi-view-dashboard">
+            <v-list-item-title>{{ $t('dashboard') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/disks" :class="{ 'bg-grey-lighten-3': tab === 'disks' }" prepend-icon="mdi-harddisk">
+            <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/pools" :class="{ 'bg-grey-lighten-3': tab === 'pools' }" prepend-icon="mdi-view-array">
+            <v-list-item-title>{{ $t('pools') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/shares" :class="{ 'bg-grey-lighten-3': tab === 'shares' }" prepend-icon="mdi-share">
+            <v-list-item-title>{{ $t('shares') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="mosServices.docker?.enabled" to="/docker"
+            :class="{ 'bg-grey-lighten-3': tab === 'docker' }" prepend-icon="mdi-docker">
+            <v-list-item-title>{{ $t('docker') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="mosServices.lxc?.enabled" to="/lxc" :class="{ 'bg-grey-lighten-3': tab === 'lxc' }"
+            prepend-icon="mdi-arrange-send-backward">
+            <v-list-item-title>{{ $t('lxc') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="mosServices.vm?.enabled" to="/vm" :class="{ 'bg-grey-lighten-3': tab === 'vm' }"
+            prepend-icon="mdi-monitor-account">
+            <v-list-item-title>{{ $t('vm') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/users" :class="{ 'bg-grey-lighten-3': tab === 'users' }" prepend-icon="mdi-account">
+            <v-list-item-title>{{ $t('users') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/webTerminal" :class="{ 'bg-grey-lighten-3': tab === 'webTerminal' }"
+            prepend-icon="mdi-powershell">
+            <v-list-item-title>{{ $t('webterminal') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/mosSettings" :class="{ 'bg-grey-lighten-3': tab === 'settings' }" prepend-icon="mdi-tools">
+            <v-list-item-title>{{ $t('settings') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-on:click="logoutDialog = true" prepend-icon="mdi-logout">
+            <v-list-item-title>{{ $t('logout') }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+      <v-main>
+        <router-view v-slot="{ Component }">
+          <component :is="Component" @refresh-drawer="getMosServices()" />
+        </router-view>
+      </v-main>
+    </template>
+  </v-app>
+
+  <v-dialog v-model="logoutDialog" width="auto">
+    <v-card max-width="400" prepend-icon="mdi-logout" :text="$t('do you want to logout?')" :title="$t('logout')">
+      <template v-slot:actions>
+        <v-btn class="ms-auto" :text="$t('cancel')" @click="logoutDialog = false"></v-btn>
+        <v-btn class="ms-auto" :text="$t('ok')" @click="doLogout"></v-btn>
+      </template>
+    </v-card>
+  </v-dialog>
+
+  <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000">
+    <template #actions>
+      <v-icon v-if="snackbarIcon" class="me-2">{{ snackbarIcon }}</v-icon>
+    </template>
+    {{ snackbarText }}
+  </v-snackbar>
+
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import Login from './views/login.vue'
+import { useSnackbar, showSnackbarError, showSnackbarSuccess } from './composables/snackbar'
+import { useTheme } from 'vuetify';
+import { useI18n } from 'vue-i18n';
+import { getContrast } from 'vuetify/lib/util/colorUtils';
+
+const { snackbar, snackbarText, snackbarColor, snackbarIcon } = useSnackbar()
+const theme = useTheme();
+const { locale, t } = useI18n();
+const tab = ref('');
+const drawer = ref(false);
+const loggedIn = ref(false);
+const logoutDialog = ref(false);
+const loginChecked = ref(false);
+const mosServices = ref({});
+const appBarColor = 'primary';
+
+onMounted(async () => {
+  if (tab.value === '') {
+    tab.value = 'dashboard'
+  }
+  await checkLoggedIn();
+  if (loggedIn.value) {
+    await getMosServices();
+  }
+})
+
+const backgroundColor = computed(() => {
+  return theme.current.value.colors[appBarColor];
+})
+const isDark = computed(() => {
+  const contrast = getContrast(backgroundColor.value, '#fff');
+  return contrast < 2.7;
+})
+const logoSrc = computed(() => {
+  return isDark.value
+    ? 'mos_black.png'
+    : 'mos_white.png'
+})
+
+const checkLoggedIn = async () => {
+  if (localStorage.getItem('authToken')) {
+    checkTokenExpired(localStorage.getItem('authToken'));
+    if (loggedIn.value) {
+      await getUserProfile();
+    } else {
+      loggedIn.value = false;
+    }
+  } else {
+    loggedIn.value = false;
+  }
+  loginChecked.value = true;
+}
+
+function checkTokenExpired(token) {
+  if (token) {
+    const payload = token.split('.')[1];
+    try {
+      const decoded = JSON.parse(atob(payload));
+      if (decoded.exp && Date.now() / 1000 > decoded.exp) {
+        localStorage.removeItem('authToken');
+        loggedIn.value = false;
+        return;
+      }
+    } catch (e) {
+      loggedIn.value = false;
+      return;
+    }
+  }
+  loggedIn.value = true;
+  return;
+}
+
+const getUserProfile = async () => {
+  try {
+    const res = await fetch('/api/v1/auth/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      }
+    });
+
+    if (!res.ok) throw new Error('Not logged in');
+
+    const result = await res.json();
+
+    theme.global.name.value = result.darkmode ? 'dark' : 'light';
+    locale.value = result.language || 'en';
+    theme.themes.value[theme.global.name.value].colors.primary = result.primary_color || '#1976D2';
+    localStorage.setItem('userid', result.id);
+
+    loggedIn.value = true;
+
+  } catch (e) {
+    loggedIn.value = false;
+  }
+}
+
+function handleLoginSuccess() {
+  loggedIn.value = true
+  getMosServices();
+}
+
+function doLogout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userid');
+  tab.value = 'dashboard'
+  loggedIn.value = false
+  drawer.value = false
+  logoutDialog.value = false
+}
+
+const changeDarkMode = async () => {
+  const currentTheme = theme.global.name.value;
+  let targetTheme;
+  if (currentTheme === 'dark') {
+    targetTheme = 'light';
+  } else {
+    targetTheme = 'dark';
+  }
+
+  try {
+    const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 'darkmode': targetTheme === 'dark' ? true : false })
+    })
+
+    if (!res.ok) throw new Error('API-Error');
+
+    // Response in JSON umwandeln
+    const result = await res.json();
+
+    theme.global.name.value = result.darkmode ? 'dark' : 'light';
+    locale.value = result.language || 'en'
+    theme.themes.value[theme.global.name.value].colors.primary = result.primary_color || '#1976D2';
+
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+};
+
+const getMosServices = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/services', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      }
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+
+    mosServices.value = await res.json();
+
+
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+}
+
+</script>
