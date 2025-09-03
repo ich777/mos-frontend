@@ -1,0 +1,82 @@
+name: Build MOS Frontend
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build_frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Remove dist directory
+      run: rm -rf ${{ github.workspace }}/dist
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.19.0'
+
+    - name: Build MOS Frontend
+      run: npm run build
+
+    - name: Get next version
+      id: version
+      run: |
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "Last tag: $LAST_TAG"
+
+        if [[ $LAST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+          MAJOR=${BASH_REMATCH[1]}
+          MINOR=${BASH_REMATCH[2]}
+          PATCH=${BASH_REMATCH[3]}
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_TAG="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
+        else
+          NEXT_TAG="v0.0.1"
+        fi
+
+        echo "NEXT_TAG=${NEXT_TAG#v}" >> $GITHUB_ENV
+
+    - name: Create Release Archive
+      run: |
+        cd ${{ github.workspace }}
+        tar -czf mos-frontend-${{ env.NEXT_TAG }}.tar.gz -C dist .
+        md5sum mos-frontend-${{ env.NEXT_TAG }}.tar.gz | awk '{print $1}' > mos-frontend-${{ env.NEXT_TAG }}.tar.gz.md5
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.NEXT_TAG }}
+        release_name: "MOS Frontend ${{ env.NEXT_TAG }}"
+        body: "MOS-Frontend - Built from commit: ${{ github.sha }}"
+        draft: false
+        prerelease: ${{ env.PRERELEASE }}
+
+    - name: Upload Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/mos-frontend-${{ env.NEXT_TAG }}.tar.gz
+        asset_name: mos-frontend-${{ env.NEXT_TAG }}.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Upload md5 to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/mos-frontend-${{ env.NEXT_TAG }}.tar.gz.md5
+        asset_name: mos-frontend-${{ env.NEXT_TAG }}.tar.gz.md5
+        asset_content_type: text/plain
