@@ -37,9 +37,6 @@ jobs:
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
         echo "Last tag: $LAST_TAG"
 
-        # Troubleshoot tags:
-        echo "Test: $(git tag -l | sort -V | tail -1)"
-
         if [[ $LAST_TAG =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
           MAJOR=${BASH_REMATCH[1]}
           MINOR=${BASH_REMATCH[2]}
@@ -47,7 +44,7 @@ jobs:
           NEXT_PATCH=$((PATCH + 1))
           NEXT_TAG="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
         else
-          NEXT_TAG="v0.0.1"
+          NEXT_TAG="0.0.1"
         fi
 
         echo "Next tag: $NEXT_TAG"
