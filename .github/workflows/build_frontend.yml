@@ -28,6 +28,9 @@ jobs:
     - name: Build MOS Frontend
       run: npm run build
 
+    - name: Fetch tags
+      run: git fetch --tags
+
     - name: Get next version
       id: version
       run: |
