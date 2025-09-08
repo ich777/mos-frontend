@@ -97,8 +97,8 @@ const stopVM = async (name) => {
     });
     overlay.value = false;
 
-    if (!res.ok) throw new Error(t('vm container could not be stopped'));
-    showSnackbarSuccess(t('vm container stopped successfully'));
+    if (!res.ok) throw new Error(t('VM could not be stopped'));
+    showSnackbarSuccess(t('VM shutdown initiated'));
     fetchVMs();
 
   } catch (e) {
@@ -118,8 +118,8 @@ const startVM = async (name) => {
     });
     overlay.value = false;
 
-    if (!res.ok) throw new Error(t('vm container could not be started'));
-    showSnackbarSuccess(t('vm container started successfully'));
+    if (!res.ok) throw new Error(t('VM could not be started'));
+    showSnackbarSuccess(t('VM started successfully'));
     fetchVMs();
 
   } catch (e) {
