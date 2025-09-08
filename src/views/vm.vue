@@ -20,17 +20,17 @@
                               <v-icon v-bind="props">mdi-server-outline</v-icon>
                             </template>
                             <v-list>
-                              <v-list-item v-if="vm.state !== 'started'" @click="startVM(vm.name)">
+                              <v-list-item v-if="vm.state !== 'running'" @click="startVM(vm.name)">
                                 <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                               </v-list-item>
-                              <v-list-item v-if="vm.state === 'started'" @click="stopVM(vm.name)">
+                              <v-list-item v-if="vm.state === 'running'" @click="stopVM(vm.name)">
                                 <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                               </v-list-item>
                             </v-list>
                           </v-menu>
                         </template>
                         <v-list-item-title>{{ vm.name }}</v-list-item-title>
-                        <v-list-item-subtitle :style="{ color: vm.state === 'started' ? 'green' : 'red' }">
+                        <v-list-item-subtitle :style="{ color: vm.state === 'running' ? 'green' : 'red' }">
                           {{ vm.state }}
                         </v-list-item-subtitle>
                         <template v-slot:append>
