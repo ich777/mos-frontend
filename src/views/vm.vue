@@ -99,7 +99,7 @@ const stopVM = async (name) => {
 
     if (!res.ok) throw new Error(t('vm container could not be stopped'));
     showSnackbarSuccess(t('vm container stopped successfully'));
-    getVMs();
+    fetchVMs();
 
   } catch (e) {
     overlay.value = false;
@@ -120,7 +120,7 @@ const startVM = async (name) => {
 
     if (!res.ok) throw new Error(t('vm container could not be started'));
     showSnackbarSuccess(t('vm container started successfully'));
-    getVMs();
+    fetchVMs();
 
   } catch (e) {
     overlay.value = false;
