@@ -32,41 +32,58 @@ onMounted(async () => {
     term = new Terminal({ cursorBlink: true })
     term.open(document.getElementById('terminal'))
 
-    socket = io(window.location.hostname + '/terminal', { path: '/api/v1/socket.io/' });
-
-    // Session-Infos senden
-    socket.emit('join-session', {
-        sessionId: sessions.value[0].sessionId,
-        token: localStorage.getItem('authToken')
-    });
+    // Websocket connection through proxy
+    socket = io('/terminal', { path: '/api/v1/socket.io/' });
 
     socket.on('connect', () => {
+        console.log('WebSocket connected');
+        // Session-Infos senden
+        socket.emit('join-session', {
+            sessionId: sessions.value[0].sessionId,
+            token: localStorage.getItem('authToken')
+        });
+    });
+
+    // Wait for join confirmation
+    socket.on('session-joined', (data) => {
+        console.log('Session joined:', data);
         term.write(t('connection to mos terminal established') + '\r\n');
+        // Trigger initial prompt
         socket.emit('terminal-input', '\n');
     });
 
-    // Terminal-Output anzeigen
+    // Display output
     socket.on('terminal-output', (data) => {
         term.write(data);
     });
 
-    // Input an Server schicken
+    // Send input to Sevrer
     term.onData(data => {
         socket.emit('terminal-input', data);
     });
 
+    // Resize handling
     term.onResize(({ cols, rows }) => {
-        socket.emit('resize', { cols, rows });
+        socket.emit('terminal-resize', { cols, rows });
     });
 
-    // Fehler/Disconnect abfangen
+    // Error handling
+    socket.on('error', (error) => {
+        console.error('Terminal WebSocket error:', error);
+        showSnackbarError(error.message || 'Terminal connection error');
+    });
+
+    // Catch disconnect
     socket.on('disconnect', () => {
-        term.write(t('connection closed') + '\r\n')
+        term.write('\r\n' + t('connection closed') + '\r\n')
     });
 })
 
 onBeforeUnmount(() => {
-    if (socket) socket.disconnect()
+    if (socket) {
+        socket.emit('leave-session');
+        socket.disconnect();
+    }
     if (term) term.dispose()
 })
 
