@@ -5,9 +5,15 @@
     </v-card-title>
     <v-card-text>
       <div>
-        <p><b>{{ info.manufacturer }}, {{ info.brand }}</b></p>
-        <p><b>{{ $t('cores') }}:</b> {{ info.cores }}</p>
-        <p><b>{{ $t('physicalcores') }}:</b> {{ info.physicalCores }}</p>
+        <p v-if="osInfo.cpu?.manufacturer && osInfo.cpu?.brand">
+          <b>{{ osInfo.cpu.manufacturer }}, {{ osInfo.cpu.brand }}</b>
+        </p>
+        <p v-if="osInfo.cpu?.cores !== undefined">
+          <b>{{ $t('cores') }}:</b> {{ osInfo.cpu.cores }}
+        </p>
+        <p v-if="osInfo.cpu?.physicalCores !== undefined">
+          <b>{{ $t('physicalcores') }}:</b> {{ osInfo.cpu.physicalCores }}
+        </p>
         <v-row class="align-center">
           <v-col cols="auto" class="d-flex align-center" style="width: 60px;">
             <b>{{ $t('load') }}:</b>
@@ -29,31 +35,30 @@
 import { ref, onMounted } from 'vue'
 import { toRefs, computed } from 'vue'
 
-const info = ref({});
 const props = defineProps({
   cpu: { type: Object, default: () => ({ load: 0 }) }
 })
 const { cpu } = toRefs(props)
 const processor = computed(() => cpu.value ?? { load: 0 })
+const osInfo = ref({});
 
 onMounted(() => {
-  fetchInfo();
+  getOsInfo();
 });
 
-const fetchInfo = async () => {
+const getOsInfo = async () => {
   try {
-    const res = await fetch('/api/v1/system/info', {
+    const res = await fetch('/api/v1/mos/osinfo', {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken')
       }
     });
 
     if (!res.ok) throw new Error('API-Error');
-    const result = await res.json();
-    info.value = result.cpu;
+    osInfo.value = await res.json();
 
   } catch (e) {
-
+    console.log(e);
   }
 }
 

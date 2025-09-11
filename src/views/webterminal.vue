@@ -32,7 +32,7 @@ onMounted(async () => {
     term = new Terminal({ cursorBlink: true })
     term.open(document.getElementById('terminal'))
 
-    socket = io(window.location.hostname, { path: '/api/socket.io/' });
+    socket = io(window.location.hostname, { path: '/api/v1/terminal/socket.io' });
 
     // Session-Infos senden
     socket.emit('join-session', {

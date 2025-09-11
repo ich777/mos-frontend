@@ -5,16 +5,14 @@
     </v-card-title>
     <v-card-text>
       <div>
-        <p v-if="info && info.os"><b>{{ $t('platform') }}:</b> {{ info.os.platform }}</p>
-        <p v-if="info && info.os"><b>{{ $t('distribution') }}:</b> {{ info.os.distro }}</p>
-        <p v-if="info && info.os"><b>{{ $t('release') }}:</b> {{ info.os.release }}</p>
-        <p v-if="info && info.os"><b>{{ $t('kernel') }}:</b> {{ info.os.kernel }}</p>
-        <p><b>{{ $t('hostname') }}:</b> <span v-if="detailed && detailed.os">{{ detailed.os.hostname }}</span></p>
-        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos version') }}:</b> {{ releaseInfo.mos.version }}</p>
-        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ releaseInfo.mos.channel }}</p>
-        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos build') }}:</b> {{ releaseInfo.mos.build }}</p>
-        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos kernel') }}:</b> {{ releaseInfo.mos.recommended_kernel }}</p>
-
+        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('platform') }}:</b> {{ osInfo.base[0].os_id }}</p>
+        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('name') }}:</b> {{ osInfo.base[0].os_name }}</p>
+        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('version') }}:</b> {{ osInfo.base[0].os_version }}</p>
+        <p><b>{{ $t('hostname') }}:</b> <span v-if="osInfo && osInfo.hostname">{{ osInfo.hostname }}</span></p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos version') }}:</b> {{ osInfo.mos.version }}</p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ osInfo.mos.channel }}</p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos build') }}:</b> {{ osInfo.mos.build }}</p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos kernel') }}:</b> {{ osInfo.mos.recommended_kernel }}</p>
       </div>
     </v-card-text>
   </v-card>
@@ -23,51 +21,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const info = ref({});
-const detailed = ref({});
-const releaseInfo = ref({});
+const osInfo = ref({});
 
-const getInfo = async () => {
+const getOsInfo = async () => {
   try {
-    const res = await fetch('/api/v1/system/info', {
+    const res = await fetch('/api/v1/mos/osinfo', {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken')
       }
     });
 
     if (!res.ok) throw new Error('API-Error');
-    info.value = await res.json();
-  } catch (e) {
-    console.error('Failed to fetch system info:', e.message);
-  }
-}
-
-const getDetailed = async () => {
-  try {
-    const res = await fetch('/api/v1/system/detailed', {
-      headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
-    });
-
-    if (!res.ok) throw new Error('API-Error');
-    detailed.value = await res.json();
-
-  } catch (e) {
-    console.error('Failed to fetch detailed system info:', e.message);
-  }
-}
-
-const getReleaseInfo = async () => {
-  try {
-    const res = await fetch('/api/v1/mos/releaseinfo', {
-      headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
-    });
-
-    if (!res.ok) throw new Error('API-Error');
-    releaseInfo.value = await res.json();
+    osInfo.value = await res.json();
 
   } catch (e) {
 
@@ -75,9 +40,7 @@ const getReleaseInfo = async () => {
 }
 
 onMounted(() => {
-  getInfo();
-  getDetailed();
-  getReleaseInfo();
+  getOsInfo();
 });
 
 </script>
