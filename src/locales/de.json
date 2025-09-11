@@ -348,5 +348,10 @@
   "admin api token created": "Admin API Token erstellt",
   "admin api token deleted": "Admin API Token gelöscht",
   "description": "Beschreibung",
-  "create admin api token": "Admin API Token erstellen"
+  "create admin api token": "Admin API Token erstellen",
+  "mos version": "MOS Version",
+  "mos channel": "MOS Kanal",
+  "mos build": "MOS Build",
+  "mos kernel": "MOS Kernel",
+  "check for updates": "Nach Updates suchen"
 }

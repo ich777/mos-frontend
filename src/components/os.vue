@@ -10,6 +10,11 @@
         <p v-if="info && info.os"><b>{{ $t('release') }}:</b> {{ info.os.release }}</p>
         <p v-if="info && info.os"><b>{{ $t('kernel') }}:</b> {{ info.os.kernel }}</p>
         <p><b>{{ $t('hostname') }}:</b> <span v-if="detailed && detailed.os">{{ detailed.os.hostname }}</span></p>
+        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos version') }}:</b> {{ releaseInfo.mos.version }}</p>
+        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ releaseInfo.mos.channel }}</p>
+        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos build') }}:</b> {{ releaseInfo.mos.build }}</p>
+        <p v-if="releaseInfo && releaseInfo.mos"><b>{{ $t('mos kernel') }}:</b> {{ releaseInfo.mos.recommended_kernel }}</p>
+
       </div>
     </v-card-text>
   </v-card>
@@ -20,6 +25,7 @@ import { ref, onMounted } from 'vue'
 
 const info = ref({});
 const detailed = ref({});
+const releaseInfo = ref({});
 
 const getInfo = async () => {
   try {
@@ -52,9 +58,26 @@ const getDetailed = async () => {
   }
 }
 
+const getReleaseInfo = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/releaseinfo', {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      }
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+    releaseInfo.value = await res.json();
+
+  } catch (e) {
+
+  }
+}
+
 onMounted(() => {
   getInfo();
   getDetailed();
+  getReleaseInfo();
 });
 
 </script>

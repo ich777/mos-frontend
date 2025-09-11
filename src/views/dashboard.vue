@@ -9,13 +9,15 @@
           <OS />
         </v-col>
         <v-col cols="12" md="6">
+          <Network v-if="network" :network="network" />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" md="6">
           <Processor v-if="cpu" :cpu="cpu" />
         </v-col>
         <v-col cols="12" md="6">
           <Memory v-if="memory" :memory="memory" />
-        </v-col>
-        <v-col cols="12" md="6">
-          <Network v-if="network" :network="network" />
         </v-col>
       </v-row>
     </v-container>
