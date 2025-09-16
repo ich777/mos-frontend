@@ -6,7 +6,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-row>
-          <v-col cols="12" sm="12" md="6" lg="6" xl="6">
+          <v-col cols="12" sm="12" md="12" lg="12" xl="12">
             <v-card variant="tonal" fluid>
               <v-card-title>{{ $t('overview') }}</v-card-title>
               <v-card-text class="pa-0">
@@ -44,28 +44,6 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="12" md="6" lg="6" xl="6">
-            <v-card variant="tonal" fluid>
-              <v-card-title>{{ $t('newuser') }}</v-card-title>
-              <v-card-text>
-                <form @submit.prevent="addUser">
-                  <v-text-field v-model="newUser.username" :label="$t('username')" required />
-                  <v-text-field v-model="newUser.password" :type="showPassword ? 'text' : 'password'"
-                    :label="$t('password')" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                    @click:append-inner="showPassword = !showPassword" required />
-                  <v-select v-model="newUser.role" :items="['admin', 'user', 'samba_only']" :label="$t('role')" required
-                    @update:modelValue="val => { newUser.role = val; if (val === 'samba_only') newUser.samba_user = true; }" />
-                  <v-switch v-model="newUser.samba_user" :label="$t('samba user')" inset color="primary"
-                    density="compact" />
-                </form>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="d-flex justify-end">
-            <v-btn color="primary" @click="addUser()"><v-icon left>mdi-plus</v-icon> {{ $t('create') }}</v-btn>
-          </v-col>
         </v-row>
       </v-container>
     </v-container>
@@ -82,6 +60,31 @@
           <v-btn text @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="red" @click="deleteUser(deleteDialog.user)">
             {{ $t('delete') }}
+          </v-btn>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="addDialog.value" max-width="400">
+    <v-card>
+      <v-card-title>{{ $t('add user') }}</v-card-title>
+      <v-card-text>
+        <form @submit.prevent="addUser">
+          <v-text-field v-model="addDialog.username" :label="$t('username')" required />
+          <v-text-field v-model="addDialog.password" :type="showPassword ? 'text' : 'password'"
+            :label="$t('password')" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append-inner="showPassword = !showPassword" required />
+          <v-select v-model="addDialog.role" :items="['admin', 'user', 'samba_only']" :label="$t('role')" required
+            @update:modelValue="val => { addDialog.role = val; if (val === 'samba_only') addDialog.samba_user = true; }" />
+          <v-switch v-model="addDialog.samba_user" :label="$t('samba user')" inset color="primary" />
+        </form>
+      </v-card-text>
+      <v-card-actions>
+        <v-row class="d-flex justify-end">
+          <v-btn text @click="addDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="primary" @click="addUser()">
+            {{ $t('save') }}
           </v-btn>
         </v-row>
       </v-card-actions>
@@ -112,6 +115,18 @@
     </v-card>
   </v-dialog>
 
+  <!-- Floating Action Button -->
+  <v-btn
+    color="primary"
+    class="fab"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;"
+    size="large"
+    icon
+    @click="openAddDialog()"
+  >
+    <v-icon>mdi-plus</v-icon>
+  </v-btn>
+
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
@@ -138,10 +153,11 @@ const changeDialog = reactive({
   role: '',
   samba_user: false
 });
-const newUser = ref({
+const addDialog = reactive({
+  value: false,
   username: '',
   password: '',
-  role: 'user',
+  role: '',
   samba_user: false
 });
 
@@ -155,6 +171,13 @@ const openChangeDialog = (user) => {
   changeDialog.password = '';
   changeDialog.role = user.role;
   changeDialog.samba_user = user.samba_user;
+};
+const openAddDialog = () => {
+  addDialog.value = true;
+  addDialog.username = '';
+  addDialog.password = '';
+  addDialog.role = 'user';
+  addDialog.samba_user = false;
 };
 
 const getUsers = async () => {
@@ -178,6 +201,15 @@ const getUsers = async () => {
 };
 
 const addUser = async () => {
+  addDialog.value = false;
+
+  const newUser = {
+    username: addDialog.username,
+    password: addDialog.password,
+    role: addDialog.role,
+    samba_user: addDialog.samba_user
+  };
+
   try {
     overlay.value = true;
     const res = await fetch('/api/v1/auth/users', {
@@ -186,7 +218,7 @@ const addUser = async () => {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(newUser.value)
+      body: JSON.stringify(newUser)
 
     });
     overlay.value = false;
@@ -197,7 +229,7 @@ const addUser = async () => {
     }
 
     showSnackbarSuccess(t('User successfully created'));
-    newUser.value = { username: '', role: 'user', password: '' };
+
     getUsers();
 
   } catch (e) {
@@ -206,6 +238,7 @@ const addUser = async () => {
 };
 
 const deleteUser = async (user) => {
+  deleteDialog.value = false;
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/auth/users/${user.id}`, {
@@ -222,7 +255,6 @@ const deleteUser = async (user) => {
     }
 
     showSnackbarSuccess(t('User successfully deleted'));
-    deleteDialog.value = false;
     getUsers();
 
   } catch (e) {
@@ -231,6 +263,7 @@ const deleteUser = async (user) => {
 };
 
 const changeUser = async () => {
+  changeDialog.value = false;
   const userData = {
     username: changeDialog.user.username,
     password: changeDialog.password,
@@ -256,7 +289,6 @@ const changeUser = async () => {
     }
 
     showSnackbarSuccess(t('User successfully updated'));
-    changeDialog.value = false;
     getUsers();
 
   } catch (e) {

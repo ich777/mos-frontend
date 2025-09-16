@@ -47,7 +47,7 @@
                                 <v-divider />
                                 <v-list-item @click="openTerminalLogs(docker.Names[0])">
                                   <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
-                                </v-list-item>                                
+                                </v-list-item>
                                 <v-list-item @click="updateDocker(docker.Names[0])">
                                   <v-list-item-title>{{ $t('update') }}</v-list-item-title>
                                 </v-list-item>
@@ -64,7 +64,7 @@
                           <template v-slot:append>
                             <template v-if="$vuetify.display.xlAndUp">
                               <v-divider vertical class="mx-2" />
-                                <p  style="min-width:250px; max-width: 150px;">{{ $t('image') }}: {{ docker.Image }}</p>
+                              <p style="min-width:250px; max-width: 150px;">{{ $t('image') }}: {{ docker.Image }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
                             <template v-if="$vuetify.display.mdAndUp">
@@ -79,22 +79,26 @@
                               <v-divider vertical class="mx-2" />
                             </template>
                             <template v-if="$vuetify.display.mdAndUp && docker.HostConfig.NetworkMode === 'bridge'">
-                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
+                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{
+                                docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
                             <template v-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'host'">
-                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
+                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{
+                                docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <template v-if="$vuetify.display.smAndUp" >
-                              <p v-if="!docker.HostConfig.NetworkMode.startsWith('container:')" style="min-width:150px; max-width: 150px;">
+                            <template v-if="$vuetify.display.smAndUp">
+                              <p v-if="!docker.HostConfig.NetworkMode.startsWith('container:')"
+                                style="min-width:150px; max-width: 150px;">
                                 {{ $t('network') }}: {{ docker.HostConfig.NetworkMode }}
                               </p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <template v-if="$vuetify.display.smAndUp && mosDockers && mosDockers.find(item => item.name === docker.Names[0] && item.update_available)">
-                              <v-icon
-                                tooltip="$t('update available')" color="green" @click="updateDocker(docker.Names[0])">
+                            <template
+                              v-if="$vuetify.display.smAndUp && mosDockers && mosDockers.find(item => item.name === docker.Names[0] && item.update_available)">
+                              <v-icon tooltip="$t('update available')" color="green"
+                                @click="updateDocker(docker.Names[0])">
                                 mdi-autorenew
                               </v-icon>
                               <v-divider vertical class="mx-2" />
@@ -116,10 +120,6 @@
         </v-row>
         <v-row class="mt-4">
           <v-col class="d-flex justify-end">
-            <v-btn color="primary" to="/docker/create" class="ml-2">
-              <v-icon left>mdi-plus</v-icon>
-              {{ $t('create docker') }}
-            </v-btn>
             <v-btn color="primary" @click="updateAll()" class="ml-2">
               <v-icon left>mdi-autorenew</v-icon>
               {{ $t('update all') }}
@@ -133,6 +133,12 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <!-- Floating Action Button -->
+  <v-btn to="/docker/create" color="primary" class="fab"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+    <v-icon>mdi-plus</v-icon>
+  </v-btn>
 
   <v-dialog v-model="createDialog" max-width="700">
     <v-card>
@@ -165,7 +171,8 @@
 
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
-      <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0] }}</v-card-title>
+      <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
+        }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
@@ -611,97 +618,97 @@ const openTerminalLogs = async (dockerName) => {
 };
 
 const createDockerTerminalSession = async (dockerName) => {
-    const existingSessionId = await checkExistingTerminal("docker", "exec", dockerName);
-    if (existingSessionId) {
-        return existingSessionId;
+  const existingSessionId = await checkExistingTerminal("docker", "exec", dockerName);
+  if (existingSessionId) {
+    return existingSessionId;
+  }
+
+  try {
+    const res = await fetch('/api/v1/terminal/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "command": "docker", "args": ["exec", "-it", dockerName, "/bin/sh"] })
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || t('failed to create terminal session'));
     }
 
-    try {
-        const res = await fetch('/api/v1/terminal/create', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({"command": "docker", "args": ["exec", "-it", dockerName, "/bin/sh"]})
-        });
+    const Result = await res.json();
+    return Result.sessionId;
 
-        if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.error || t('failed to create terminal session'));
-        }
-
-        const Result = await res.json();
-        return Result.sessionId;
-
-    } catch (e) {
-        showSnackbarError(e.message);
-    }
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
 }
 
 const createLogsTerminalSession = async (dockerName) => {
-    const existingSessionId = await checkExistingTerminal("docker", "logs", dockerName);
-    if (existingSessionId) {
-        return existingSessionId;
+  const existingSessionId = await checkExistingTerminal("docker", "logs", dockerName);
+  if (existingSessionId) {
+    return existingSessionId;
+  }
+
+  try {
+    const res = await fetch('/api/v1/terminal/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "command": "docker", "args": ["logs", "-f", "--tail", "100", dockerName], readonlyOnly: true })
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || t('failed to create terminal log session'));
     }
 
-    try {
-        const res = await fetch('/api/v1/terminal/create', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({"command": "docker", "args": ["logs", "-f", "--tail", "100", dockerName], readonlyOnly: true})
-        });
+    const Result = await res.json();
+    return Result.sessionId;
 
-        if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.error || t('failed to create terminal log session'));
-        }
-
-        const Result = await res.json();
-        return Result.sessionId;
-
-    } catch (e) {
-        showSnackbarError(e.message);
-    }
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
 }
 
 const checkExistingTerminal = async (command, arg, dockerName) => {
-    try {
-        const res = await fetch(`/api/v1/terminal/sessions`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-            }
-        });
+  try {
+    const res = await fetch(`/api/v1/terminal/sessions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      }
+    });
 
-        if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.error || t('failed to retrieve terminal sessions'));
-        }
-
-        const Result = await res.json();
-        const sessions = ref([]);
-        sessions.value = Result.sessions || [];
-        const session = sessions.value.filter(
-          session =>
-            session.command === command &&
-            Array.isArray(session.args) &&
-            session.args.includes(dockerName)
-            &&
-            session.args.includes(arg)
-        );
-        if (session.length > 0) {
-          return session[0].sessionId;
-        } else {
-          return null;
-        }
-
-    } catch (e) {
-        showSnackbarError(e.message);
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || t('failed to retrieve terminal sessions'));
     }
+
+    const Result = await res.json();
+    const sessions = ref([]);
+    sessions.value = Result.sessions || [];
+    const session = sessions.value.filter(
+      session =>
+        session.command === command &&
+        Array.isArray(session.args) &&
+        session.args.includes(dockerName)
+        &&
+        session.args.includes(arg)
+    );
+    if (session.length > 0) {
+      return session[0].sessionId;
+    } else {
+      return null;
+    }
+
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
 }
 
 const openInfoDialog = (docker) => {

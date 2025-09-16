@@ -355,5 +355,11 @@
   "mos kernel": "MOS Kernel",
   "check for updates": "Nach Updates suchen",
   "update api": "API aktualisieren",
-  "update ui": "UI aktualisieren"
+  "update ui": "UI aktualisieren",
+  "variables": "Variablen",
+  "add variable": "Variable hinzufügen",
+  "remove variable": "Variable entfernen",
+  "variable": "Variable",
+  "add device": "Gerät hinzufügen",
+  "remove device": "Gerät entfernen"
 }

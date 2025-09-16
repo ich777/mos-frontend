@@ -6,7 +6,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-row>
-          <v-col cols="12" sm="12" md="6" lg="6" xl="6">
+          <v-col cols="12" sm="12" md="12" lg="12" xl="12">
             <v-card variant="tonal" fluid>
               <v-card-title>{{ $t('overview') }}</v-card-title>
               <v-card variant="tonal" v-for="pool in pools" :key="pool.id" fluid class="mb-4 ml-4 mr-4 pa-0">
@@ -50,17 +50,17 @@
                     </v-list-item>
                   </v-list>
                 </v-card-text>
-                <v-card-actions class="justify-end">
+                <v-card-actions class="justify-space-between">
+                  <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact"
+                    color="primary" />
                   <v-btn icon @click="openDeletePoolDialog(pool)">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
-                  <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact" class="mr-4"
-                    color="primary" />
                 </v-card-actions>
               </v-card>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="12" md="6" lg="6" xl="6">
+          <v-col cols="12" sm="12" md="12" lg="12" xl="12">
             <v-card variant="tonal" fluid>
               <v-card-title>{{ $t('unassigned disks') }}</v-card-title>
               <v-card-text class="pa-0">
@@ -73,7 +73,7 @@
                   <v-list-item v-for="unassignedDisk in unassignedDisks" :key="unassignedDisk.name">
                     <v-list-item-title>{{ unassignedDisk.name }}</v-list-item-title>
                     <v-list-item-subtitle>{{ unassignedDisk.type }} ({{ unassignedDisk.sizeHuman
-                    }})</v-list-item-subtitle>
+                      }})</v-list-item-subtitle>
                     <template v-slot:prepend>
                       <v-icon class="cursor-pointer">
                         {{ getDiskIcon(unassignedDisk.type) }}
@@ -105,6 +105,18 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <!-- Floating Action Button -->
+  <v-btn
+    color="primary"
+    class="fab"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;"
+    size="large"
+    icon
+    @click="openCreatePoolDialog()"
+  >
+    <v-icon>mdi-plus</v-icon>
+  </v-btn>
 
   <v-dialog v-model="formatDialog.value" max-width="400">
     <v-card>
