@@ -19,13 +19,32 @@
             <b>{{ $t('load') }}:</b>
           </v-col>
           <v-col class="d-flex align-center" style="height: 14px;">
-            <v-progress-linear :model-value="processor.load" height="14" color="primary" style="margin-top: 0;">
+            <v-progress-linear :model-value="processor.load" height="14" color="primary"
+              style="margin-top: 0; border-radius: 7px; overflow: hidden;">
               <template #default>
                 <span>{{ processor.load.toFixed(2) }}%</span>
               </template>
             </v-progress-linear>
           </v-col>
         </v-row>
+        <div v-if="processor.cores && processor.cores.length">
+          <v-row dense>
+            <v-col v-for="(core, i) in processor.cores" :key="i" cols="12" sm="6" class="d-flex align-center"
+              style="gap:8px; margin-top:6px;">
+              <div style="width:48px; display:flex; align-items:center;">
+                <small><b>CPU {{ i }}</b></small>
+              </div>
+              <div style="flex:1; display:flex; align-items:center; height:12px;">
+                <v-progress-linear :model-value="core.load?.total ?? 0" height="12" color="primary"
+                  style="margin-top:2px; border-radius:6px; overflow:hidden; width:100%;">
+                  <template #default>
+                    <span>{{ (Number(core.load?.total ?? 0)).toFixed(2) }}%</span>
+                  </template>
+                </v-progress-linear>
+              </div>
+            </v-col>
+          </v-row>
+        </div>
       </div>
     </v-card-text>
   </v-card>
