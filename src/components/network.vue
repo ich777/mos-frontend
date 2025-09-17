@@ -3,15 +3,15 @@
     <v-card-title>{{ $t('network') }}</v-card-title>
     <v-card-text>
       <template v-if="nic">
-        <p><b>{{ $t('interface') }}:</b> {{ nic.interface }}</p>
-        <p><b>{{ $t('rx') }}:</b> {{ nic.statistics.rx.speed_human }}</p>
-        <p><b>{{ $t('tx') }}:</b> {{ nic.statistics.tx.speed_human }}</p>
-        <p><b>{{ $t('total') }}:</b> {{ nic.statistics.total.speed_human }}</p>
-        <p><b>{{ $t('type') }}:</b> {{ nic.type }}</p>
-        <p><b>{{ $t('state') }}:</b> {{ nic.state }}</p>
-        <p><b>{{ $t('ip4') }}:</b> {{ nic.ip4 }}</p>
-        <p><b>{{ $t('ip6') }}:</b> {{ nic.ip6 }}</p>
-        <p><b>{{ $t('mac') }}:</b> {{ nic.mac }}</p>
+        <p v-if="nic.interface"><b>{{ $t('interface') }}:</b> {{ nic.interface }}</p>
+        <p v-if="nic.statistics?.rx?.speed_human"><b>{{ $t('rx') }}:</b> {{ nic.statistics.rx.speed_human }}</p>
+        <p v-if="nic.statistics?.tx?.speed_human"><b>{{ $t('tx') }}:</b> {{ nic.statistics.tx.speed_human }}</p>
+        <p v-if="nic.statistics?.total?.speed_human"><b>{{ $t('total') }}:</b> {{ nic.statistics.total.speed_human }}</p>
+        <p v-if="nic.type"><b>{{ $t('type') }}:</b> {{ nic.type }}</p>
+        <p v-if="nic.state"><b>{{ $t('state') }}:</b> {{ nic.state }}</p>
+        <p v-if="nic.ip4"><b>{{ $t('ip4') }}:</b> {{ nic.ip4 }}</p>
+        <p v-if="nic.ip6"><b>{{ $t('ip6') }}:</b> {{ nic.ip6 }}</p>
+        <p v-if="nic.mac"><b>{{ $t('mac') }}:</b> {{ nic.mac }}</p>
       </template>
       <template v-else>
         <p>{{ $t('no network interface found') }}</p>

@@ -362,5 +362,8 @@
   "variable": "Variable",
   "add device": "Gerät hinzufügen",
   "remove device": "Gerät entfernen",
-  "no pools have been created yet": "Es wurden noch keine Pools erstellt"
+  "no pools have been created yet": "Es wurden noch keine Pools erstellt",
+  "actual usage": "Genutzt",
+  "reserved": "Reserviert",
+  "dirty caches": "Dirty Caches"
 }

@@ -362,5 +362,8 @@
   "variable": "Variable",
   "add device": "Add Device",
   "remove device": "Remove Device",
-  "no pools have been created yet": "No pools have been created yet"
+  "no pools have been created yet": "No pools have been created yet",
+  "actual_usage": "Actual Usage",
+  "reserved": "Reserved",
+  "dirty caches": "Dirty Caches"
 }
