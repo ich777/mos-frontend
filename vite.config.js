@@ -8,8 +8,19 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 80,
     proxy: {
-      "/api": "http://192.168.1.194",
-      "/ws": "ws://192.168.1.194"
+      "^/api/(?!v1/socket\\.io)": {
+        target: "http://192.168.1.194",
+        changeOrigin: true,
+      },
+      "/api/v1/socket.io": {
+        target: "http://192.168.1.194:3000",
+        changeOrigin: true,
+        ws: true,
+      },
+      "/ws": {
+        target: "ws://192.168.1.194:3000",
+        ws: true,
+      }
     },
   },
   resolve: {

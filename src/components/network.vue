@@ -21,11 +21,30 @@
 </template>
 
 <script setup>
-import { toRefs, computed } from 'vue'
+import { toRefs, ref, watch } from 'vue'
 
 const props = defineProps({
   network: { type: Object, default: () => ({ interfaces: [] }) }
 })
 const { network } = toRefs(props)
-const nic = computed(() => network.value?.interfaces?.[0] ?? null)
+const nic = ref(null)
+
+watch(
+  () => network.value?.interfaces?.[0],
+  (newVal) => {
+    if (!newVal) {
+      nic.value = null
+      return
+    }
+    if (!nic.value) {
+      nic.value = { ...newVal }
+      return
+    }
+    Object.keys(newVal).forEach(key => {
+      nic.value[key] = newVal[key]
+    })
+  },
+  { immediate: true, deep: true }
+)
+
 </script>
