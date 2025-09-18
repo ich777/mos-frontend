@@ -19,9 +19,7 @@
                       </v-icon>
                     </template>
                     <v-list-item-title>{{ disk.name }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ disk.device }}, Size {{ (disk.size / 1024 / 1024 /
-                      1024).toFixed(2)
-                    }}GB</v-list-item-subtitle>
+                    <v-list-item-subtitle>{{ disk.device }}, Size {{ disk.size_human }}</v-list-item-subtitle>
                     <template v-slot:append>
                       <v-menu>
                         <template #activator="{ props }">
