@@ -23,38 +23,34 @@
       </v-app-bar>
       <v-navigation-drawer v-if="!$route.meta.hideAppBar" v-model="drawer">
         <v-list>
-          <v-list-item to="/dashboard" :class="{ 'bg-grey-lighten-3': tab === 'dashboard' }" prepend-icon="mdi-view-dashboard">
+          <v-list-item to="/dashboard" prepend-icon="mdi-view-dashboard">
             <v-list-item-title>{{ $t('dashboard') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/disks" :class="{ 'bg-grey-lighten-3': tab === 'disks' }" prepend-icon="mdi-harddisk">
+          <v-list-item to="/disks" prepend-icon="mdi-harddisk">
             <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/pools" :class="{ 'bg-grey-lighten-3': tab === 'pools' }" prepend-icon="mdi-view-array">
+          <v-list-item to="/pools" prepend-icon="mdi-view-array">
             <v-list-item-title>{{ $t('pools') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/shares" :class="{ 'bg-grey-lighten-3': tab === 'shares' }" prepend-icon="mdi-share">
+          <v-list-item to="/shares" prepend-icon="mdi-share">
             <v-list-item-title>{{ $t('shares') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.docker?.enabled" to="/docker"
-            :class="{ 'bg-grey-lighten-3': tab === 'docker' }" prepend-icon="mdi-docker">
+          <v-list-item v-if="mosServices.docker?.enabled" to="/docker" prepend-icon="mdi-docker">
             <v-list-item-title>{{ $t('docker') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.lxc?.enabled" to="/lxc" :class="{ 'bg-grey-lighten-3': tab === 'lxc' }"
-            prepend-icon="mdi-arrange-send-backward">
+          <v-list-item v-if="mosServices.lxc?.enabled" to="/lxc" prepend-icon="mdi-arrange-send-backward">
             <v-list-item-title>{{ $t('lxc') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.vm?.enabled" to="/vm" :class="{ 'bg-grey-lighten-3': tab === 'vm' }"
-            prepend-icon="mdi-monitor-account">
+          <v-list-item v-if="mosServices.vm?.enabled" to="/vm" prepend-icon="mdi-monitor-account">
             <v-list-item-title>{{ $t('vm') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/users" :class="{ 'bg-grey-lighten-3': tab === 'users' }" prepend-icon="mdi-account">
+          <v-list-item to="/users" prepend-icon="mdi-account">
             <v-list-item-title>{{ $t('users') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/webTerminal" :class="{ 'bg-grey-lighten-3': tab === 'webTerminal' }"
-            prepend-icon="mdi-powershell">
+          <v-list-item to="/webTerminal" prepend-icon="mdi-powershell">
             <v-list-item-title>{{ $t('webterminal') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/mosSettings" :class="{ 'bg-grey-lighten-3': tab === 'settings' }" prepend-icon="mdi-tools">
+          <v-list-item to="/mosSettings" prepend-icon="mdi-tools">
             <v-list-item-title>{{ $t('settings') }}</v-list-item-title>
           </v-list-item>
           <v-list-item v-on:click="logoutDialog = true" prepend-icon="mdi-logout">

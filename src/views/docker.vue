@@ -135,14 +135,6 @@
     </v-container>
   </v-container>
 
-  <!-- Floating Action Button -->
-  <v-btn to="/docker/create" color="primary" class="fab"
-    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
-    <v-icon>mdi-plus</v-icon>
-  </v-btn>
-
-
-
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
@@ -192,6 +184,12 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Floating Action Button -->
+  <v-btn to="/docker/create" color="primary" class="fab"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+    <v-icon>mdi-plus</v-icon>
+  </v-btn>
 
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
