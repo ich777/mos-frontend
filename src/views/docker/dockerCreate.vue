@@ -15,10 +15,8 @@
                 <v-card variant="tonal" fluid>
                     <v-card-text>
                         <v-select :items="allTemplatesMixed || []" :label="$t('template')"
-                            v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense 
-                            outlined>
+                            v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense outlined>
                         </v-select>
-                        <v-card-subtitle class="mb-4">{{ $t('load from url') }}</v-card-subtitle>
                         <v-row>
                             <v-col cols="9" class="d-flex align-center">
                                 <v-text-field v-model="dockerUrl" :label="$t('load from url')" type="url" class="mb-0"
@@ -26,7 +24,7 @@
                             </v-col>
                             <v-col cols="3" class="d-flex align-center justify-center">
                                 <v-btn color="primary" @click="fetchDockerTemplateUrl()" :disabled="!dockerUrl"
-                                    style="margin-bottom: 20px;">
+                                    style="margin-bottom: 20px;" hide-details>
                                     {{ $t('fetch') }}
                                 </v-btn>
                             </v-col>
@@ -60,23 +58,34 @@
                         <div v-for="(path, i) in form.paths" :key="i" class="mb-5">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('name')" v-model="path.name" density="compact"></v-text-field>
+                                <v-col cols="1" class="d-flex flex-column justify-center align-center">
+                                    <v-btn icon="mdi-delete" size="x-small" color="error" class="ma-1 pa-0"
+                                        style="width:24px; height:24px; min-width:24px;" @click="removePath(i)"
+                                        title="Remove path" aria-label="remove path">
+                                        <v-icon size="18">mdi-delete</v-icon>
+                                    </v-btn>
                                 </v-col>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('mode')" v-model="path.mode" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="2" class="d-flex align-center justify-center">
-                                    <v-btn icon="mdi-delete" size="small" color="error" variant="text"
-                                        @click="removePath(i)"></v-btn>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-n8">
-                                <v-col cols="6">
-                                    <v-text-field :label="$t('host')" v-model="path.host" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="6">
-                                    <v-text-field :label="$t('container')" v-model="path.container" density="compact"></v-text-field>
+                                <v-col cols="11">
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('name')" v-model="path.name"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('mode')" v-model="path.mode"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-n8">
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('host')" v-model="path.host" type="number"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('container')" v-model="path.container"
+                                                type="number" density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
                             </v-row>
                         </div>
@@ -87,60 +96,80 @@
                                 @click="form.ports.push({ name: '', protocol: '', host: '', container: '' })"
                                 title="Add port" aria-label="add port">
                                 <v-icon size="18">mdi-plus</v-icon>
-                            </v-btn>   
-                            {{ $t('ports') }}                  
+                            </v-btn>
+                            {{ $t('ports') }}
                         </v-card-subtitle>
                         <div v-for="(port, i) in form.ports" :key="i" class="mb-5">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('name')" v-model="port.name" density="compact"></v-text-field>
+                                <v-col cols="1" class="d-flex flex-column justify-center align-center">
+                                    <v-btn icon="mdi-delete" size="x-small" color="error" class="ma-1 pa-0"
+                                        style="width:24px; height:24px; min-width:24px;" @click="removePort(i)"
+                                        title="Remove port" aria-label="remove port">
+                                        <v-icon size="18">mdi-delete</v-icon>
+                                    </v-btn>
                                 </v-col>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('protocol')" v-model="port.protocol" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="2" class="d-flex align-center justify-center">
-                                    <v-btn icon="mdi-delete" size="small" color="error" variant="text"
-                                        @click="removePort(i)"></v-btn>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-n8">
-                                <v-col cols="6">
-                                    <v-text-field :label="$t('host')" v-model="port.host" type="number" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="6">
-                                    <v-text-field :label="$t('container')" v-model="port.container"
-                                        type="number" density="compact"></v-text-field>
+                                <v-col cols="11">
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('name')" v-model="port.name"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('protocol')" v-model="port.protocol"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-n8">
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('host')" v-model="port.host" type="number"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('container')" v-model="port.container"
+                                                type="number" density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
                             </v-row>
                         </div>
                         <v-divider class="my-2"></v-divider>
                         <v-card-subtitle class="mb-8">
-                           <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
+                            <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
-                                @click="form.devices.push({ name: '', host: '', container: '' })"
-                                title="Add device" aria-label="add device">
+                                @click="form.devices.push({ name: '', host: '', container: '' })" title="Add device"
+                                aria-label="add device">
                                 <v-icon size="18">mdi-plus</v-icon>
-                            </v-btn> 
+                            </v-btn>
                             {{ $t('devices') }}
                         </v-card-subtitle>
                         <div v-for="(device, i) in form.devices" :key="i" class="mb-5">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('name')" v-model="device.name" density="compact"></v-text-field>
+                                <v-col cols="1" class="d-flex flex-column justify-center align-center">
+                                    <v-btn icon="mdi-delete" size="x-small" color="error" class="ma-1 pa-0"
+                                        style="width:24px; height:24px; min-width:24px;" @click="removeDevice(i)"
+                                        title="Remove device" aria-label="remove device">
+                                        <v-icon size="18">mdi-delete</v-icon>
+                                    </v-btn>
                                 </v-col>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('host')" v-model="device.host" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="2" class="d-flex align-center justify-center">
-                                    <v-btn icon="mdi-delete" size="small" color="error" variant="text"
-                                        @click="removeDevice(i)"></v-btn>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-n8">
-                                <v-col cols="12">
-                                    <v-text-field :label="$t('container')" v-model="device.container" density="compact"></v-text-field>
+                                <v-col cols="11">
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('name')" v-model="device.name"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('host')" v-model="device.host"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-n8">
+                                        <v-col cols="12">
+                                            <v-text-field :label="$t('container')" v-model="device.container"
+                                                type="number" density="compact"></v-text-field>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
                             </v-row>
                         </div>
@@ -157,27 +186,34 @@
                         <div v-for="(variable, i) in form.variables" :key="i" class="mb-5">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
-                                <v-col cols="10">
-                                    <v-text-field :label="$t('name')" v-model="variable.name" density="compact"></v-text-field>
+                                <v-col cols="1" class="d-flex flex-column justify-center align-center">
+                                    <v-btn icon="mdi-delete" size="x-small" color="error" class="ma-1 pa-0"
+                                        style="width:24px; height:24px; min-width:24px;" @click="removeVariable(i)"
+                                        title="Remove variable" aria-label="remove variable">
+                                        <v-icon size="18">mdi-delete</v-icon>
+                                    </v-btn>
                                 </v-col>
-                                <v-col cols="2" class="d-flex align-center justify-center">
-                                    <v-btn icon="mdi-delete" size="small" color="error" variant="text"
-                                        @click="removeVariable(i)"></v-btn>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-n8">
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('key')" v-model="variable.key" density="compact"></v-text-field>
-                                </v-col>
-                                <v-col cols="5">
-                                    <v-text-field :label="$t('value')" v-model="variable.value"
-                                        :type="variable.mask ? 'password' : 'text'" density="compact">
-                                    </v-text-field>
-                                </v-col>
-                                <v-col cols="2" class="d-flex align-center">
-                                    <v-checkbox v-model="variable.mask" :label="$t('hide')" density="compact"
-                                        hide-details>
-                                    </v-checkbox>
+                                <v-col cols="11">
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('name')" v-model="variable.name"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-switch :label="$t('masked')" v-model="variable.mask" inset
+                                                color="primary" density="compact"></v-switch>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-n8">
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('key')" v-model="variable.key"
+                                                density="compact"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field :label="$t('value')" v-model="variable.value"
+                                                density="compact" :type="variable.mask ? 'password' : 'text'"></v-text-field>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
                             </v-row>
                         </div>

@@ -234,8 +234,8 @@ const deletePoolDialog = reactive({
   filesystem: ''
 });
 
-onMounted(() => {
-  getPools();
+onMounted(async () => {
+  await getPools();
   getUnassignedDisks();
   getFilesystems();
 });

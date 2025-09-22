@@ -373,5 +373,8 @@
   "dirty caches": "Dirty Caches",
   "password is required": "Password is required",
   "add user": "Add User",
-  "confirm password": "Confirm Password"
+  "confirm password": "Confirm Password",
+  "key": "Key",
+  "value": "Value",
+  "masked": "Masked"
 }
