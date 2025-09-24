@@ -46,7 +46,7 @@
                         <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
                         <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
                         <v-divider class="my-2"></v-divider>
-                        <v-card-subtitle class="mb-8">
+                        <v-card-subtitle class="mb-2">
                             <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.paths.push({ name: '', mode: '', host: '', container: '' })"
@@ -55,7 +55,7 @@
                             </v-btn>
                             {{ $t('paths') }}
                         </v-card-subtitle>
-                        <div v-for="(path, i) in form.paths" :key="i" class="mb-5">
+                        <div v-for="(path, i) in form.paths" :key="i" class="mb-2">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -76,29 +76,29 @@
                                 <v-col cols="11">
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('name')" v-model="path.name"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('name')" v-model="path.name" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('mode')" v-model="path.mode"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('mode')" v-model="path.mode" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
                                             <v-text-field :label="$t('host')" v-model="path.host" type="number"
-                                                density="compact"></v-text-field>
+                                                density="compact" hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field :label="$t('container')" v-model="path.container"
-                                                type="number" density="compact"></v-text-field>
+                                                type="number" density="compact" hide-details></v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>
                             </v-row>
                         </div>
                         <v-divider class="my-2"></v-divider>
-                        <v-card-subtitle class="mb-8">
+                        <v-card-subtitle class="mb-2">
                             <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.ports.push({ name: '', protocol: '', host: '', container: '' })"
@@ -107,7 +107,7 @@
                             </v-btn>
                             {{ $t('ports') }}
                         </v-card-subtitle>
-                        <div v-for="(port, i) in form.ports" :key="i" class="mb-5">
+                        <div v-for="(port, i) in form.ports" :key="i" class="mb-2">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -128,29 +128,29 @@
                                 <v-col cols="11">
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('name')" v-model="port.name"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('name')" v-model="port.name" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field :label="$t('protocol')" v-model="port.protocol"
-                                                density="compact"></v-text-field>
+                                                density="compact" hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
                                             <v-text-field :label="$t('host')" v-model="port.host" type="number"
-                                                density="compact"></v-text-field>
+                                                density="compact" hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field :label="$t('container')" v-model="port.container"
-                                                type="number" density="compact"></v-text-field>
+                                                type="number" density="compact" hide-details></v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>
                             </v-row>
                         </div>
                         <v-divider class="my-2"></v-divider>
-                        <v-card-subtitle class="mb-8">
+                        <v-card-subtitle class="mb-2">
                             <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.devices.push({ name: '', host: '', container: '' })" title="Add device"
@@ -159,7 +159,7 @@
                             </v-btn>
                             {{ $t('devices') }}
                         </v-card-subtitle>
-                        <div v-for="(device, i) in form.devices" :key="i" class="mb-5">
+                        <div v-for="(device, i) in form.devices" :key="i" class="mb-2">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -180,25 +180,25 @@
                                 <v-col cols="11">
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('name')" v-model="device.name"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('name')" v-model="device.name" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('host')" v-model="device.host"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('host')" v-model="device.host" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="12">
                                             <v-text-field :label="$t('container')" v-model="device.container"
-                                                type="number" density="compact"></v-text-field>
+                                                type="number" density="compact" hide-details></v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>
                             </v-row>
                         </div>
                         <v-divider class="my-2"></v-divider>
-                        <v-card-subtitle class="mb-8">
+                        <v-card-subtitle class="mb-2">
                             <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.variables.push({ name: '', key: '', value: '', mask: false })"
@@ -207,7 +207,7 @@
                             </v-btn>
                             {{ $t('variables') }}
                         </v-card-subtitle>
-                        <div v-for="(variable, i) in form.variables" :key="i" class="mb-5">
+                        <div v-for="(variable, i) in form.variables" :key="i" class="mb-2">
                             <v-divider v-if="i > 0" class="my-2"></v-divider>
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -228,23 +228,24 @@
                                 <v-col cols="11">
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('name')" v-model="variable.name"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('name')" v-model="variable.name" density="compact"
+                                                hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-switch :label="$t('masked')" v-model="variable.mask" inset
-                                                color="primary" density="compact"></v-switch>
+                                                color="primary" density="compact" hide-details class="mb-4"></v-switch>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('key')" v-model="variable.key"
-                                                density="compact"></v-text-field>
+                                            <v-text-field :label="$t('key')" v-model="variable.key" density="compact"
+                                                hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field :label="$t('value')" v-model="variable.value"
-                                                density="compact"
-                                                :type="variable.mask ? 'password' : 'text'"></v-text-field>
+                                                density="compact" :type="variable.mask ? 'password' : 'text'"
+                                                hide-details>
+                                            </v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>
@@ -561,12 +562,22 @@ const createDocker = async () => {
         overlay.value = false;
 
         if (!res.ok) throw new Error(t('docker container could not be created'));
-        router.back();
+        goBackSafely();
         showSnackbarSuccess(t('docker container created successfully'));
 
     } catch (e) {
         overlay.value = false;
         showSnackbarError(e.message);
+    }
+};
+
+const goBackSafely = () => {
+    if (window.history.state?.back) {
+        requestAnimationFrame(() => {
+            setTimeout(() => router.back(), 0);
+        });
+    } else {
+        router.go('/docker');
     }
 };
 
