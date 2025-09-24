@@ -376,5 +376,8 @@
   "confirm password": "Passwort bestätigen",
   "key": "Key",
   "value": "Wert",
-  "masked": "Maskiert"
+  "masked": "Maskiert",
+  "samples": "Proben",
+  "history": "Verlauf",
+  "last": "Letzte"
 }

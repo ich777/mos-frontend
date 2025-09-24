@@ -376,5 +376,8 @@
   "confirm password": "Confirm Password",
   "key": "Key",
   "value": "Value",
-  "masked": "Masked"
+  "masked": "Masked",
+  "samples": "Samples",
+  "history": "History",
+  "last": "Last"
 }
