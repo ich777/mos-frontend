@@ -63,17 +63,6 @@ function formatBytesPerSec(bytesPerSec) {
   return `${v.toFixed(v >= 100 ? 0 : v >= 10 ? 1 : 2)} ${units[i]}`
 }
 
-// Für die Textanzeige als Bit/s (optional hübscher)
-function formatBpsFromBytes(bytesPerSec) {
-  if (bytesPerSec == null || isNaN(bytesPerSec)) return '–'
-  const bps = bytesPerSec * 8
-  const units = ['bps', 'Kbps', 'Mbps', 'Gbps', 'Tbps']
-  let v = bps
-  let i = 0
-  while (v >= 1000 && i < units.length - 1) { v /= 1000; i++ }
-  return `${v.toFixed(v >= 100 ? 0 : v >= 10 ? 1 : 2)} ${units[i]}`
-}
-
 function initChart() {
   if (!chartEl.value) return
   chart = markRaw(new Chart(chartEl.value.getContext('2d'), {
@@ -83,31 +72,37 @@ function initChart() {
       datasets: [
         { label: 'RX', data: seriesRx, borderColor: '#4caf50', fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 },
         { label: 'TX', data: seriesTx, borderColor: '#2196f3', fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 },
-        { label: 'Total', data: seriesTotal, borderColor: '#ff9800', borderDash: [6, 4], fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 }
+        { label: 'Total', data: seriesTotal, borderColor: '#ff9800', fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      normalized: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${formatBytesPerSec(ctx.parsed.y)}`
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
-        y: {
-          beginAtZero: true,
-          ticks: { callback: (v) => formatBytesPerSec(v) }
-        }
+options: {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  normalized: true,
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: {
+      position: 'top',
+      labels: {
+        usePointStyle: true,
+        pointStyle: 'line'
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => `${ctx.dataset.label}: ${formatBytesPerSec(ctx.parsed.y)}`
       }
     }
+  },
+  scales: {
+    x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
+    y: {
+      beginAtZero: true,
+      ticks: { callback: (v) => formatBytesPerSec(v) }
+    }
+  }
+}
   }))
 }
 

@@ -258,10 +258,10 @@
     </v-container>
 
     <!-- Floating Action Button -->
-    <v-btn color="primary" @click="createDocker()" class="fab"
+    <v-fab color="primary" @click="createDocker()"
         style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
         <v-icon>mdi-content-save</v-icon>
-    </v-btn>
+    </v-fab>
 
     <v-overlay :model-value="overlay" class="align-center justify-center">
         <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>

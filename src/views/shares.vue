@@ -156,10 +156,10 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-btn color="primary" class="fab" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large"
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large"
     icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
-  </v-btn>
+  </v-fab>
 
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
