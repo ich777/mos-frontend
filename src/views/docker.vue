@@ -16,7 +16,21 @@
                       <div v-if="group.name !== ''">
                         <v-list-item :id="group.id">
                           <template v-slot:prepend>
-                            <v-icon class="drag-handle" style="cursor: pointer">mdi-folder</v-icon>
+                            <v-menu>
+                              <template #activator="{ props }">
+                                <v-icon class="drag-handle" style="cursor: pointer" v-bind="props">mdi-folder</v-icon>
+                              </template>
+                                <v-list>
+                                  <v-list-item
+                                    @click="openChangeGroupDialog(group)">
+                                    <v-list-item-title>{{ $t('edit group') }}</v-list-item-title>
+                                  </v-list-item>
+                                  <v-list-item
+                                    @click="openDeleteGroupDialog(group)">
+                                    <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                            </v-menu>
                           </template>
                           <template v-slot:append>
                             <v-btn icon small density="compact" class="ms-2"
@@ -29,7 +43,6 @@
                             {{ group.containers.length }} {{ $t('containers') }}
                           </v-list-item-subtitle>
                         </v-list-item>
-
                         <v-expand-transition>
                           <div v-if="group.expanded">
                             <v-list dense>
@@ -159,11 +172,10 @@
                             </v-list>
                           </div>
                         </v-expand-transition>
-
                       </div>
                     </template>
                   </draggable>
-                  <draggable v-model="dockers" :item-key="Id" @end="onDragEnd" handle=".drag-handle">
+                  <draggable v-model="dockers" item-key="Id" @end="onDragEnd" handle=".drag-handle">
                     <template #item="{ element: docker, index }">
                       <div>
                         <v-list-item :id="docker.Id" v-if="!dockerGroups.some(g => g.containers && g.containers.includes(docker.Names?.[0]))">
@@ -271,15 +283,20 @@
         </v-row>
         <v-row class="mt-4">
           <v-col class="d-flex justify-end">
-            <v-btn color="primary" @click="checkForUpdates()" class="ml-2">
-              <v-icon left>mdi-update</v-icon>
-              {{ $t('check for updates') }}
-            </v-btn>
-            <v-btn color="primary" @click="updateAll()" class="ml-2">
-              <v-icon left>mdi-autorenew</v-icon>
-              {{ $t('update all') }}
-            </v-btn>
-
+            <div class="d-flex flex-column flex-sm-row">
+              <v-btn color="primary" @click="openCreateGroupDialog()">
+                <v-icon left>mdi-folder-plus</v-icon>
+                &nbsp;{{ $t('create docker group') }}
+              </v-btn>
+              <v-btn color="primary" @click="checkForUpdates()" class="mt-2 mt-sm-0 ml-sm-2">
+                <v-icon left>mdi-update</v-icon>
+                &nbsp;{{ $t('check for updates') }}
+              </v-btn>
+              <v-btn color="primary" @click="updateAll()" class="mt-2 mt-sm-0 ml-sm-2">
+                <v-icon left>mdi-autorenew</v-icon>
+                &nbsp;{{ $t('update all') }}
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -336,6 +353,59 @@
     </v-card>
   </v-dialog>
 
+  <v-dialog v-model="createGroupDialog.value" max-width="600">
+    <v-card>
+      <v-card-title class="text-h6">{{ $t('create docker group') }}</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="createGroupDialog.name" :label="$t('group name')" required></v-text-field>
+        <v-select v-model="createGroupDialog.containers" :items="dockers.map(d => d.Names[0])"
+          :label="$t('select containers')" multiple chips></v-select>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="clearCreateGroupDialog()">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="createDockerGroup()">
+          {{ $t('create') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="changeGroupDialog.value" max-width="600">
+    <v-card>
+      <v-card-title class="text-h6">{{ $t('edit docker group') }} - {{ changeGroupDialog.name }}</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="changeGroupDialog.name" :label="$t('group name')" required></v-text-field>
+        <v-select v-model="changeGroupDialog.containers" :items="dockers.map(d => d.Names[0])"
+          :label="$t('select containers')" multiple chips></v-select>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="clearChangeGroupDialog()">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="updateDockerGroup()">
+          {{ $t('save') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="deleteGroupDialog.value" max-width="500">
+    <v-card>
+      <v-card-title class="text-h6" v-if="deleteGroupDialog.group">{{ $t('delete') }} - {{
+        deleteGroupDialog.group.name }}</v-card-title>
+      <v-card-text>
+        {{ $t('are you sure you want to delete this docker group?') }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="deleteGroupDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="red" @click="deleteDockerGroup()">
+          {{ $t('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog> 
+
   <!-- Floating Action Button -->
   <v-btn to="/docker/create" color="primary" class="fab"
     style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
@@ -367,6 +437,21 @@ const deleteDialog = reactive({
 const infoDialog = reactive({
   value: false,
   docker: null
+});
+const createGroupDialog = reactive({
+  value: false,
+  name: '',
+  containers: []
+});
+const changeGroupDialog = reactive({
+  value: false,
+  group: null,
+  name: '',
+  containers: []
+});
+const deleteGroupDialog = reactive({
+  value: false,
+  group: null
 });
 
 onMounted(() => {
@@ -534,8 +619,6 @@ const killDocker = async (name) => {
     showSnackbarError(e.message);
   }
 };
-
-
 
 const removeDocker = async (name) => {
   deleteDialog.value = false;
@@ -818,23 +901,159 @@ const checkExistingTerminal = async (command, arg, dockerName) => {
   }
 }
 
-const openInfoDialog = (docker) => {
-  infoDialog.value = true;
-  infoDialog.docker = docker;
+const createDockerGroup = async () => {
+  if (!createGroupDialog.name || createGroupDialog.name.trim() === '') {
+    showSnackbarError(t('group name is required'));
+    return;
+  }
+  if (!createGroupDialog.containers || createGroupDialog.containers.length === 0) {
+    showSnackbarError(t('at least one container must be selected'));
+    return;
+  }
+
+  const newGroup = {
+    name: createGroupDialog.name.trim(),
+    containers: createGroupDialog.containers
+  };
+
+  try {
+    overlay.value = true;
+    const res = await fetch('/api/v1/docker/mos/groups', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newGroup)
+    });
+    overlay.value = false;
+
+    if (!res.ok) throw new Error(t('docker group could not be created'));
+    showSnackbarSuccess(t('docker group created successfully'));
+    getDockerGroups();
+    clearCreateGroupDialog();
+
+  } catch (e) {
+    overlay.value = false;
+    showSnackbarError(e.message);
+  }
+};
+
+const deleteDockerGroup = async () => {
+  if (!deleteGroupDialog.group) {
+    showSnackbarError(t('no group selected'));
+    return;
+  }
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(deleteGroupDialog.group.id)}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      }
+    });
+    overlay.value = false;
+
+    if (!res.ok) throw new Error(t('docker group could not be deleted'));
+    showSnackbarSuccess(t('docker group deleted successfully'));
+    getDockerGroups();
+    clearDeleteGroupDialog();
+
+  } catch (e) {
+    overlay.value = false;
+    showSnackbarError(e.message);
+  }
+};
+
+const updateDockerGroup = async () => {
+  if (!changeGroupDialog.group) {
+    showSnackbarError(t('no group selected'));
+    return;
+  }
+  if (!changeGroupDialog.name || changeGroupDialog.name.trim() === '') {
+    showSnackbarError(t('group name is required'));
+    return;
+  }
+  if (!changeGroupDialog.containers || changeGroupDialog.containers.length === 0) {
+    showSnackbarError(t('at least one container must be selected'));
+    return;
+  }
+
+  const updatedGroup = {
+    name: changeGroupDialog.name.trim(),
+    containers: changeGroupDialog.containers
+  };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${changeGroupDialog.group.id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedGroup)
+    });
+    overlay.value = false;
+
+    if (!res.ok) throw new Error(t('docker group could not be updated'));
+    showSnackbarSuccess(t('docker group updated successfully'));
+    getDockerGroups();
+    clearChangeGroupDialog();
+
+  } catch (e) {
+    overlay.value = false;
+    showSnackbarError(e.message);
+  }
 };
 
 const showWebui = (docker) => {
   window.open(`${docker.webui}`, '_blank');
 };
 
+const openInfoDialog = (docker) => {
+  infoDialog.value = true;
+  infoDialog.docker = docker;
+};
 const clearDeleteDialog = () => {
   deleteDialog.value = false;
   deleteDialog.docker = null;
 };
-
 const openDeleteDialog = (docker) => {
   deleteDialog.value = true;
   deleteDialog.docker = docker;
+};
+const openCreateGroupDialog = () => {
+  createGroupDialog.value = true;
+  createGroupDialog.name = '';
+  createGroupDialog.containers = [];
+};
+const clearCreateGroupDialog = () => {
+  createGroupDialog.value = false;
+  createGroupDialog.name = '';
+  createGroupDialog.containers = [];
+};
+const openChangeGroupDialog = (group) => {
+  changeGroupDialog.value = true;
+  changeGroupDialog.group = group;
+  changeGroupDialog.name = group.name;
+  changeGroupDialog.containers = group.containers || [];
+};
+const clearChangeGroupDialog = () => {
+  changeGroupDialog.value = false;
+  changeGroupDialog.group = null;
+  changeGroupDialog.name = '';
+  changeGroupDialog.containers = [];
+};
+const openDeleteGroupDialog = (group) => {
+  deleteGroupDialog.value = true;
+  deleteGroupDialog.group = group;
+};
+const clearDeleteGroupDialog = () => {
+  deleteGroupDialog.value = false;
+  deleteGroupDialog.group = null;
 };
 
 </script>
