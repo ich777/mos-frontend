@@ -22,32 +22,32 @@ import webterminal from "../views/webterminal.vue";
 import webterminalPopup from "../views/webterminalPopup.vue";
 
 const routes = [
-  { path: "/login", component: Login },
-  { path: "/firstSetup", component: FirstSetup, props: true },
-  { path: "", component: Dashboard },
-  { path: "/dashboard", component: Dashboard },
-  { path: "/users", component: Users },
-  { path: "/pools", component: Pools },
-  { path: "/disks", component: Disks },
-  { path: "/shares", component: Shares },
-  { path: "/docker", component: Docker },
-  { path: "/docker/create", component: DockerCreate },
-  { path: "/docker/change/:docker", component: DockerChange, props: true },
-  { path: "/lxc", component: LXC },
-  { path: "/vm", component: Vm },
-  { path: "/mosSettings", component: mosSettings },
-  { path: "/mosSettings/docker", component: mosSettingsDocker },
-  { path: "/mosSettings/lxc", component: mosSettingsLXC },
-  { path: "/mosSettings/vm", component: mosSettingsVm },
-  { path: "/mosSettings/network", component: mosSettingsNetwork },
-  { path: "/mosSettings/system", component: mosSettingsSstem },
-  { path: "/profile", component: profile },
-  { path: "/webTerminal", component: webterminal },
+  { path: "/login", component: Login, meta: { title: "MOS Login", description: "Login to your account" } },
+  { path: "/firstSetup", component: FirstSetup, props: true, meta: { title: "MOS First Setup", description: "Set up your account for the first time" } },
+  { path: "", component: Dashboard, meta: { title: "Dashboard", description: "Overview of your account" } },
+  { path: "/dashboard", component: Dashboard, meta: { title: "Dashboard", description: "Overview of your account" } },
+  { path: "/users", component: Users, meta: { title: "Users", description: "Manage users in your account" } },
+  { path: "/pools", component: Pools, meta: { title: "Pools", description: "Manage storage pools" } },
+  { path: "/disks", component: Disks, meta: { title: "Disks", description: "Manage disks in your account" } },
+  { path: "/shares", component: Shares, meta: { title: "Shares", description: "Manage shares in your account" } },
+  { path: "/docker", component: Docker, meta: { title: "Docker", description: "Manage Docker containers" } },
+  { path: "/docker/create", component: DockerCreate, meta: { title: "Create Docker", description: "Create a new Docker container" } },
+  { path: "/docker/change/:docker", component: DockerChange, props: true, meta: { title: "Change Docker", description: "Change Docker container settings" } },
+  { path: "/lxc", component: LXC, meta: { title: "LXC", description: "Manage LXC containers" } },
+  { path: "/vm", component: Vm, meta: { title: "VM", description: "Manage virtual machines" } },
+  { path: "/mosSettings", component: mosSettings, meta: { title: "MOS Settings", description: "Manage MOS settings" } },
+  { path: "/mosSettings/docker", component: mosSettingsDocker, meta: { title: "MOS Settings - Docker", description: "Manage Docker settings" } },
+  { path: "/mosSettings/lxc", component: mosSettingsLXC, meta: { title: "MOS Settings - LXC", description: "Manage LXC settings" } },
+  { path: "/mosSettings/vm", component: mosSettingsVm, meta: { title: "MOS Settings - VM", description: "Manage VM settings" } },
+  { path: "/mosSettings/network", component: mosSettingsNetwork, meta: { title: "MOS Settings - Network", description: "Manage Network settings" } },
+  { path: "/mosSettings/system", component: mosSettingsSstem, meta: { title: "MOS Settings - System", description: "Manage System settings" } },
+  { path: "/profile", component: profile, meta: { title: "Profile", description: "Manage your profile" } },
+  { path: "/webTerminal", component: webterminal, meta: { title: "Web Terminal", description: "Access the web terminal" } },
   {
     path: "/webTerminalPopup",
     component: webterminalPopup,
     children: [
-      { path: "", component: webterminalPopup, meta: { hideAppBar: true } },
+      { path: "", component: webterminalPopup, meta: { hideAppBar: true, title: "Web Terminal", description: "Access the web terminal" } },
     ],
   },
 ];
@@ -56,5 +56,24 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+router.beforeEach((to) => {
+  const { title, description } = to.meta || {};
+  const defaultTitle = 'Default Title';
+  const defaultDescription = 'Default Description';
+
+  document.title = title || defaultTitle;
+
+  const descriptionElement = document.querySelector('head meta[name="description"]');
+
+  if (descriptionElement) {
+    descriptionElement.setAttribute('content', description || defaultDescription);
+  } else {
+    const meta = document.createElement('meta');
+    meta.name = 'description';
+    meta.content = description || defaultDescription;
+    document.head.appendChild(meta);
+  }
+})
 
 export default router;
