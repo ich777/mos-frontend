@@ -59,8 +59,8 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const { title, description } = to.meta || {};
-  const defaultTitle = 'Default Title';
-  const defaultDescription = 'Default Description';
+  const defaultTitle = 'MOS';
+  const defaultDescription = 'MOS - Modern Operating System for your home server';
 
   document.title = title || defaultTitle;
 

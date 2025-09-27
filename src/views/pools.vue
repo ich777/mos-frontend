@@ -9,7 +9,8 @@
           <v-card-title class="d-flex align-center">
             <span>{{ pool.name }}</span>
             <v-spacer />
-            <v-icon v-if="pool.config.encrypted" class="ml-2" color="grey darken-1" aria-label="locked">mdi-lock</v-icon>
+            <v-icon v-if="pool.config.encrypted" class="ml-2" color="grey darken-1"
+              aria-label="locked">mdi-lock</v-icon>
           </v-card-title>
           <v-card-subtitle>{{ $t('type') }}: {{ pool.type }}
             <v-progress-linear :model-value="pool.status.usagePercent" height="8"
@@ -21,35 +22,37 @@
             <v-list class="pa-0" style="background-color: transparent;">
               <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
               <v-list-item v-for="data_device in pool.data_devices" :key="data_device.id"
-              @click="selectedDisk = data_device">
-              <v-list-item-title>{{ data_device.device }}</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ data_device.filesystem }}
-              </v-list-item-subtitle>
-              <v-progress-linear :model-value="data_device.storage.usagePercent" height="8"
-                :color="getUsageColor(data_device.storage.usagePercent)" rounded class="mt-2"
-                :label="`${data_device.storage.usagePercent}%`" style="min-width: 120px;" />
-              <v-list-item-subtitle class="mt-2">
-                {{ data_device.storage.usedSpace_human }} / {{ data_device.storage.totalSpace_human }}
-              </v-list-item-subtitle>
+                @click="selectedDisk = data_device">
+                <v-list-item-title>{{ data_device.device }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ data_device.filesystem }}
+                </v-list-item-subtitle>
+                <v-progress-linear :model-value="data_device.storage.usagePercent" height="8"
+                  :color="getUsageColor(data_device.storage.usagePercent)" rounded class="mt-2"
+                  :label="`${data_device.storage.usagePercent}%`" style="min-width: 120px;" />
+                <v-list-item-subtitle class="mt-2">
+                  {{ data_device.storage.usedSpace_human }} / {{ data_device.storage.totalSpace_human }}
+                </v-list-item-subtitle>
               </v-list-item>
             </v-list>
-            <v-list v-if="pool.parity_devices && pool.parity_devices.length > 0" class="pa-0" style="background-color: transparent;">
+            <v-list v-if="pool.parity_devices && pool.parity_devices.length > 0" class="pa-0"
+              style="background-color: transparent;">
               <v-list-item-title>{{ $t('parities') }}</v-list-item-title>
               <v-list-item v-for="parity_device in pool.parity_devices" :key="parity_device.id">
-              <v-list-item-title>{{ parity_device.device }}</v-list-item-title>
-              <v-list-item-subtitle>{{ parity_device.filesystem }}</v-list-item-subtitle>
-              <v-progress-linear :model-value="parity_device.storage.usagePercent" height="8"
-                :color="getUsageColor(parity_device.storage.usagePercent)" rounded class="mt-2"
-                :label="`${parity_device.storage.usagePercent}%`" style="min-width: 120px;" />
-              <v-list-item-subtitle class="mt-2">
-                {{ parity_device.storage.usedSpace_human }} / {{ parity_device.storage.totalSpace_human }}
-              </v-list-item-subtitle>
+                <v-list-item-title>{{ parity_device.device }}</v-list-item-title>
+                <v-list-item-subtitle>{{ parity_device.filesystem }}</v-list-item-subtitle>
+                <v-progress-linear :model-value="parity_device.storage.usagePercent" height="8"
+                  :color="getUsageColor(parity_device.storage.usagePercent)" rounded class="mt-2"
+                  :label="`${parity_device.storage.usagePercent}%`" style="min-width: 120px;" />
+                <v-list-item-subtitle class="mt-2">
+                  {{ parity_device.storage.usedSpace_human }} / {{ parity_device.storage.totalSpace_human }}
+                </v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-space-between">
-            <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact" color="primary" @change="switchAutomount(pool)" />
+            <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact" color="primary"
+              @change="switchAutomount(pool)" />
             <v-btn icon @click="openDeletePoolDialog(pool)">
               <v-icon color="red">mdi-delete</v-icon>
             </v-btn>
@@ -65,36 +68,35 @@
           <v-card-text class="pa-0">
             <v-list class="pa-0" style="background-color: transparent;">
               <template v-if="unassignedDisks.length === 0">
-              <v-list-item>
-                <v-list-item-title>{{ $t('no unassigned disks found') }}</v-list-item-title>
-              </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>{{ $t('no unassigned disks found') }}</v-list-item-title>
+                </v-list-item>
               </template>
               <v-list-item v-for="unassignedDisk in unassignedDisks" :key="unassignedDisk.name">
-              <v-list-item-title>{{ unassignedDisk.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ unassignedDisk.type }} ({{ unassignedDisk.sizeHuman
-              }})</v-list-item-subtitle>
-              <template v-slot:prepend>
-                <v-icon class="cursor-pointer">
-                {{ getDiskIcon(unassignedDisk.type) }}
-                </v-icon>
-              </template>
-              <template v-slot:append>
-                <v-menu>
-                <template #activator="{ props }">
-                  <v-btn variant="text" icon v-bind="props">
-                  <v-icon>mdi-dots-vertical</v-icon>
-                  </v-btn>
+                <v-list-item-title>{{ unassignedDisk.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ unassignedDisk.type }} ({{ unassignedDisk.size_human }})</v-list-item-subtitle>
+                <template v-slot:prepend>
+                  <v-icon class="cursor-pointer">
+                    {{ getDiskIcon(unassignedDisk.type) }}
+                  </v-icon>
                 </template>
-                <v-list>
-                  <v-list-item @click="openCreatePoolDialog(unassignedDisk)">
-                  <v-list-item-title>{{ $t('create pool') }}</v-list-item-title>
-                  </v-list-item>
-                  <v-list-item @click="openFormatDialog(unassignedDisk)">
-                  <v-list-item-title>{{ $t('format') }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-                </v-menu>
-              </template>
+                <template v-slot:append>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn variant="text" icon v-bind="props">
+                        <v-icon>mdi-dots-vertical</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list>
+                      <v-list-item @click="openCreatePoolDialog(unassignedDisk)">
+                        <v-list-item-title>{{ $t('create pool') }}</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="openFormatDialog(unassignedDisk)">
+                        <v-list-item-title>{{ $t('format') }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -104,8 +106,8 @@
   </v-container>
 
   <!-- Floating Action Button -->
-  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large"
-    icon @click="openCreatePoolDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
+    @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -180,6 +182,10 @@
             color="primary" inset />
           <v-switch v-model="createPoolDialog.format" :label="$t('format')" hide-details density="compact"
             color="primary" inset />
+          <v-switch v-model="createPoolDialog.encrypted" :label="$t('encrypt')" hide-details density="compact"
+            color="primary" inset />
+          <v-text-field v-if="createPoolDialog.encrypted" v-model="createPoolDialog.passphrase"
+            :label="$t('passphrase')" type="password" :rules="[v => !!v || $t('passphrase is required')]" />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -228,7 +234,9 @@ const createPoolDialog = reactive({
   comment: '',
   mergerfsOptions: "defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs",
   snapraidDevice: "",
-  raidLevel: ""
+  raidLevel: "",
+  encrypted: false,
+  passphrase: ''
 });
 const deletePoolDialog = reactive({
   value: false,
@@ -375,7 +383,12 @@ const createPoolMergerfs = async () => {
       comment: createPoolDialog.comment,
       mergerfsOptions: createPoolDialog.mergerfsOptions,
       snapraid: { device: createPoolDialog.snapraidDevice }
-    }
+    },
+    config: {
+      encrypted: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted
+    },
+    passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null
   };
 
   try {
@@ -412,7 +425,12 @@ const createPoolMulti = async () => {
     format: createPoolDialog.format,
     options: {
       automount: createPoolDialog.automount,
-    }
+    },
+    config: {
+      encrypted: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted
+    },
+    passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null
   };
 
   try {
@@ -448,7 +466,12 @@ const createPoolSingle = async () => {
     format: createPoolDialog.format,
     options: {
       automount: createPoolDialog.automount
-    }
+    },
+    config: {
+      encrypted: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted
+    },
+    passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null
   };
 
   try {
@@ -546,6 +569,12 @@ const clearCreatePoolDialog = () => {
   createPoolDialog.filesystem = '';
   createPoolDialog.automount = true;
   createPoolDialog.raidLevel = "";
+  createPoolDialog.comment = '';
+  createPoolDialog.mergerfsOptions = "defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs";
+  createPoolDialog.snapraidDevice = "";
+  createPoolDialog.format = false;
+  createPoolDialog.encrypted = false;
+  createPoolDialog.passphrase = '';
 };
 
 const clearFormatDialog = () => {

@@ -8,7 +8,7 @@
         <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('platform') }}:</b> {{ osInfo.base[0].os_id }}</p>
         <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('name') }}:</b> {{ osInfo.base[0].os_name }}</p>
         <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('version') }}:</b> {{ osInfo.base[0].os_version }}</p>
-        <p><b>{{ $t('hostname') }}:</b> <span v-if="osInfo && osInfo.hostname">{{ osInfo.hostname }}</span></p>
+        <p v-if="osInfo && osInfo.hostname"><b>{{ $t('hostname') }}:</b>{{ osInfo.hostname }}</p>
         <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos version') }}:</b> {{ osInfo.mos.version }}</p>
         <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ osInfo.mos.channel }}</p>
         <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos build') }}:</b> {{ osInfo.mos.build }}</p>

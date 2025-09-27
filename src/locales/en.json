@@ -414,5 +414,7 @@
   "could not change automount setting": "Could not change automount setting",
   "automount setting changed successfully": "Automount setting changed successfully",
   "docker group order could not be saved": "Docker group order could not be saved",
-  "docker group order saved successfully": "Docker group order saved successfully"
+  "docker group order saved successfully": "Docker group order saved successfully",
+  "encrypt": "Encrypt",
+  "passphrase": "Passphrase"
 }
