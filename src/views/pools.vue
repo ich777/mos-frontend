@@ -49,7 +49,7 @@
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-space-between">
-            <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact" color="primary" />
+            <v-switch v-model="pool.automount" label="Automount" inset hide-details density="compact" color="primary" @change="switchAutomount(pool)" />
             <v-btn icon @click="openDeletePoolDialog(pool)">
               <v-icon color="red">mdi-delete</v-icon>
             </v-btn>
@@ -492,6 +492,29 @@ const deletePool = async (poolId) => {
     clearDeletePoolDialog();
     getPools();
     getUnassignedDisks();
+
+  } catch (e) {
+    overlay.value = false;
+    showSnackbarError(e.message);
+  }
+};
+
+const switchAutomount = async (pool) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/pools/${pool.id}/automount`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ enabled: pool.automount })
+    });
+    overlay.value = false;
+    if (!res.ok) throw new Error(t('could not change automount setting'));
+    showSnackbarSuccess(t('automount setting changed successfully'));
+
+    getPools();
 
   } catch (e) {
     overlay.value = false;

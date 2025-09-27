@@ -410,5 +410,7 @@
   "update ui initiated successfully": "Update UI initiated successfully",
   "read rights": "Read rights",
   "write rights": "Write rights",
-  "update system": "Update system"
+  "update system": "Update system",
+  "could not change automount setting": "Could not change automount setting",
+  "automount setting changed successfully": "Automount setting changed successfully"
 }
