@@ -10,7 +10,7 @@
             <v-card v-if="notifications.length > 0" variant="tonal" fluid>
               <v-card-text class="pa-0">
                 <v-list>
-                  <v-list-item v-for="notification in notifications" :key="timestamp">
+                  <v-list-item v-for="notification in notifications" :key="id">
                     <template v-slot:prepend>
                       <v-icon v-if="notification.priority === 'normal'" color="blue">mdi-information-outline</v-icon>
                       <v-icon v-else-if="notification.priority === 'warning'" color="yellow">mdi-alert-outline</v-icon>
