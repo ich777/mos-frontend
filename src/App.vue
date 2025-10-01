@@ -14,10 +14,12 @@
         <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
         <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
-        <v-btn icon to="/notifications" variant="text">
-          <v-icon>mdi-bell</v-icon>
-          <v-badge v-if="notificationsBadge" color="green" dot></v-badge>
-        </v-btn>
+        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end"
+          :offset-x="14" :offset-y="14">
+          <v-btn icon to="/notifications" variant="text" aria-label="Notifications">
+            <v-icon>mdi-bell</v-icon>
+          </v-btn>
+        </v-badge>
         <v-btn icon variant="text" @click="changeDarkMode()">
           <v-icon>
             {{ theme.global.name.value === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
@@ -255,9 +257,7 @@ const getMosServices = async () => {
     });
 
     if (!res.ok) throw new Error('API-Error');
-
     mosServices.value = await res.json();
-
 
   } catch (e) {
     showSnackbarError(e.message);
@@ -282,7 +282,7 @@ const checkFirstSetup = async () => {
 
 const getNotificationsBadge = async () => {
   try {
-    const res = await fetch('/api/v1/notifications', {
+    const res = await fetch('/api/v1/notifications?read=false&limit=1', {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
       }
@@ -291,11 +291,11 @@ const getNotificationsBadge = async () => {
     if (!res.ok) throw new Error('API-Error');
     let notification = await res.json();
 
-    notification = notification.map(notification => {
-      if (!notification.read) {
-        notificationsBadge.value = true;
-      }
-    });
+    if (notification.length > 0) {
+      notificationsBadge.value = true;
+    } else {
+      notificationsBadge.value = false;
+    }
 
   } catch (e) {
     showSnackbarError(e.message);
