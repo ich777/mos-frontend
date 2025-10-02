@@ -40,6 +40,9 @@
           <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
             <v-btn width="250px" to="/mosSettings/system">{{ $t('system') }}</v-btn>
           </v-col>
+          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
+            <v-btn width="250px" to="/mosSettings/cron">{{ $t('cron jobs') }}</v-btn>
+          </v-col>
         </v-row>
         <v-divider class="mb-4 mt-4"></v-divider>
         <v-row>
@@ -49,7 +52,7 @@
           <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
             <v-btn width="250px" @click="updateUI()">{{ $t('update ui') }}</v-btn>
           </v-col>
-        </v-row>        
+        </v-row>
       </v-container>
     </v-container>
   </v-container>
@@ -58,18 +61,10 @@
     <v-card max-width="500" prepend-icon="mdi-update" :text="t('please select your target firmware!')"
       :title="t('update firmware')">
       <v-card-text>
-        <v-select
-          v-model="updateOsDialog.channel"
-          :items="getMosChannels()"
-          :label="t('channel')"
-        ></v-select>
-        <v-select
-          v-model="updateOsDialog.release"
-          :items="getMosReleasesOfChannel()"
-          :label="t('release')"
-        ></v-select>
-        <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset
-          density="compact" color="primary"/>
+        <v-select v-model="updateOsDialog.channel" :items="getMosChannels()" :label="t('channel')"></v-select>
+        <v-select v-model="updateOsDialog.release" :items="getMosReleasesOfChannel()" :label="t('release')"></v-select>
+        <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact"
+          color="primary" />
       </v-card-text>
       <template v-slot:actions>
         <v-btn class="ms-auto" :text="t('cancel')" @click="updateOsDialog.value = false"></v-btn>
@@ -150,7 +145,7 @@ const getMosChannels = () => {
 
 const getMosReleasesOfChannel = () => {
   if (!updateOsDialog.channel) return [];
-  
+
   const releases = mosReleases.value[updateOsDialog.channel] || [];
   const tags = releases.map(item => item.tag_name);
   if (releases.length > 0) {

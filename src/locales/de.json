@@ -446,5 +446,10 @@
   "ftp proxy": "FTP Proxy",
   "no proxy": "Kein Proxy",
   "ntp": "NTP",
-  "proxies could not be changed": "Proxies konnten nicht geändert werden"
+  "proxies could not be changed": "Proxies konnten nicht geändert werden",
+  "cron jobs": "Cron Jobs",
+  "cron": "Cron",
+  "schedule": "Zeitplan",
+  "command": "Befehl",
+  "no cron jobs available yet": "Noch keine Cron Jobs vorhanden"
 }
