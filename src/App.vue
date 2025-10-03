@@ -113,12 +113,12 @@ const appBarColor = 'primary';
 const notificationsBadge = ref(false);
 
 onMounted(async () => {
-  getNotificationsBadge();
   if (tab.value === '') {
     tab.value = 'dashboard'
   }
   await checkLoggedIn();
   if (loggedIn.value) {
+    getNotificationsBadge();
     await getMosServices();
   }
 })
