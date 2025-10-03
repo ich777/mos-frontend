@@ -50,10 +50,12 @@
                                     <v-menu>
                                       <template #activator="{ props }">
                                         <v-img class="drag-handle mr-4" v-bind="props"
-                                          :src="`/docker_icons/${containerName}.png`"
-                                          alt="docker image" width="30" height="30" style="cursor: pointer" >
+                                          :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30"
+                                          height="30" style="cursor: pointer">
                                           <template v-slot:error>
-                                            <v-icon>mdi-image-off</v-icon>
+                                            <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
+                                              <v-icon color="grey-darken-1">mdi-image-off</v-icon>
+                                            </v-sheet>
                                           </template>
                                         </v-img>
                                       </template>
@@ -121,9 +123,10 @@
                                         {{ $t('ports') }}:
                                         {{
                                           dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports &&
-                                            dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port => port.PublicPort)
+                                            dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port =>
+                                              port.PublicPort)
                                             ? dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.filter(port => port.PublicPort).map(port => port.PublicPort).join(', ')
-                                            : '-'
+                                        : '-'
                                         }}
                                       </p>
                                       <v-divider vertical class="mx-2" />
@@ -185,11 +188,12 @@
                             <v-menu>
                               <template #activator="{ props }">
                                 <v-img v-if="docker.Names && docker.Names.length > 0" class="drag-handle mr-4"
-                                  v-bind="props"
-                                  :src="`/docker_icons/${docker.Names[0]}.png`"
-                                  alt="docker image" width="30" height="30" style="cursor: pointer">
+                                  v-bind="props" :src="`/docker_icons/${docker.Names[0]}.png`" alt="docker image"
+                                  width="30" height="30" style="cursor: pointer">
                                   <template v-slot:error>
-                                    <v-icon>mdi-image-off</v-icon>
+                                    <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
+                                      <v-icon color="grey-darken-1">mdi-image-off</v-icon>
+                                    </v-sheet>
                                   </template>
                                 </v-img>
                               </template>
@@ -313,7 +317,7 @@
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
-      }}</v-card-title>
+        }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
