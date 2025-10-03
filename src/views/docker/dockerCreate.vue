@@ -86,8 +86,8 @@
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('host')" v-model="path.host"
-                                                density="compact" hide-details></v-text-field>
+                                            <v-text-field :label="$t('host')" v-model="path.host" density="compact"
+                                                hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field :label="$t('container')" v-model="path.container"
@@ -258,8 +258,8 @@
     </v-container>
 
     <!-- Floating Action Button -->
-    <v-fab color="primary" @click="createDocker()"
-        style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+    <v-fab color="primary" @click="createDocker()" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;"
+        size="large" icon>
         <v-icon>mdi-content-save</v-icon>
     </v-fab>
 
@@ -306,7 +306,6 @@ const allTemplatesMixed = ref([])
 
 onMounted(() => {
     window.scrollTo(0, 0);
-
     getAllTemplates();
     getDockerNetworks();
     getDockerContainers();
@@ -322,37 +321,30 @@ const getDockerNetworks = async () => {
             }
         });
 
-        if (res.ok) {
-            const networks = await res.json();
-            networkOptions.value = networks.map(network => ({
-                name: network.Name,
-                id: network.Id
-            }));
+        if (!res.ok) throw new Error(t('docker networks could not be loaded'));
+        const networks = await res.json();
+        networkOptions.value = networks.map(network => ({
+            name: network.Name,
+            id: network.Id
+        }));
+        networkOptions.value.sort((a, b) => {
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
 
-            networkOptions.value.sort((a, b) => {
-                const nameA = a.name.toLowerCase();
-                const nameB = b.name.toLowerCase();
+            if (nameA === 'bridge') return -1;
+            if (nameB === 'bridge') return 1;
 
-                if (nameA === 'bridge') return -1;
-                if (nameB === 'bridge') return 1;
+            const isEthBrA = nameA.startsWith('eth') || nameA.startsWith('br');
+            const isEthBrB = nameB.startsWith('eth') || nameB.startsWith('br');
 
-                const isEthBrA = nameA.startsWith('eth') || nameA.startsWith('br');
-                const isEthBrB = nameB.startsWith('eth') || nameB.startsWith('br');
+            if (isEthBrA && !isEthBrB) return -1;
+            if (!isEthBrA && isEthBrB) return 1;
 
-                if (isEthBrA && !isEthBrB) return -1;
-                if (!isEthBrA && isEthBrB) return 1;
+            return nameA.localeCompare(nameB);
+        });
 
-                return nameA.localeCompare(nameB);
-            });
+        networkOptions.value.push({ name: 'container-network', id: 'container-network' });
 
-            networkOptions.value.push({ name: 'container-network', id: 'container-network' });
-            networkOptions.value.push({ name: 'none', id: 'none' });
-
-            if (networkOptions.value.length === 1) {
-            }
-        } else {
-            networkOptions.value = [{ name: 'container-network', id: 'container-network' }, { name: 'none', id: 'none' }];
-        }
     } catch (e) {
         networkOptions.value = [{ name: 'container-network', id: 'container-network' }, { name: 'none', id: 'none' }];
     } finally {

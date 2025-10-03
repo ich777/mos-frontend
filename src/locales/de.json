@@ -451,5 +451,6 @@
   "cron": "Cron",
   "schedule": "Zeitplan",
   "command": "Befehl",
-  "no cron jobs available yet": "Noch keine Cron Jobs vorhanden"
+  "no cron jobs available yet": "Noch keine Cron Jobs vorhanden",
+  "docker networks could not be loaded": "Docker Netzwerke konnten nicht geladen werden"
 }
