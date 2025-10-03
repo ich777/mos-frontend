@@ -20,16 +20,14 @@
                               <template #activator="{ props }">
                                 <v-icon class="drag-handle" style="cursor: pointer" v-bind="props">mdi-folder</v-icon>
                               </template>
-                                <v-list>
-                                  <v-list-item
-                                    @click="openChangeGroupDialog(group)">
-                                    <v-list-item-title>{{ $t('edit group') }}</v-list-item-title>
-                                  </v-list-item>
-                                  <v-list-item
-                                    @click="openDeleteGroupDialog(group)">
-                                    <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
+                              <v-list>
+                                <v-list-item @click="openChangeGroupDialog(group)">
+                                  <v-list-item-title>{{ $t('edit group') }}</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="openDeleteGroupDialog(group)">
+                                  <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
+                                </v-list-item>
+                              </v-list>
                             </v-menu>
                           </template>
                           <template v-slot:append>
@@ -52,9 +50,8 @@
                                     <v-menu>
                                       <template #activator="{ props }">
                                         <v-img class="drag-handle mr-4" v-bind="props"
-                                          :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30"
-                                          height="30" style="cursor: pointer"
-                                          @error="event => event.target.src = '/docker_icons/placeholder.png'" />
+                                          :src="dockerImageExists(containerName) ? `/docker_icons/${containerName}.png` : '/docker_icons/placeholder.png'"
+                                          alt="docker image" width="30" height="30" style="cursor: pointer" />
                                       </template>
                                       <v-list>
                                         <v-list-item
@@ -120,8 +117,7 @@
                                         {{ $t('ports') }}:
                                         {{
                                           dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports &&
-                                            dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port =>
-                                              port.PublicPort)
+                                            dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port => port.PublicPort)
                                             ? dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.filter(port => port.PublicPort).map(port => port.PublicPort).join(', ')
                                             : '-'
                                         }}
@@ -179,14 +175,15 @@
                   <draggable v-model="dockers" item-key="Id" @end="onDragEnd" handle=".drag-handle">
                     <template #item="{ element: docker, index }">
                       <div>
-                        <v-list-item :id="docker.Id" v-if="!dockerGroups.some(g => g.containers && g.containers.includes(docker.Names?.[0]))">
+                        <v-list-item :id="docker.Id"
+                          v-if="!dockerGroups.some(g => g.containers && g.containers.includes(docker.Names?.[0]))">
                           <template v-slot:prepend>
                             <v-menu>
                               <template #activator="{ props }">
-                                <v-img class="drag-handle mr-4" v-bind="props"
-                                  :src="`/docker_icons/${docker.Names[0]}.png`" alt="docker image" width="30"
-                                  height="30" style="cursor: pointer"
-                                  @error="event => event.target.src = '/docker_icons/placeholder.png'" />
+                                <v-img v-if="docker.Names && docker.Names.length > 0" class="drag-handle mr-4"
+                                  v-bind="props"
+                                  :src="dockerImageExists(docker.Names[0]) ? `/docker_icons/${docker.Names[0]}.png` : '/docker_icons/placeholder.png'"
+                                  alt="docker image" width="30" height="30" style="cursor: pointer" />
                               </template>
                               <v-list>
                                 <v-list-item v-if="checkWebui(docker)" @click="showWebui(docker)">
@@ -308,7 +305,7 @@
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
-        }}</v-card-title>
+      }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
@@ -406,11 +403,11 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog> 
+  </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab to="/docker/create" color="primary"
-    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+  <v-fab to="/docker/create" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;"
+    size="large" icon>
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -740,16 +737,16 @@ const onDragEndGrp = async () => {
   );
 
   try {
-  const res = await fetch('/api/v1/docker/mos/groups/order', {
-    method: 'PUT',
-    headers: {
-      'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      'Content-Type': 'application/json'
-    },
-    body: newOrder
-  });
+    const res = await fetch('/api/v1/docker/mos/groups/order', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json'
+      },
+      body: newOrder
+    });
 
-  if (!res.ok) throw new Error(t('docker group order could not be saved'));
+    if (!res.ok) throw new Error(t('docker group order could not be saved'));
     showSnackbarSuccess(t('docker group order saved successfully'));
   } catch (e) {
     showSnackbarError(e.message);
@@ -1033,6 +1030,12 @@ const updateDockerGroup = async () => {
     overlay.value = false;
     showSnackbarError(e.message);
   }
+};
+
+const dockerImageExists = (name) => {
+  const img = new Image();
+  img.src = `/docker_icons/${name}.png`;
+  return img.complete && img.naturalWidth !== 0;
 };
 
 const showWebui = (docker) => {
