@@ -53,7 +53,8 @@
                                       <template #activator="{ props }">
                                         <v-img class="drag-handle mr-4" v-bind="props"
                                           :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30"
-                                          height="30" style="cursor: pointer" />
+                                          height="30" style="cursor: pointer"
+                                          @error="event => event.target.src = '/docker_icons/placeholder.png'" />
                                       </template>
                                       <v-list>
                                         <v-list-item
@@ -184,7 +185,8 @@
                               <template #activator="{ props }">
                                 <v-img class="drag-handle mr-4" v-bind="props"
                                   :src="`/docker_icons/${docker.Names[0]}.png`" alt="docker image" width="30"
-                                  height="30" style="cursor: pointer" />
+                                  height="30" style="cursor: pointer"
+                                  @error="event => event.target.src = '/docker_icons/placeholder.png'" />
                               </template>
                               <v-list>
                                 <v-list-item v-if="checkWebui(docker)" @click="showWebui(docker)">
