@@ -452,5 +452,19 @@
   "schedule": "Zeitplan",
   "command": "Befehl",
   "no cron jobs available yet": "Noch keine Cron Jobs vorhanden",
-  "docker networks could not be loaded": "Docker Netzwerke konnten nicht geladen werden"
+  "docker networks could not be loaded": "Docker Netzwerke konnten nicht geladen werden",
+  "cron jobs could not be loaded": "Cron Jobs konnten nicht geladen werden",
+  "cron job could not be created": "Cron Job konnte nicht erstellt werden",
+  "cron job created successfully": "Cron Job erfolgreich erstellt",
+  "cron job could not be updated": "Cron Job konnte nicht aktualisiert werden",
+  "cron job updated successfully": "Cron Job erfolgreich aktualisiert",
+  "cron job could not be deleted": "Cron Job konnte nicht gelöscht werden",
+  "cron job deleted successfully": "Cron Job erfolgreich gelöscht",
+  "edit cron job": "Cron Job bearbeiten",
+  "create cron job": "Cron Job erstellen",
+  "are you sure you want to delete this cron job?": "Bist du sicher, dass du diesen Cron Job löschen möchtest?",
+  "invalid schedule format": "Ungültiges Zeitplan Format",
+  "cron jobs changed successfully": "Cron Jobs erfolgreich geändert",
+  "all cron jobs changed successfully": "Alle Cron Jobs erfolgreich geändert",
+  "some cron jobs could not be changed": "Einige Cron Jobs konnten nicht geändert werden"
 }

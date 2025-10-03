@@ -452,5 +452,19 @@
   "schedule": "Schedule",
   "command": "Command",
   "no cron jobs available yet": "No cron jobs available yet",
-  "docker networks could not be loaded": "Docker networks could not be loaded"
+  "docker networks could not be loaded": "Docker networks could not be loaded",
+  "cron jobs could not be loaded": "Cron jobs could not be loaded",
+  "cron job could not be created": "Cron job could not be created",
+  "cron job created successfully": "Cron job created successfully",
+  "cron job could not be updated": "Cron job could not be updated",
+  "cron job updated successfully": "Cron job updated successfully",
+  "cron job could not be deleted": "Cron job could not be deleted",
+  "cron job deleted successfully": "Cron job deleted successfully",
+  "edit cron job": "Edit cron job",
+  "create cron job": "Create cron job",
+  "are you sure you want to delete this cron job?": "Are you sure you want to delete this cron job?",
+  "invalid schedule format": "Invalid schedule format",
+  "cron jobs changed successfully": "Cron jobs changed successfully",
+  "all cron jobs changed successfully": "All cron jobs changed successfully",
+  "some cron jobs could not be changed": "Some cron jobs could not be changed"
 }
