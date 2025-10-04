@@ -462,6 +462,7 @@
   "cron job deleted successfully": "Cron Job erfolgreich gelöscht",
   "edit cron job": "Cron Job bearbeiten",
   "create cron job": "Cron Job erstellen",
+  "change cron job": "Cron Job ändern",
   "are you sure you want to delete this cron job?": "Bist du sicher, dass du diesen Cron Job löschen möchtest?",
   "invalid schedule format": "Ungültiges Zeitplan Format",
   "cron jobs changed successfully": "Cron Jobs erfolgreich geändert",

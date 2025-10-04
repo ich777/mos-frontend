@@ -6,51 +6,71 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-card variant="tonal">
-          <v-card-text>
-            <div v-for="(cronJob, index) in cronJobs" :key="index" class="mb-4">
-              <v-row>
-                <v-col cols="1" class="d-flex flex-column justify-center align-center">
-                  <v-btn icon size="x-small" color="primary" class="pa-0"
-                    style="width:24px; height:24px; min-width:24px; margin-bottom:6px;"
-                    @click="cronJobs.splice(index + 1, 0, { name: '', schedule: '', command: '', enabled: false })"
-                    title="Add cron job" aria-label="add cron job">
-                    <v-icon size="18">mdi-plus</v-icon>
+          <v-card-text class="pa-0">
+            <v-list>
+              <v-list-item v-for="(cronJob, index) in cronJobs" :key="index">
+                <template v-slot:prepend>
+                  <v-icon class="cursor-pointer" :color="cronJob.enabled ? 'green' : 'blue'">
+                    mdi-calendar-clock
+                  </v-icon>
+                </template>
+                <v-list-item-title>{{ cronJob.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ cronJob.schedule }} - {{ cronJob.command }}</v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-btn icon @click="openChangeCronJobDialog(cronJob)">
+                    <v-icon>mdi-content-save</v-icon>
                   </v-btn>
-                  <v-btn icon size="x-small" color="error" class="pa-0" style="width:24px; height:24px; min-width:24px;"
-                    @click="cronJobs.splice(index, 1)" title="Remove cron job" aria-label="remove cron job">
-                    <v-icon size="18">mdi-delete</v-icon>
-                  </v-btn>
-                </v-col>
-                <v-col cols="11">
-                  <v-checkbox :label="$t('enabled')" v-model="cronJob.enabled" density="compact"></v-checkbox>
-                  <v-text-field :label="$t('name')" v-model="cronJob.name" density="compact"></v-text-field>
-                  <v-text-field :label="$t('schedule')" v-model="cronJob.schedule" density="compact"></v-text-field>
-                  <v-text-field :label="$t('command')" v-model="cronJob.command" density="compact"></v-text-field>
-                  <v-divider></v-divider>
-                </v-col>
-              </v-row>
-            </div>
-            <div v-if="!cronJobs || cronJobs.length === 0" class="text-center">
-              {{ $t('no cron jobs available yet') }}
-            </div>
-            <div class="text-center">
-              <v-btn icon size="x-small" color="primary" class="ma-1 pa-0"
-                style="width:24px; height:24px; min-width:24px;"
-                @click="cronJobs.push({ id: '', name: '', schedule: '', command: '', enabled: false })"
-                title="Add cron job" aria-label="add cron job">
-                <v-icon size="18">mdi-plus</v-icon>
-              </v-btn>
-            </div>
+                </template>
+              </v-list-item>
+            </v-list>
           </v-card-text>
         </v-card>
       </v-container>
     </v-container>
   </v-container>
 
+  <!-- Create Cron Job Dialog -->
+  <v-dialog v-model="createCronJobDialog.value" max-width="600px">
+    <v-card>
+      <v-card-title>{{ $t('create cron job') }}</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-text-field v-model="createCronJobDialog.name" :label="$t('name')" required></v-text-field>
+          <v-text-field v-model="createCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
+          <v-text-field v-model="createCronJobDialog.command" :label="$t('command')" required></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="createCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn text @click="createCronJob()">{{ $t('create') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Change Cron Job Dialog -->
+  <v-dialog v-model="changeCronJobDialog.value" max-width="600px">
+    <v-card>
+      <v-card-title>{{ $t('change cron job') }}</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-text-field v-model="changeCronJobDialog.name" :label="$t('name')" required></v-text-field>
+          <v-text-field v-model="changeCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
+          <v-text-field v-model="changeCronJobDialog.command" :label="$t('command')" required></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="changeCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn text @click="changeCronJob()">{{ $t('save') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
-  <v-fab color="primary" @click="setAllCrons()" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;"
-    size="large" icon>
-    <v-icon>mdi-content-save</v-icon>
+  <v-fab @click="openCreateCronJobDialog()" color="primary"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+    <v-icon>mdi-plus</v-icon>
   </v-fab>
 
   <v-overlay :model-value="overlay" class="align-center justify-center">
@@ -67,6 +87,19 @@ const emit = defineEmits(['refresh-drawer']);
 const cronJobs = ref([]);
 const overlay = ref(false);
 const { t } = useI18n();
+const createCronJobDialog = ref({
+  value: false,
+  name: '',
+  schedule: '',
+  command: ''
+});
+const changeCronJobDialog = ref({
+  value: false,
+  id: '',
+  name: '',
+  schedule: '',
+  command: ''
+});
 
 onMounted(() => {
   getCron();
@@ -91,7 +124,7 @@ const getCron = async () => {
   }
 };
 
-const createCron = async (cronJob) => {
+const createCronJob = async (cronJob) => {
   try {
     const res = await fetch('/api/v1/cron', {
       method: 'POST',
@@ -110,9 +143,9 @@ const createCron = async (cronJob) => {
   }
 };
 
-const changeCron = async (cronJob) => {
+const changeCronJob = async (cronJob) => {
   try {
-    const res = await fetch('/api/v1/cron/' + cronJob.id , {
+    const res = await fetch('/api/v1/cron/' + cronJob.id, {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
@@ -129,28 +162,19 @@ const changeCron = async (cronJob) => {
   }
 };
 
-const setAllCrons = async() => {
-  let error = false;
-  overlay.value = true;
-  cronJobs.value = cronJobs.value.filter(job => job.name.trim() !== '' || job.schedule.trim() !== '' || job.command.trim() !== '');
-  for (const job of cronJobs.value) {
-    try {
-      if (job.id && job.id !== '') {
-        await changeCron(job);
-      } else {
-        await createCron(job);
-      }
-    } catch (e) {
-      error = true;
-    }
-  }
-  overlay.value = false;
-  if (!error) {
-    showSnackbarSuccess(t('all cron jobs changed successfully'));
-    getCron();
-  } else {
-    showSnackbarError(t('some cron jobs could not be changed'));
-  }
+const openCreateCronJobDialog = () => {
+  createCronJobDialog.value = true;
+  createCronJobDialog.name = '';
+  createCronJobDialog.schedule = '';
+  createCronJobDialog.command = '';
+};
+
+const openChangeCronJobDialog = (cronJob) => {
+  changeCronJobDialog.value = true;
+  changeCronJobDialog.id = cronJob.id;
+  changeCronJobDialog.name = cronJob.name;
+  changeCronJobDialog.schedule = cronJob.schedule;
+  changeCronJobDialog.command = cronJob.command;
 };
 
 </script>

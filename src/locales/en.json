@@ -462,6 +462,7 @@
   "cron job deleted successfully": "Cron job deleted successfully",
   "edit cron job": "Edit cron job",
   "create cron job": "Create cron job",
+  "change cron job": "Change cron job",
   "are you sure you want to delete this cron job?": "Are you sure you want to delete this cron job?",
   "invalid schedule format": "Invalid schedule format",
   "cron jobs changed successfully": "Cron jobs changed successfully",
