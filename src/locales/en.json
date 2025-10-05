@@ -474,5 +474,11 @@
   "script": "Script",
   "script could not be loaded": "Script could not be loaded",
   "script could not be changed": "Script could not be changed",
-  "script changed successfully": "Script changed successfully"
+  "script changed successfully": "Script changed successfully",
+  "add container": "Add container",
+  "remove container": "Remove container",
+  "select all": "Select all",
+  "deselect all": "Deselect all",
+  "no containers found": "No containers found",
+  "select": "Select"
 }

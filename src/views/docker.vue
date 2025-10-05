@@ -126,7 +126,7 @@
                                           dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports &&
                                             dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port => port.PublicPort)
                                             ? dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.filter(port => port.PublicPort).map(port => port.PublicPort).join(', ')
-                                            : '-'
+                                        : '-'
                                         }}
                                       </p>
                                       <v-divider vertical class="mx-2" />
@@ -299,7 +299,7 @@
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
-      }}</v-card-title>
+        }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
@@ -402,19 +402,31 @@
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed;bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
     <v-icon>mdi-dots-vertical</v-icon>
-    <v-speed-dial v-model="menu" location="top" transition="slide-y-reverse-transition" activator="parent">
-      <v-btn key="1" color="primary" prepend-icon="mdi-plus" @click="$router.push('/docker/create')">
-        {{ $t('create docker container') }}
+    <v-speed-dial v-model="menu" location="top" activator="parent">
+    <div class="d-flex align-center justify-end ga-2" :key="1">
+      <span class="me-2">{{ $t('add container') }}</span>
+      <v-btn icon color="primary" @click="$router.push('/docker/create')">
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
-      <v-btn key="2" color="primary" prepend-icon="mdi-folder-plus" @click="openCreateGroupDialog()">
-        {{ $t('create docker group') }}
+    </div>
+    <div class="d-flex align-center justify-end ga-2" :key="2">
+      <span class="me-2">{{ $t('create docker group') }}</span>
+      <v-btn icon color="primary" @click="openCreateGroupDialog()">
+        <v-icon>mdi-folder-plus</v-icon>
       </v-btn>
-      <v-btn key="3" color="primary" prepend-icon="mdi-update" @click="checkForUpdates()">
-        {{ $t('check for updates') }}
+    </div>
+    <div class="d-flex align-center justify-end ga-2" :key="3">
+      <span class="me-2">{{ $t('check for updates') }}</span>
+      <v-btn icon color="primary" @click="checkForUpdates()">
+        <v-icon>mdi-update</v-icon>
       </v-btn>
-      <v-btn key="4" color="primary" prepend-icon="mdi-autorenew" @click="checkForUpdates()">
-        {{ $t('check for updates') }}
+    </div>
+    <div class="d-flex align-center justify-end ga-2" :key="4">
+      <span class="me-2">{{ $t('check for updates') }}</span>
+      <v-btn icon color="primary" @click="checkForUpdates()">
+        <v-icon>mdi-refresh</v-icon>
       </v-btn>
+    </div>
     </v-speed-dial>
   </v-fab>
 
