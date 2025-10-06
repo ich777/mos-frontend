@@ -137,7 +137,7 @@ const setSystemSettings = async () => {
 
 const getKeymaps = async () => {
     try {
-        const res = await fetch('/api/v1/mos/settings/system/keymap', {
+        const res = await fetch('/api/v1/mos/settings/keymap', {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
             }
@@ -153,7 +153,7 @@ const getKeymaps = async () => {
 
 const getTimezones = async () => {
     try {
-        const res = await fetch('/api/v1/mos/settings/system/timezones', {
+        const res = await fetch('/api/v1/mos/settings/timezones', {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
             }
@@ -185,7 +185,7 @@ const getProxies = async () => {
 
 const getGovernors = async () => {
     try {
-        const res = await fetch('/api/v1/mos/settings/system/governors', {
+        const res = await fetch('/api/v1/mos/settings/governors', {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
             }
