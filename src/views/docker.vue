@@ -402,31 +402,33 @@
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed;bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
     <v-icon>mdi-dots-vertical</v-icon>
-    <v-speed-dial v-model="menu" location="top right" activator="parent">
-    <div class="d-flex align-center justify-end ga-2" key="1">
-      <span class="me-2">{{ $t('add container') }}</span>
-      <v-btn icon color="primary" @click="$router.push('/docker/create')">
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </div>
-    <div class="d-flex align-center justify-end ga-2" key="2">
-      <span class="me-2">{{ $t('create docker group') }}</span>
-      <v-btn icon color="primary" @click="openCreateGroupDialog()">
-        <v-icon>mdi-folder-plus</v-icon>
-      </v-btn>
-    </div>
-    <div class="d-flex align-center justify-end ga-2" key="3">
-      <span class="me-2">{{ $t('check for updates') }}</span>
-      <v-btn icon color="primary" @click="checkForUpdates()">
-        <v-icon>mdi-update</v-icon>
-      </v-btn>
-    </div>
-    <div class="d-flex align-center justify-end ga-2" key="4">
-      <span class="me-2">{{ $t('check for updates') }}</span>
-      <v-btn icon color="primary" @click="checkForUpdates()">
-        <v-icon>mdi-refresh</v-icon>
-      </v-btn>
-    </div>
+    <v-speed-dial v-model="menu" location="top right" activator="parent" :itemTransition="false" transition="false">
+      <v-sheet class="bg-surface elevation-8 rounded-xl pa-2 d-flex flex-column align-end" style="max-width: 250px;" >
+        <div class="d-flex align-center justify-end ga-2" key="1">
+          <span class="me-2">{{ $t('add container') }}</span>
+          <v-btn icon color="primary" @click="$router.push('/docker/create')">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
+        <div class="d-flex align-center justify-end ga-2" key="2">
+          <span class="me-2">{{ $t('create docker group') }}</span>
+          <v-btn icon color="primary" @click="openCreateGroupDialog()">
+            <v-icon>mdi-folder-plus</v-icon>
+          </v-btn>
+        </div>
+        <div class="d-flex align-center justify-end ga-2" key="3">
+          <span class="me-2">{{ $t('check for updates') }}</span>
+          <v-btn icon color="primary" @click="checkForUpdates()">
+            <v-icon>mdi-update</v-icon>
+          </v-btn>
+        </div>
+        <div class="d-flex align-center justify-end ga-2" key="4">
+          <span class="me-2">{{ $t('check for updates') }}</span>
+          <v-btn icon color="primary" @click="checkForUpdates()">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </div>
+      </v-sheet>
     </v-speed-dial>
   </v-fab>
 
