@@ -14,7 +14,7 @@
         <p v-if="osInfo.cpu?.physicalCores !== undefined">
           <b>{{ $t('physicalcores') }}:</b> {{ osInfo.cpu.physicalCores }}
         </p>
-        <p v-if="temp">
+        <p v-if="temp && temp.main !== null">
           <b>{{ $t('temperature') }}:</b> {{ temp.main }}°C / {{ temp.min }} °C / {{ temp.max }} °C
         </p>
         <v-divider class="mt-2 mb-2"></v-divider>
