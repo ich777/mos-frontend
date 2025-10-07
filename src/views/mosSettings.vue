@@ -58,9 +58,12 @@
   </v-container>
 
   <v-dialog v-model="updateOsDialog.value" width="auto">
-    <v-card max-width="500" prepend-icon="mdi-update" :text="t('please select your target firmware!')"
-      :title="t('update firmware')">
+    <v-card max-width="600" prepend-icon="mdi-update":title="t('update firmware')">
       <v-card-text>
+        <p class="mb-4">{{ t('please select your target firmware!') }}</p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos version') }}:</b> {{ osInfo.mos.version }}</p>
+        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ osInfo.mos.channel }}</p>
+        <p v-if="osInfo && osInfo.mos" class="mb-4"><b>{{ $t('mos kernel') }}:</b> {{ osInfo.mos.running_kernel }}</p>
         <v-select v-model="updateOsDialog.channel" :items="getMosChannels()" :label="t('channel')"></v-select>
         <v-select v-model="updateOsDialog.release" :items="getMosReleasesOfChannel()" :label="t('release')"></v-select>
         <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact"
@@ -114,11 +117,13 @@ const updateOsDialog = reactive({
 });
 const rebootDialog = ref(false);
 const shutdownDialog = ref(false);
+const osInfo = ref({});
 const overlay = ref(false);
 const { t } = useI18n();
 
 onMounted(() => {
   getMosReleases();
+  getOsInfo();
 });
 
 const getMosReleases = async () => {
@@ -138,6 +143,22 @@ const getMosReleases = async () => {
     showSnackbarError(e.message);
   }
 };
+
+const getOsInfo = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/osinfo', {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      }
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+    osInfo.value = await res.json();
+
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+}
 
 const getMosChannels = () => {
   return Object.keys(mosReleases.value);

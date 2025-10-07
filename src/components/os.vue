@@ -23,6 +23,10 @@ import { ref, onMounted } from 'vue'
 
 const osInfo = ref({});
 
+onMounted(() => {
+  getOsInfo();
+});
+
 const getOsInfo = async () => {
   try {
     const res = await fetch('/api/v1/mos/osinfo', {
@@ -39,8 +43,6 @@ const getOsInfo = async () => {
   }
 }
 
-onMounted(() => {
-  getOsInfo();
-});
+
 
 </script>
