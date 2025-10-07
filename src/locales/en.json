@@ -483,5 +483,6 @@
   "select": "Select",
   "cpu governor": "CPU Governor",
   "governor": "Governor",
-  "cpufreq": "CPU Frequency"
+  "cpufreq": "CPU Frequency",
+  "force update": "Force Update"
 }

@@ -483,5 +483,6 @@
   "select": "Auswählen",
   "cpu governor": "CPU Regler",
   "governor": "Regler",
-  "cpufreq": "CPU Frequenz"
+  "cpufreq": "CPU Frequenz",
+  "force update": "Erzwinge Update"
 }

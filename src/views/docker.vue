@@ -98,8 +98,11 @@
                                         <v-list-item @click="openTerminalLogs(containerName)">
                                           <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item @click="updateDocker(containerName)">
+                                        <v-list-item v-if="mosDockers.find(item => item.name === containerName && item.update_available)" @click="updateDocker(containerName)">
                                           <v-list-item-title>{{ $t('update') }}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item v-if="!mosDockers.find(item => item.name === containerName && item.update_available)" @click="updateDocker(containerName, true)">
+                                          <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item
                                           @click="openDeleteDialog(dockers.find(d => d.Names && d.Names[0] === containerName))">
@@ -223,8 +226,11 @@
                                 <v-list-item @click="openTerminalLogs(docker.Names[0])">
                                   <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="updateDocker(docker.Names[0])">
+                                <v-list-item v-if="mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0])">
                                   <v-list-item-title>{{ $t('update') }}</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item v-if="!mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0], true)">
+                                  <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="openDeleteDialog(docker)">
                                   <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
@@ -666,7 +672,8 @@ const removeDocker = async (name) => {
   }
 };
 
-const updateDocker = async (name) => {
+const updateDocker = async (name, force_update = false) => {
+  updateBody = force_update ? { name: name, force_update: true } : { name: name };
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/upgrade`, {
@@ -675,7 +682,7 @@ const updateDocker = async (name) => {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: name })
+      body: JSON.stringify(updateBody)
     });
     overlay.value = false;
 
