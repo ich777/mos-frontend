@@ -169,22 +169,22 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="createPoolDialog.value" max-width="400">
+  <v-dialog v-model="createPoolDialog.value" max-width="600">
     <v-card>
       <v-card-title>{{ $t('create pool') }}</v-card-title>
       <v-card-text>
         <v-form>
-          <v-text-field v-model="createPoolDialog.name" :label="$t('name')" />
           <v-select v-model="createPoolDialog.type" :items="['single', 'mergerfs', 'multi']" :label="$t('type')"
-            dense />
+            dense @update:model-value="switchPoolType()" />
+          <v-text-field v-model="createPoolDialog.name" :label="$t('name')" />
           <v-select v-model="createPoolDialog.devices"
             :items="Array.isArray(unassignedDisks) ? unassignedDisks.map(disk => disk.device) : []"
             :label="$t('devices')" :multiple="createPoolDialog.type !== 'single'" dense />
           <v-select v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.snapraidDevice"
             :items="Array.isArray(unassignedDisks) ? unassignedDisks.map(disk => disk.device) : []"
             :label="$t('snapraid device')" dense />
-          <v-text-field v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel"
-            :label="$t('raid level')" />
+            <v-select v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel"
+            :items="['raid0', 'raid1', 'raid5']" :label="$t('raid level')" dense />
           <v-select v-model="createPoolDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.comment"
             :label="$t('comment')" />
@@ -246,7 +246,7 @@ const createPoolDialog = reactive({
   name: '',
   type: 'single',
   devices: [],
-  filesystem: '',
+  filesystem: 'xfs',
   format: false,
   automount: true,
   comment: '',
@@ -601,6 +601,14 @@ const mountPool = async (pool) => {
   } catch (e) {
     overlay.value = false;
     showSnackbarError(e.message);
+  }
+};
+
+const switchPoolType = () => {
+  if (createPoolDialog.type === 'single' || createPoolDialog.type === 'mergerfs' ) {
+    createPoolDialog.filesystem = 'xfs';
+  } else {
+    createPoolDialog.filesystem = 'btrfs';
   }
 };
 
