@@ -188,8 +188,18 @@
           <v-select v-model="createPoolDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.comment"
             :label="$t('comment')" />
-          <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.mergerfsOptions"
-            :label="$t('mergerfs options')" />
+          <div v-if="createPoolDialog.type === 'mergerfs'">
+            <v-divider></v-divider>
+            <v-btn variant="text" @click="createPoolDialog.showAdvanced = !createPoolDialog.showAdvanced" class="mb-4">
+              {{ createPoolDialog.showAdvanced ? $t('hide advanced options') : $t('show advanced options') }}
+            </v-btn>
+            <v-slide-y-transition>
+              <div v-if="createPoolDialog.showAdvanced">
+                  <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.mergerfsOptions"
+                    :label="$t('mergerfs options')" />
+              </div>
+            </v-slide-y-transition>
+          </div>
           <v-switch v-model="createPoolDialog.automount" :label="$t('automount')" hide-details density="compact"
             color="primary" inset />
           <v-switch v-model="createPoolDialog.format" :label="$t('format')" hide-details density="compact"
@@ -254,7 +264,8 @@ const createPoolDialog = reactive({
   snapraidDevice: "",
   raidLevel: "",
   encrypted: false,
-  passphrase: ''
+  passphrase: '',
+  showAdvanced: false
 });
 const deletePoolDialog = reactive({
   value: false,

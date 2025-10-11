@@ -56,8 +56,26 @@
           <v-select v-model="createDialog.selectedUser" :items="smbUsers" item-title="username" item-value="username"
             :label="$t('smb user')" required return-object />
           <v-text-field v-model="createDialog.comment" :label="$t('comment')" clearable />
-          <v-text-field v-model="createDialog.create_mask" :label="$t('create mask')" required />
-          <v-text-field v-model="createDialog.directory_mask" :label="$t('directory mask')" required />
+          <v-divider></v-divider>
+          <v-btn variant="text" @click="createDialog.showAdvanced = !createDialog.showAdvanced" class="mb-4">
+            {{ createDialog.showAdvanced ? $t('hide advanced options') : $t('show advanced options') }}
+          </v-btn>
+          <v-slide-y-transition>
+            <div v-if="createDialog.showAdvanced">
+              <v-text-field v-model="createDialog.create_mask" :label="$t('create mask')" required />
+              <v-text-field v-model="createDialog.directory_mask" :label="$t('directory mask')" required />
+              <v-switch v-model="createDialog.force_root" :label="$t('force root')" inset hide-details density="compact"
+                class="ml-4" color="primary" />
+              <v-switch v-model="createDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details
+                density="compact" class="ml-4" color="primary" />
+              <v-switch v-model="createDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details
+                density="compact" class="ml-4" color="primary" />
+              <v-switch v-model="createDialog.preserve_case" :label="$t('preserve case')" inset hide-details
+                density="compact" class="ml-4" color="primary" />
+              <v-switch v-model="createDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details
+                density="compact" class="ml-4" color="primary" />
+            </div>
+          </v-slide-y-transition>
           <v-switch v-model="createDialog.enabled" :label="$t('enabled')" inset hide-details density="compact"
             class="ml-4" color="primary" />
           <v-switch v-model="createDialog.browseable" :label="$t('browseable')" inset hide-details density="compact"
@@ -66,16 +84,6 @@
             class="ml-4" color="primary" />
           <v-switch v-model="createDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact"
             class="ml-4" color="primary" />
-          <v-switch v-model="createDialog.force_root" :label="$t('force root')" inset hide-details density="compact"
-            class="ml-4" color="primary" />
-          <v-switch v-model="createDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details
-            density="compact" class="ml-4" color="primary" />
-          <v-switch v-model="createDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details
-            density="compact" class="ml-4" color="primary" />
-          <v-switch v-model="createDialog.preserve_case" :label="$t('preserve case')" inset hide-details
-            density="compact" class="ml-4" color="primary" />
-          <v-switch v-model="createDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details
-            density="compact" class="ml-4" color="primary" />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -156,8 +164,8 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large"
-    icon @click="openCreatePoolDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
+    @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -196,7 +204,8 @@ const createDialog = reactive({
   preserve_case: true,
   case_sensitive: true,
   policies: [],
-  createDirectory: true
+  createDirectory: true,
+  showAdvanced: false
 });
 const editDialog = reactive({
   value: false,

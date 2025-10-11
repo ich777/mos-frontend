@@ -484,5 +484,7 @@
   "cpu governor": "CPU Governor",
   "governor": "Governor",
   "cpufreq": "CPU Frequency",
-  "force update": "Force Update"
+  "force update": "Force Update",
+  "show advanced options": "Show advanced options",
+  "hide advanced options": "Hide advanced options"
 }
