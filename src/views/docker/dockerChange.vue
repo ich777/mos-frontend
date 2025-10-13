@@ -283,7 +283,7 @@ const form = reactive({
     paths: [],
     devices: [],
     variables: []
-})
+});
 const props = defineProps({
     docker: String
 });
@@ -305,9 +305,10 @@ const getDockerTemplate = async () => {
             }
         });
 
-        overlay.value = false;
-
-        if (!res.ok) throw new Error(t('docker container could not be loaded'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker container could not be loaded')}|$| ${error.error || t('unknown error')}`);
+        }
 
         getDocker.value = await res.json();
 
@@ -366,8 +367,10 @@ const getDockerTemplate = async () => {
             }))
             : [];
     } catch (e) {
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
+    } finally {
         overlay.value = false;
-        showSnackbarError(e.message);
     }
 };
 
@@ -381,7 +384,10 @@ const getDockerNetworks = async () => {
             }
         });
 
-        if (!res.ok) throw new Error(t('docker networks could not be loaded'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker networks could not be loaded')}|$| ${error.error || t('unknown error')}`);
+        }
 
         const networks = await res.json();
         networkOptions.value = networks.map(network => ({
@@ -407,6 +413,8 @@ const getDockerNetworks = async () => {
 
     } catch (e) {
         networkOptions.value = [{ name: 'container-network', id: 'container-network' }, { name: 'none', id: 'none' }];
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
     } finally {
         loadingNetworks.value = false;
     }
@@ -486,14 +494,18 @@ const updateDocker = async () => {
             },
             body: JSON.stringify(changeDocker)
         });
-        overlay.value = false;
 
-        if (!res.ok) throw new Error(t('docker container could not be changed'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker container could not be changed')}|$| ${error.error || t('unknown error')}`);
+        }
         showSnackbarSuccess(t('docker container changed successfully'));
         goBackSafely();
     } catch (e) {
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
+    } finally {
         overlay.value = false;
-        showSnackbarError(e.message);
     }
 };
 

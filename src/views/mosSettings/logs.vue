@@ -44,7 +44,7 @@ const emit = defineEmits(['refresh-drawer']);
 const logs = ref([]);
 const selectedLog = ref('');
 const logFileContent = ref([]);
-const lines = ref(100);
+const lines = ref(1000);
 const overlay = ref(false);
 const { t } = useI18n();
 

@@ -321,7 +321,11 @@ const getDockerNetworks = async () => {
             }
         });
 
-        if (!res.ok) throw new Error(t('docker networks could not be loaded'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker networks could not be loaded')}|$| ${error.error || t('unknown error')}`);
+        }
+
         const networks = await res.json();
         networkOptions.value = networks.map(network => ({
             name: network.Name,
@@ -347,6 +351,8 @@ const getDockerNetworks = async () => {
 
     } catch (e) {
         networkOptions.value = [{ name: 'container-network', id: 'container-network' }, { name: 'none', id: 'none' }];
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
     } finally {
         loadingNetworks.value = false;
     }
@@ -362,19 +368,23 @@ const getDockerContainers = async () => {
             }
         });
 
-        if (res.ok) {
-            const containers = await res.json();
-            containerOptions.value = containers.map(container => ({
-                name: container.Names[0].startsWith('/') ? container.Names[0].slice(1) : container.Names[0],
-                id: container.Id
-            }));
-
-            containerOptions.value.sort((a, b) => a.name.localeCompare(b.name));
-        } else {
-            containerOptions.value = [];
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker containers could not be loaded')}|$| ${error.error || t('unknown error')}`);
         }
+
+        const containers = await res.json();
+        containerOptions.value = containers.map(container => ({
+            name: container.Names[0].startsWith('/') ? container.Names[0].slice(1) : container.Names[0],
+            id: container.Id
+        }));
+
+        containerOptions.value.sort((a, b) => a.name.localeCompare(b.name));
+
     } catch (e) {
         containerOptions.value = [];
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
     } finally {
         loadingContainers.value = false;
     }
@@ -427,78 +437,78 @@ const fetchDockerTemplateUrl = async () => {
         });
         overlay.value = false;
 
-        if (!res.ok) throw new Error(t('docker template could not be fetched'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker template could not be fetched')}|$| ${error.error || t('unknown error')}`);
+        }
 
         const jsonData = await res.json();
         fillFormFromJson(jsonData);
         dockerUrl.value = '';
 
     } catch (e) {
-        overlay.value = false;
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
         showSnackbarError(e.message);
+    } finally {
+        overlay.value = false;
     }
 };
 
 const fillFormFromJson = (jsonData) => {
-    if (jsonData) {
-        form.value.name = jsonData.name || '';
-        form.value.repo = jsonData.repo || '';
-
-        if (jsonData.network && jsonData.network.startsWith('container:')) {
-            networkMode.value = 'container-network';
-            form.value.network = jsonData.network;
-            const containerName = jsonData.network.replace('container:', '');
-            selectedContainer.value = containerName;
-        } else {
-            networkMode.value = jsonData.network || '';
-            form.value.network = jsonData.network || '';
-            selectedContainer.value = '';
-        }
-
-        form.value.custom_ip = jsonData.custom_ip || '';
-        form.value.default_shell = jsonData.default_shell || '';
-        form.value.privileged = jsonData.privileged || false;
-        form.value.extra_parameters = jsonData.extra_parameters || '';
-        form.value.web_ui_url = jsonData.web_ui_url || '';
-        form.value.icon = jsonData.icon || '';
-
-        form.value.paths = Array.isArray(jsonData.paths)
-            ? jsonData.paths.map(path => ({
-                name: path.name || '',
-                mode: path.mode || '',
-                host: path.host || '',
-                container: path.container || ''
-            }))
-            : [];
-
-        form.value.ports = Array.isArray(jsonData.ports)
-            ? jsonData.ports.map(port => ({
-                name: port.name || '',
-                protocol: port.protocol || '',
-                host: port.host || '',
-                container: port.container || ''
-            }))
-            : [];
-
-        form.value.variables = Array.isArray(jsonData.variables)
-            ? jsonData.variables.map(variable => ({
-                name: variable.name || '',
-                key: variable.key || '',
-                value: variable.value || '',
-                mask: variable.mask || false
-            }))
-            : [];
-
-        form.value.devices = Array.isArray(jsonData.devices)
-            ? jsonData.devices.map(device => ({
-                name: device.name || '',
-                host: device.host || '',
-                container: device.container || ''
-            }))
-            : [];
-
-        showSnackbarSuccess(t('template loaded successfully'));
+    if (!jsonData) {
+        return;
     }
+
+    form.value.name = jsonData.name || '';
+    form.value.repo = jsonData.repo || '';
+
+    if (jsonData.network && jsonData.network.startsWith('container:')) {
+        networkMode.value = 'container-network';
+        form.value.network = jsonData.network;
+        const containerName = jsonData.network.replace('container:', '');
+        selectedContainer.value = containerName;
+    } else {
+        networkMode.value = jsonData.network || '';
+        form.value.network = jsonData.network || '';
+        selectedContainer.value = '';
+    }
+
+    form.value.custom_ip = jsonData.custom_ip || '';
+    form.value.default_shell = jsonData.default_shell || '';
+    form.value.privileged = jsonData.privileged || false;
+    form.value.extra_parameters = jsonData.extra_parameters || '';
+    form.value.web_ui_url = jsonData.web_ui_url || '';
+    form.value.icon = jsonData.icon || '';
+
+    form.value.paths = Array.isArray(jsonData.paths)
+        ? jsonData.paths.map(path => ({
+            name: path.name || '',
+            mode: path.mode || '',
+            host: path.host || '',
+            container: path.container || ''
+        })) : [];
+    form.value.ports = Array.isArray(jsonData.ports)
+        ? jsonData.ports.map(port => ({
+            name: port.name || '',
+            protocol: port.protocol || '',
+            host: port.host || '',
+            container: port.container || ''
+        })) : [];
+    form.value.variables = Array.isArray(jsonData.variables)
+        ? jsonData.variables.map(variable => ({
+            name: variable.name || '',
+            key: variable.key || '',
+            value: variable.value || '',
+            mask: variable.mask || false
+        })) : [];
+    form.value.devices = Array.isArray(jsonData.devices)
+        ? jsonData.devices.map(device => ({
+            name: device.name || '',
+            host: device.host || '',
+            container: device.container || ''
+        })) : [];
+
+    showSnackbarSuccess(t('template loaded successfully'));
 };
 
 const createDocker = async () => {
@@ -551,15 +561,18 @@ const createDocker = async () => {
             body: JSON.stringify(newDocker)
         });
 
-        overlay.value = false;
-
-        if (!res.ok) throw new Error(t('docker container could not be created'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker container could not be created')}|$| ${error.error || t('unknown error')}`);
+        }
         goBackSafely();
         showSnackbarSuccess(t('docker container created successfully'));
 
     } catch (e) {
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
+    } finally {
         overlay.value = false;
-        showSnackbarError(e.message);
     }
 };
 
@@ -582,12 +595,16 @@ const getAllTemplates = async () => {
             }
         });
 
-        if (!res.ok) throw new Error(t('could not fetch templates'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('could not fetch templates')}|$| ${error.error || t('unknown error')}`);
+        }
         const result = await res.json();
         allTemplates.value = result;
         allTemplatesMixed.value = [...result.installed, ...result.removed];
     } catch (e) {
-        showSnackbarError(e.message);
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
     }
 }
 
@@ -604,9 +621,11 @@ const getDockerTemplate = async (docker, installed) => {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken')
             }
         });
-        overlay.value = false;
 
-        if (!res.ok) throw new Error(t('docker container could not be loaded'));
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(`${t('docker container could not be loaded')}|$| ${error.error || t('unknown error')}`);
+        }
         const result = await res.json();
 
         if (result) {
@@ -636,31 +655,27 @@ const getDockerTemplate = async (docker, installed) => {
                     mode: path.mode,
                     host: path.host,
                     container: path.container
-                }))
-                : [];
+                })) : [];
             form.value.ports = Array.isArray(result.ports)
                 ? result.ports.map(port => ({
                     name: port.name,
                     protocol: port.protocol,
                     host: port.host,
                     container: port.container
-                }))
-                : [];
+                })) : [];
             form.value.variables = Array.isArray(result.variables)
                 ? result.variables.map(variable => ({
                     name: variable.name,
                     key: variable.key,
                     value: variable.value,
                     mask: variable.mask || false
-                }))
-                : [];
+                })) : [];
             form.value.devices = Array.isArray(result.devices)
                 ? result.devices.map(device => ({
                     name: device.name,
                     path: device.path,
                     type: device.type
-                }))
-                : [];
+                })) : [];
         } else {
             form.value.name = '';
             form.value.repo = '';
@@ -680,8 +695,10 @@ const getDockerTemplate = async (docker, installed) => {
         }
 
     } catch (e) {
+        const [userMessage, apiErrorMessage] = e.message.split('|$|');
+        showSnackbarError(userMessage, apiErrorMessage);
+    } finally {
         overlay.value = false;
-        showSnackbarError(e.message);
     }
 };
 
