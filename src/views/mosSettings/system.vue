@@ -12,8 +12,9 @@
                             item-title="keymap" item-value="keymap"></v-select>
                         <v-select :items="timezones" :label="$t('timezone')" v-model="settingsSystem.timezone"
                             item-title="timezone" item-value="timezone"></v-select>
-                        <v-select :items="governors" :label="$t('cpu governor')" v-model="settingsSystem.cpufreq.governor"
-                            item-title="governor" item-value="governor"></v-select>
+                        <v-select :items="governors" :label="$t('cpu governor')"
+                            v-model="settingsSystem.cpufreq.governor" item-title="governor"
+                            item-value="governor"></v-select>
                         <v-text-field :label="$t('global spindown (min)')" type="number"
                             v-model="settingsSystem.global_spindown"></v-text-field>
                         <v-divider class="my-2"></v-divider>
@@ -21,8 +22,23 @@
                         <v-switch :label="$t('ntp enabled')" color="primary" inset density="compact"
                             v-model="settingsSystem.ntp.enabled"></v-switch>
                         <v-text-field :label="$t('ntp mode')" v-model="settingsSystem.ntp.mode"></v-text-field>
-                        <v-text-field :label="$t('ntp servers')" v-model="settingsSystem.ntp.servers[0]"
-                            hint="First NTP server"></v-text-field>
+                        <v-row>
+                            <v-col cols="12" v-for="(server, i) in settingsSystem.ntp.servers" :key="`ntp-${i}`">
+                                <v-text-field :label="$t('ntp servers')" v-model="settingsSystem.ntp.servers[i]"
+                                    :hint="i === 0 ? 'First NTP server' : undefined" append-inner-icon="mdi-delete"
+                                    @click:append-inner="settingsSystem.ntp.servers.splice(i, 1)"
+                                    hide-details></v-text-field>
+                            </v-col>
+                            <v-col cols="12" class="py-0 mb-6">
+                                <div class="d-flex align-center my-2">
+                                    <v-divider class="flex-grow-1"></v-divider>
+                                    <v-btn class="mx-4" icon="mdi-plus" color="primary" size="small" density="compact"
+                                        @click="settingsSystem.ntp.servers.push('')"
+                                        aria-label="Add NTP server"></v-btn>
+                                    <v-divider class="flex-grow-1"></v-divider>
+                                </div>
+                            </v-col>
+                        </v-row>
                         <h3 class="mb-2">{{ $t('proxy') }}</h3>
                         <v-text-field :label="$t('http proxy')" v-model="proxies.http_proxy"
                             :placeholder="proxies.http_proxy"></v-text-field>
