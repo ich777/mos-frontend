@@ -84,11 +84,10 @@
     </v-card>
   </v-dialog>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="showErrorDetails ? -1 : 3000">
+  <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="showErrorDetails ? -1 : 3000" :width="isWideScreen ? 600 : 'auto'">
     <template #actions>
       <v-icon v-if="snackbarIcon" class="me-2">{{ snackbarIcon }}</v-icon>
-      <v-btn v-if="snackbarApiError != ''" text @click="showErrorDetails = !showErrorDetails" color="white">{{
-        showErrorDetails ? $t('less details') : $t('details') }}</v-btn>
+      <v-btn v-if="snackbarApiError != ''" text @click="showErrorDetails = !showErrorDetails" color="white">{{ showErrorDetails ? $t('less details') : $t('details') }}</v-btn>
     </template>
     {{ snackbarText }}
     <v-expand-transition>
