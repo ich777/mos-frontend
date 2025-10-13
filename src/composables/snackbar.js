@@ -12,6 +12,8 @@ export function showSnackbarSuccess(text) {
   snackbarColor.value = 'success'
   snackbar.value = true
   snackbarIcon.value = 'mdi-success'
+  snackbarApiError.value = ''
+  snackbarShowErrorDetails.value = false
 }
 
 export function showSnackbarError(text, errorText = '') {
@@ -20,6 +22,7 @@ export function showSnackbarError(text, errorText = '') {
   snackbar.value = true
   snackbarIcon.value = 'mdi-error'
   snackbarApiError.value = errorText
+  snackbarShowErrorDetails.value = false
 }
 
 export function useSnackbar() {
