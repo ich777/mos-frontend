@@ -128,21 +128,18 @@
                                 <v-col cols="11">
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('name')" v-model="port.name" density="compact"
-                                                hide-details class="mb-4"></v-text-field>
+                                            <v-text-field :label="$t('name')" v-model="port.name" density="compact" hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('protocol')" v-model="port.protocol"
-                                                density="compact" hide-details class="mb-4"></v-text-field>
+                                            <v-text-field :label="$t('protocol')" v-model="port.protocol" density="compact" hide-details class="mb-4"></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('host')" v-model="port.host"
-                                                density="compact" hide-details></v-text-field>
+                                            <v-text-field :label="$t('host')" v-model="port.host" type="number" density="compact" hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('container')" v-model="port.container" density="compact" hide-details></v-text-field>
+                                            <v-text-field :label="$t('container')" v-model="port.container" type="number" density="compact" hide-details></v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>

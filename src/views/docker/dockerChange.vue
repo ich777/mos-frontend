@@ -120,10 +120,10 @@
                                     </v-row>
                                     <v-row class="mt-n8">
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('host')" v-model="port.host" density="compact" hide-details></v-text-field>
+                                            <v-text-field :label="$t('host')" type="number" v-model="port.host" density="compact" hide-details></v-text-field>
                                         </v-col>
                                         <v-col cols="6">
-                                            <v-text-field :label="$t('container')" v-model="port.container" density="compact" hide-details></v-text-field>
+                                            <v-text-field :label="$t('container')" type="number" v-model="port.container" density="compact" hide-details></v-text-field>
                                         </v-col>
                                     </v-row>
                                 </v-col>
