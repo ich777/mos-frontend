@@ -490,5 +490,7 @@
   "select log file": "Protokolldatei auswählen",
   "log content": "Protokollinhalt",
   "lines": "Zeilen",
-  "update check could not be performed": "Update-Prüfung konnte nicht durchgeführt werden"
+  "update check could not be performed": "Update-Prüfung konnte nicht durchgeführt werden",
+  "ipv4": "IPv4",
+  "ipv6": "IPv6"
 }

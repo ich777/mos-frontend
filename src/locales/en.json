@@ -490,5 +490,7 @@
   "select log file": "Select log file",
   "log content": "Log content",
   "lines": "Lines",
-  "update check could not be performed": "Update check could not be performed"
+  "update check could not be performed": "Update check could not be performed",
+  "ipv4": "IPv4",
+  "ipv6": "IPv6"  
 }
