@@ -84,7 +84,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="formatDialog.value = false">
+        <v-btn color="onPrimary" @click="formatDialog.value = false">
           {{ $t("cancel") }}
         </v-btn>
         <v-btn color="red" :disabled="!formatDialog.filesystem" @click="formatDisk(formatDialog.disk)">

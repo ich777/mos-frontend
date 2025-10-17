@@ -16,14 +16,14 @@
           </v-card-text>
         </v-card>
       </v-container>
-      <v-col class="d-flex justify-end">
-        <v-btn color="onPrimary" @click="setVMService()" class="ml-2">
-          <v-icon left>mdi-content-save</v-icon>
-          {{ $t('save') }}
-        </v-btn>
-      </v-col>
     </v-container>
   </v-container>
+
+  <!-- Floating Action Button -->
+  <v-fab @click="setVMService()" color="primary"
+    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+    <v-icon>mdi-content-save</v-icon>
+  </v-fab>
 
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>

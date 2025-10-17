@@ -59,8 +59,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="createCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn text @click="createCronJob()">{{ $t('create') }}</v-btn>
+        <v-btn color="onPrimary" @click="createCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="createCronJob()">{{ $t('create') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -79,8 +79,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="changeCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn text @click="changeCronJob()">{{ $t('save') }}</v-btn>
+        <v-btn color="onPrimary" @click="changeCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="changeCronJob()">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -94,8 +94,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text @click="deleteCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn text color="red" @click="deleteCronJob()">{{ $t('delete') }}</v-btn>
+        <v-btn color="onPrimary" @click="deleteCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="red" @click="deleteCronJob()">{{ $t('delete') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -112,15 +112,14 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="changeScriptDialog.value = false">{{ $t('close') }}</v-btn>
-        <v-btn text @click="changeScript()">{{ $t('save') }}</v-btn>
+        <v-btn color="onPrimary" @click="changeScriptDialog.value = false">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" @click="changeScript()">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab @click="openCreateCronJobDialog()" color="onPrimary"
+  <v-fab @click="openCreateCronJobDialog()" color="primary"
     style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
     <v-icon>mdi-plus</v-icon>
   </v-fab>

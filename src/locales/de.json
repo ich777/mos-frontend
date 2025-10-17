@@ -512,5 +512,15 @@
   "less details": "Weniger Details",
   "test connection": "Verbindung testen",
   "connection successful": "Verbindung erfolgreich",
-  "connection failed": "Verbindung fehlgeschlagen"
+  "connection failed": "Verbindung fehlgeschlagen",
+  "remote mount could not be updated": "Remote Mount konnte nicht aktualisiert werden",
+  "remote mount updated successfully": "Remote Mount erfolgreich aktualisiert",
+  "change remote mount": "Remote Mount ändern",
+  "edit remote mount": "Remote Mount bearbeiten",
+  "mount remote": "Remote Mount einhängen",
+  "unmount remote": "Remote Mount aushängen",
+  "remote mount could not be mounted": "Remote Mount konnte nicht eingehängt werden",
+  "remote mount mounted successfully": "Remote Mount erfolgreich eingehängt",
+  "remote mount could not be unmounted": "Remote Mount konnte nicht ausgehängt werden",
+  "remote mount unmounted successfully": "Remote Mount erfolgreich ausgehängt"
 }

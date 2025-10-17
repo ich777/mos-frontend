@@ -301,7 +301,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="removeDocker(deleteDialog.docker.Names[0])">
           {{ $t('delete') }}
         </v-btn>
@@ -336,8 +336,7 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
-        <v-btn text @click="infoDialog.value = false">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" text @click="infoDialog.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -351,8 +350,7 @@
           :label="$t('select containers')" multiple chips></v-select>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
-        <v-btn text @click="clearCreateGroupDialog()">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="clearCreateGroupDialog()">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="createDockerGroup()">
           {{ $t('create') }}
         </v-btn>
@@ -370,7 +368,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="clearChangeGroupDialog()">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="clearChangeGroupDialog()">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="updateDockerGroup()">
           {{ $t('save') }}
         </v-btn>
@@ -387,7 +385,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="deleteGroupDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="deleteGroupDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deleteDockerGroup()">
           {{ $t('delete') }}
         </v-btn>
@@ -396,7 +394,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="onPrimary" style="position: fixed;bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+  <v-fab color="Primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
     <v-icon>mdi-dots-vertical</v-icon>
     <v-speed-dial v-model="menu" location="top right" activator="parent" :itemTransition="false" transition="false">
       <v-sheet key="speed-dial-panel" class="bg-surface elevation-8 rounded-xl pa-2 d-flex flex-column align-end" style="max-width: 250px;" >

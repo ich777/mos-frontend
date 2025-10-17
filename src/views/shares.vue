@@ -88,8 +88,7 @@
       </v-card-text>
       <v-card-actions>
         <v-row class="d-flex justify-end">
-          <v-spacer />
-          <v-btn @click="createDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="createDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="onPrimary" @click="createShare">
             {{ $t('create') }}
           </v-btn>
@@ -107,8 +106,7 @@
       </v-card-text>
       <v-card-actions>
         <v-row class="d-flex justify-end">
-          <v-spacer />
-          <v-btn @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="red" @click="deleteShare(deleteDialog.share, deleteDialog.deleteDirectory)">
             {{ $t('delete') }}
           </v-btn>
@@ -154,7 +152,7 @@
       <v-card-actions>
         <v-row class="d-flex justify-end">
           <v-spacer />
-          <v-btn @click="editDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="editDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="onPrimary" @click="updateShare(editDialog)">
             {{ $t('save') }}
           </v-btn>
@@ -164,7 +162,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="onPrimary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
     @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>

@@ -111,7 +111,7 @@
   </v-container>
 
   <!-- Floating Action Button -->
-  <v-fab @click="setNetworkSettings()" color="onPrimary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
+  <v-fab @click="setNetworkSettings()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-content-save</v-icon>
   </v-fab>
 

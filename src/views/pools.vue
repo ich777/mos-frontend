@@ -6,101 +6,101 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-skeleton-loader v-if="poolsLoading" type="card" />
-          <v-card variant="tonal" v-for="pool in pools" :key="pool.id" fluid class="mb-4 pa-0">
-            <v-card-title class="d-flex align-center">
-              <span>{{ pool.name }}</span>
-              <v-spacer />
-              <v-chip v-if="pool.status.mounted" size="small">{{ $t('mounted') }}</v-chip>
-              <v-chip v-else size="small">{{ $t('unmounted') }}</v-chip>
-              <v-icon v-if="pool.config.encrypted" class="ml-2" color="grey darken-1" aria-label="locked">mdi-lock</v-icon>
-            </v-card-title>
-            <v-card-subtitle v-if="pool.status">{{ $t('type') }}: {{ pool.type }}</v-card-subtitle>
-            <div v-if="pool.status" class="mt-2 mr-4 ml-4">
-              <v-progress-linear
-                :model-value="pool.status.usagePercent"
-                height="8"
-                class="mb-2"
-                :color="getUsageColor(pool.status.usagePercent)"
-                rounded
-                :label="`${pool.status.usagePercent}%`"
-                style="min-width: 120px"
-                bg-opacity="0.35"
-              />
-              <span style="font-size: 0.875rem">{{ pool.status.usedSpace_human }} / {{ pool.status.totalSpace_human }}</span>
-            </div>
-            <v-card-text>
-              <v-list v-if="pool.data_devices && pool.data_devices.length > 0" class="pa-0" style="background-color: transparent">
-                <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
-                <v-list-item v-for="data_device in pool.data_devices" :key="data_device.id">
-                  <template v-slot:prepend>
-                    <v-icon class="cursor-pointer" :color="data_device.powerStatus === 'active' ? 'green' : data_device.powerStatus === 'standby' ? 'blue' : 'red'">
-                      {{ getDiskIcon(data_device.diskType.type) }}
-                    </v-icon>
-                  </template>
-                  <v-list-item-title>{{ data_device.device }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ data_device.filesystem }}
-                  </v-list-item-subtitle>
-                  <v-progress-linear
-                    v-if="data_device.storage"
-                    :model-value="data_device.storage.usagePercent"
-                    height="8"
-                    :color="getUsageColor(data_device.storage.usagePercent)"
-                    rounded
-                    class="mt-2"
-                    :label="`${data_device.storage.usagePercent}%`"
-                    style="min-width: 120px"
-                  />
-                  <v-list-item-subtitle v-if="data_device.storage" class="mt-2">{{ data_device.storage.usedSpace_human }} / {{ data_device.storage.totalSpace_human }}</v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-              <v-list v-if="pool.parity_devices && pool.parity_devices.length > 0" class="pa-0" style="background-color: transparent">
-                <v-list-item-title>{{ $t('parities') }}</v-list-item-title>
-                <v-list-item v-for="parity_device in pool.parity_devices" :key="parity_device.id">
-                  <template v-slot:prepend>
-                    <v-icon class="cursor-pointer" :color="parity_device.powerStatus === 'active' ? 'green' : parity_device.powerStatus === 'standby' ? 'blue' : 'red'">
-                      {{ getDiskIcon(parity_device.diskType.type) }}
-                    </v-icon>
-                  </template>
-                  <v-list-item-title>{{ parity_device.device }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ parity_device.filesystem }}</v-list-item-subtitle>
-                  <v-progress-linear
-                    v-if="parity_device.storage"
-                    :model-value="parity_device.storage.usagePercent"
-                    height="8"
-                    color="grey darken-1"
-                    rounded
-                    class="mt-2"
-                    :label="`${parity_device.storage.usagePercent}%`"
-                    style="min-width: 120px"
-                  />
-                  <v-list-item-subtitle v-if="parity_device.storage" class="mt-2">{{ parity_device.storage.usedSpace_human }} / {{ parity_device.storage.totalSpace_human }}</v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-            <v-card-actions>
-              <v-switch v-model="pool.automount" :label="$t('automount')" inset hide-details density="compact" color="onPrimary" @change="switchAutomount(pool)" />
-              <v-spacer />
-              <v-btn icon @click="openDeletePoolDialog(pool)">
-                <v-icon color="red">mdi-delete</v-icon>
-              </v-btn>
-              <v-menu>
-                <template #activator="{ props }">
-                  <v-btn variant="text" icon v-bind="props" color="onPrimary">
-                    <v-icon>mdi-dots-vertical</v-icon>
-                  </v-btn>
+        <v-card variant="tonal" v-for="pool in pools" :key="pool.id" fluid class="mb-4 pa-0">
+          <v-card-title class="d-flex align-center">
+            <span>{{ pool.name }}</span>
+            <v-spacer />
+            <v-chip v-if="pool.status.mounted" size="small">{{ $t('mounted') }}</v-chip>
+            <v-chip v-else size="small">{{ $t('unmounted') }}</v-chip>
+            <v-icon v-if="pool.config.encrypted" class="ml-2" color="grey darken-1" aria-label="locked">mdi-lock</v-icon>
+          </v-card-title>
+          <v-card-subtitle v-if="pool.status">{{ $t('type') }}: {{ pool.type }}</v-card-subtitle>
+          <div v-if="pool.status" class="mt-2 mr-4 ml-4">
+            <v-progress-linear
+              :model-value="pool.status.usagePercent"
+              height="8"
+              class="mb-2"
+              :color="getUsageColor(pool.status.usagePercent)"
+              rounded
+              :label="`${pool.status.usagePercent}%`"
+              style="min-width: 120px"
+              bg-opacity="0.35"
+            />
+            <span style="font-size: 0.875rem">{{ pool.status.usedSpace_human }} / {{ pool.status.totalSpace_human }}</span>
+          </div>
+          <v-card-text>
+            <v-list v-if="pool.data_devices && pool.data_devices.length > 0" class="pa-0" style="background-color: transparent">
+              <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
+              <v-list-item v-for="data_device in pool.data_devices" :key="data_device.id">
+                <template v-slot:prepend>
+                  <v-icon class="cursor-pointer" :color="data_device.powerStatus === 'active' ? 'green' : data_device.powerStatus === 'standby' ? 'blue' : 'red'">
+                    {{ getDiskIcon(data_device.diskType.type) }}
+                  </v-icon>
                 </template>
-                <v-list>
-                  <v-list-item v-if="!pool.status.mounted" @click="mountPool(pool)">
-                    <v-list-item-title>{{ $t('mount pool') }}</v-list-item-title>
-                  </v-list-item>
-                  <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
-                    <v-list-item-title>{{ $t('unmount pool') }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-card-actions>
-          </v-card>
+                <v-list-item-title>{{ data_device.device }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ data_device.filesystem }}
+                </v-list-item-subtitle>
+                <v-progress-linear
+                  v-if="data_device.storage"
+                  :model-value="data_device.storage.usagePercent"
+                  height="8"
+                  :color="getUsageColor(data_device.storage.usagePercent)"
+                  rounded
+                  class="mt-2"
+                  :label="`${data_device.storage.usagePercent}%`"
+                  style="min-width: 120px"
+                />
+                <v-list-item-subtitle v-if="data_device.storage" class="mt-2">{{ data_device.storage.usedSpace_human }} / {{ data_device.storage.totalSpace_human }}</v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+            <v-list v-if="pool.parity_devices && pool.parity_devices.length > 0" class="pa-0" style="background-color: transparent">
+              <v-list-item-title>{{ $t('parities') }}</v-list-item-title>
+              <v-list-item v-for="parity_device in pool.parity_devices" :key="parity_device.id">
+                <template v-slot:prepend>
+                  <v-icon class="cursor-pointer" :color="parity_device.powerStatus === 'active' ? 'green' : parity_device.powerStatus === 'standby' ? 'blue' : 'red'">
+                    {{ getDiskIcon(parity_device.diskType.type) }}
+                  </v-icon>
+                </template>
+                <v-list-item-title>{{ parity_device.device }}</v-list-item-title>
+                <v-list-item-subtitle>{{ parity_device.filesystem }}</v-list-item-subtitle>
+                <v-progress-linear
+                  v-if="parity_device.storage"
+                  :model-value="parity_device.storage.usagePercent"
+                  height="8"
+                  color="grey darken-1"
+                  rounded
+                  class="mt-2"
+                  :label="`${parity_device.storage.usagePercent}%`"
+                  style="min-width: 120px"
+                />
+                <v-list-item-subtitle v-if="parity_device.storage" class="mt-2">{{ parity_device.storage.usedSpace_human }} / {{ parity_device.storage.totalSpace_human }}</v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-actions>
+            <v-switch v-model="pool.automount" :label="$t('automount')" inset hide-details density="compact" color="onPrimary" @change="switchAutomount(pool)" />
+            <v-spacer />
+            <v-btn icon @click="openDeletePoolDialog(pool)">
+              <v-icon color="red">mdi-delete</v-icon>
+            </v-btn>
+            <v-menu>
+              <template #activator="{ props }">
+                <v-btn variant="text" icon v-bind="props" color="onPrimary">
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item v-if="!pool.status.mounted" @click="mountPool(pool)">
+                  <v-list-item-title>{{ $t('mount pool') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
+                  <v-list-item-title>{{ $t('unmount pool') }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-card-actions>
+        </v-card>
         <v-card v-if="pools.length === 0" variant="tonal" fluid class="mb-4 ml-0 mr-0 pa-0">
           <v-card-text class="pa-4">
             {{ $t('no pools have been created yet') }}
@@ -167,8 +167,7 @@
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
-        <v-btn text @click="formatDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" text @click="formatDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" :disabled="!formatDialog.filesystem" @click="formatDisk()">
           {{ $t('format') }}
         </v-btn>
@@ -183,8 +182,7 @@
         {{ $t('are you sure you want to delete this pool?') }}
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
-        <v-btn text @click="deletePoolDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="deletePoolDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deletePool(deletePoolDialog.pool.id)">
           {{ $t('delete') }}
         </v-btn>
@@ -234,7 +232,6 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-spacer />
         <v-btn @click="createPoolDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="createPool()" color="onPrimary">
           {{ $t('create') }}
@@ -244,7 +241,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="onPrimary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 

@@ -63,8 +63,7 @@
         <p class="text-caption text-grey">{{ new Date(notificationDialog.notification.timestamp).toLocaleString() }}</p>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="notificationDialog.value = false">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" @click="notificationDialog.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

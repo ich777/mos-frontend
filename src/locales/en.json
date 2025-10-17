@@ -512,5 +512,15 @@
   "less details": "Less details",
   "test connection": "Test connection",
   "connection successful": "Connection successful",
-  "connection failed": "Connection failed"
+  "connection failed": "Connection failed",
+  "remote mount could not be updated": "Remote mount could not be updated",
+  "remote mount updated successfully": "Remote mount updated successfully",
+  "change remote mount": "Change remote mount",
+  "edit remote mount": "Edit remote mount",
+  "mount remote": "Mount remote",
+  "unmount remote": "Unmount remote",
+  "remote mount could not be mounted": "Remote Mount could not be mounted",
+  "remote mount mounted successfully": "Remote Mount mounted successfully",
+  "remote mount could not be unmounted": "Remote Mount could not be unmounted",
+  "remote mount unmounted successfully": "Remote Mount unmounted successfully"
 }

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="d-flex justify-center">
-    <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
+    <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('users') }}</h2>
       </v-container>
@@ -57,7 +57,7 @@
       </v-card-text>
       <v-card-actions>
         <v-row class="d-flex justify-end">
-          <v-btn text @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="red" @click="deleteUser(deleteDialog.user)">
             {{ $t('delete') }}
           </v-btn>
@@ -71,31 +71,54 @@
       <v-card-title>{{ $t('add user') }}</v-card-title>
       <v-card-text>
         <form @submit.prevent="addUser()">
-          <v-text-field v-model="addDialog.username" :label="$t('username')" :error="addDialog.submitted && addDialog.username === ''" :error-messages="addDialog.submitted && addDialog.username === '' ? [$t('this field is required')] : []" required />
-          <v-text-field v-model="addDialog.password" :type="showPassword ? 'text' : 'password'" :label="$t('password')"
+          <v-text-field
+            v-model="addDialog.username"
+            :label="$t('username')"
+            :error="addDialog.submitted && addDialog.username === ''"
+            :error-messages="addDialog.submitted && addDialog.username === '' ? [$t('this field is required')] : []"
+            required
+          />
+          <v-text-field
+            v-model="addDialog.password"
+            :type="showPassword ? 'text' : 'password'"
+            :label="$t('password')"
             :error="addDialog.submitted && addDialog.password === ''"
             :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append-inner="showPassword = !showPassword" :error-messages="addDialog.submitted && addDialog.password === '' ? [$t('this field is required')] : []" required />
-          <v-text-field v-model="addDialog.password2" :label="$t('confirm password')" required
-            :type="showPassword ? 'text' : 'password'" :error="addDialog.submitted && addDialog.password2 === ''"
-            :error-messages="addDialog.submitted
-              ? (addDialog.password2 === ''
-                ? [$t('this field is required')]
-                : (addDialog.password2 !== addDialog.password
-                  ? [$t('password is not the same')]
-                  : []))
-              : []" />
-          <v-select v-model="addDialog.role" :items="['admin', 'user', 'samba_only']" :label="$t('role')" required
-            @update:modelValue="val => { addDialog.role = val; if (val === 'samba_only') addDialog.samba_user = true; }" />
+            @click:append-inner="showPassword = !showPassword"
+            :error-messages="addDialog.submitted && addDialog.password === '' ? [$t('this field is required')] : []"
+            required
+          />
+          <v-text-field
+            v-model="addDialog.password2"
+            :label="$t('confirm password')"
+            required
+            :type="showPassword ? 'text' : 'password'"
+            :error="addDialog.submitted && addDialog.password2 === ''"
+            :error-messages="
+              addDialog.submitted ? (addDialog.password2 === '' ? [$t('this field is required')] : addDialog.password2 !== addDialog.password ? [$t('password is not the same')] : []) : []
+            "
+          />
+          <v-select
+            v-model="addDialog.role"
+            :items="['admin', 'user', 'samba_only']"
+            :label="$t('role')"
+            required
+            @update:modelValue="
+              (val) => {
+                addDialog.role = val;
+                if (val === 'samba_only') addDialog.samba_user = true;
+              }
+            "
+          />
           <v-switch v-model="addDialog.samba_user" :label="$t('samba user')" inset color="onPrimary" />
         </form>
       </v-card-text>
       <v-card-actions>
         <v-row class="d-flex justify-end">
-          <v-btn text @click="addDialog.value = false">{{ $t('cancel') }}</v-btn>
-            <v-btn color="onPrimary" @click="onAddSubmit">
-              {{ $t('save') }}
-            </v-btn>
+          <v-btn color="onPrimary" @click="addDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="onAddSubmit">
+            {{ $t('save') }}
+          </v-btn>
         </v-row>
       </v-card-actions>
     </v-card>
@@ -107,16 +130,21 @@
       <v-card-text>
         <form @submit.prevent="changeUser(changeDialog.user)">
           <v-text-field v-model="changeDialog.user.username" :label="$t('username')" readonly />
-          <v-text-field v-model="changeDialog.password" :type="showPassword ? 'text' : 'password'"
-            :label="$t('password')" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-            @click:append-inner="showPassword = !showPassword" :required="changeDialog.samba_user" />
+          <v-text-field
+            v-model="changeDialog.password"
+            :type="showPassword ? 'text' : 'password'"
+            :label="$t('password')"
+            :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append-inner="showPassword = !showPassword"
+            :required="changeDialog.samba_user"
+          />
           <v-select v-model="changeDialog.role" :items="['admin', 'user', 'samba_only']" :label="$t('role')" required />
           <v-switch v-model="changeDialog.samba_user" :label="$t('samba user')" inset color="onPrimary" />
         </form>
       </v-card-text>
       <v-card-actions>
         <v-row class="d-flex justify-end">
-          <v-btn text @click="changeDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="changeDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="onPrimary" @click="changeUser(changeDialog.user)">
             {{ $t('save') }}
           </v-btn>
@@ -126,8 +154,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="onPrimary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large"
-    icon @click="openAddDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openAddDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -148,14 +175,14 @@ const { t } = useI18n();
 const overlay = ref(false);
 const deleteDialog = reactive({
   value: false,
-  user: null
+  user: null,
 });
 const changeDialog = reactive({
   value: false,
   user: null,
   password: '',
   role: '',
-  samba_user: false
+  samba_user: false,
 });
 const addDialog = reactive({
   value: false,
@@ -164,7 +191,7 @@ const addDialog = reactive({
   password: '',
   password2: '',
   role: '',
-  samba_user: false
+  samba_user: false,
 });
 
 const openDeleteDialog = (user) => {
@@ -191,8 +218,8 @@ const getUsers = async () => {
   try {
     const res = await fetch('/api/v1/auth/users', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -201,7 +228,6 @@ const getUsers = async () => {
     }
 
     users.value = await res.json();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -215,7 +241,7 @@ const addUser = async () => {
     username: addDialog.username,
     password: addDialog.password,
     role: addDialog.role,
-    samba_user: addDialog.samba_user
+    samba_user: addDialog.samba_user,
   };
 
   try {
@@ -223,11 +249,10 @@ const addUser = async () => {
     const res = await fetch('/api/v1/auth/users', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newUser)
-
+      body: JSON.stringify(newUser),
     });
     overlay.value = false;
 
@@ -238,7 +263,6 @@ const addUser = async () => {
 
     showSnackbarSuccess(t('User successfully created'));
     getUsers();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -251,8 +275,8 @@ const deleteUser = async (user) => {
     const res = await fetch(`/api/v1/auth/users/${user.id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
     overlay.value = false;
 
@@ -263,7 +287,6 @@ const deleteUser = async (user) => {
 
     showSnackbarSuccess(t('User successfully deleted'));
     getUsers();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -275,7 +298,7 @@ const changeUser = async () => {
     username: changeDialog.user.username,
     password: changeDialog.password,
     role: changeDialog.role,
-    samba_user: changeDialog.samba_user
+    samba_user: changeDialog.samba_user,
   };
 
   try {
@@ -283,10 +306,10 @@ const changeUser = async () => {
     const res = await fetch(`/api/v1/auth/users/${changeDialog.user.id}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userData)
+      body: JSON.stringify(userData),
     });
     overlay.value = false;
 
@@ -297,11 +320,9 @@ const changeUser = async () => {
 
     showSnackbarSuccess(t('User successfully updated'));
     getUsers();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
-
 };
 
 const onAddSubmit = () => {
@@ -318,5 +339,4 @@ const onAddSubmit = () => {
 onMounted(() => {
   getUsers();
 });
-
 </script>
