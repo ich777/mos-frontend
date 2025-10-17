@@ -4,7 +4,45 @@
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('remote mounting') }}</h2>
       </v-container>
-      <v-container fluid class="pa-0"></v-container>
+      <v-container fluid class="pa-0">
+        <v-row>
+          <v-col cols="12" sm="12" md="12" lg="12" xl="12">
+            <v-card variant="tonal" fluid>
+              <v-card-title>{{ $t('overview') }}</v-card-title>
+              <v-card-text class="pa-0">
+                <v-list>
+                  <v-list-item v-for="remote in remotes" :key="remote.id">
+                    <v-list-item-title>
+                      {{ remote.name }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle>{{ remote.server }}</v-list-item-subtitle>
+                    <template v-slot:prepend>
+                      <v-icon>mdi-network</v-icon>
+                    </template>
+                    <template v-slot:append>
+                      <v-menu>
+                        <template #activator="{ props }">
+                          <v-btn variant="text" icon v-bind="props">
+                            <v-icon>mdi-dots-vertical</v-icon>
+                          </v-btn>
+                        </template>
+                        <v-list>
+                          <v-list-item @click="openChangeDialog(user)">
+                            <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="openDeleteDialog(user)">
+                            <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-container>
   </v-container>
 
@@ -14,25 +52,15 @@
       <v-card-text>
         <v-form>
           <v-text-field v-model="newRemoteDialog.name" :label="$t('name')" required></v-text-field>
-          <v-select
-            v-model="newRemoteDialog.type"
-            :items="['cifs', 'nfs']"
-            :label="$t('type')"
-            required
-          ></v-select>
+          <v-select v-model="newRemoteDialog.type" :items="['smb']" :label="$t('type')" required></v-select>
           <v-text-field v-model="newRemoteDialog.server" :label="$t('ip')" required></v-text-field>
           <v-text-field v-model="newRemoteDialog.share" :label="$t('share')" required></v-text-field>
           <v-text-field v-model="newRemoteDialog.username" :label="$t('username')"></v-text-field>
           <v-text-field v-model="newRemoteDialog.password" :label="$t('password')" type="password"></v-text-field>
           <v-text-field v-model="newRemoteDialog.domain" :label="$t('domain')"></v-text-field>
-          <v-select
-            v-model="newRemoteDialog.version"
-            :items="['1.0', '2.0', '2.1', '3.0', '3.02', '3.1.1', '3.2']"
-            :label="$t('version')"
-            required
-          ></v-select>
-          <v-text-field v-model.number="newRemoteDialog.uid" :label="$t('uid')" type="number" required></v-text-field>
-          <v-text-field v-model.number="newRemoteDialog.gid" :label="$t('gid')" type="number" required></v-text-field>
+          <v-select v-model="newRemoteDialog.version" :items="['1.0', '2.0', '2.1', '3.0', '3.02', '3.1.1', '3.2']" :label="$t('version')" required></v-select>
+          <!--<v-text-field v-model.number="newRemoteDialog.uid" :label="$t('uid')" type="number" required></v-text-field>
+          <v-text-field v-model.number="newRemoteDialog.gid" :label="$t('gid')" type="number" required></v-text-field>-->
           <v-switch v-model="newRemoteDialog.auto_mount" :label="$t('automount')" inset color="primary"></v-switch>
         </v-form>
       </v-card-text>
@@ -45,8 +73,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
-    @click="openCreateMountDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreateMountDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -96,8 +123,8 @@ const clearRemoteDialog = () => {
   newRemoteDialog.password = '';
   newRemoteDialog.domain = '';
   newRemoteDialog.version = '3.0';
-  newRemoteDialog.uid = 500;
-  newRemoteDialog.gid = 500;
+  //newRemoteDialog.uid = 500;
+  //newRemoteDialog.gid = 500;
   newRemoteDialog.auto_mount = true;
 };
 
@@ -130,8 +157,8 @@ const createRemote = async () => {
     password: newRemoteDialog.password,
     domain: newRemoteDialog.domain,
     version: newRemoteDialog.version,
-    uid: newRemoteDialog.uid,
-    gid: newRemoteDialog.gid,
+    //uid: newRemoteDialog.uid,
+    //gid: newRemoteDialog.gid,
     auto_mount: newRemoteDialog.auto_mount,
   };
 
@@ -143,7 +170,7 @@ const createRemote = async () => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
-      body: JSON.stringify({ newRemote }),
+      body: JSON.stringify(newRemote),
     });
 
     if (!res.ok) {

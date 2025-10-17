@@ -508,5 +508,6 @@
   "domain": "Domain",
   "gid": "GID",
   "uid": "UID",
-  "details": "Details"
+  "details": "Details",
+  "less details": "Less details"
 }
