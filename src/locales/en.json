@@ -509,5 +509,8 @@
   "gid": "GID",
   "uid": "UID",
   "details": "Details",
-  "less details": "Less details"
+  "less details": "Less details",
+  "test connection": "Test connection",
+  "connection successful": "Connection successful",
+  "connection failed": "Connection failed"
 }

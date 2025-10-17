@@ -65,9 +65,9 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="newRemoteDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn @click="createRemote()">{{ $t('create') }}</v-btn>
+        <v-btn color="onPrimary" :disabled="!newRemoteDialog.type || !newRemoteDialog.server || !newRemoteDialog.share" @click="testConnection()">{{ $t('test connection') }}</v-btn>
+        <v-btn color="onPrimary" @click="newRemoteDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="createRemote()">{{ $t('create') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -79,12 +79,10 @@
         {{ $t('are you sure you want to delete this remote mount?') }}
       </v-card-text>
       <v-card-actions>
-        <v-row class="d-flex justify-end">
-          <v-btn text @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
+          <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
           <v-btn color="red" @click="deleteRemote(deleteDialog.remote)">
             {{ $t('delete') }}
           </v-btn>
-        </v-row>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -263,4 +261,44 @@ const deleteRemote = async (remote) => {
     overlay.value = false;
   }
 };
+
+const testConnection = async () => {
+  const testRemote = {
+    type: newRemoteDialog.type,
+    server: newRemoteDialog.server,
+    share: newRemoteDialog.share,
+    username: newRemoteDialog.username,
+    password: newRemoteDialog.password,
+    domain: newRemoteDialog.domain
+  };
+
+  overlay.value = true;
+  try {
+    const res = await fetch('/api/v1/remotes/connectiontest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(testRemote),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('connection failed')}|$| ${errorDetails.error || t('unknown error')}`);
+    } else {
+      const result = await res.json();
+      if (result.success === false) {
+        throw new Error(`${t('connection failed')}|$| ${result.message || t('unknown error')}`);
+      }
+    }
+    showSnackbarSuccess(t('connection successful'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
 </script>
