@@ -36,16 +36,16 @@
           </v-col>
         </v-row>
         <div v-if="processor.cores && processor.cores.length">
-          <details class="mt-2 pa-0">
+          <details class="mt-2">
             <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline">{{ $t('cores') }}</summary>
-            <v-row dense class="mt-2 pa-0">
-              <v-col v-for="(core, i) in processor.cores" :key="i" cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="d-flex align-center pa-0" style="margin-top: 6px">
+            <v-row dense class="ma-2">
+              <v-col v-for="(core, i) in processor.cores" :key="i" cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="d-flex align-center ma-0 pa-0" style="margin-top: 6px">
                 <div style="width: 48px; display: flex; align-items: center">
                   <small>
                     <b>CPU {{ i }}</b>
                   </small>
                 </div>
-                <div style="flex: 1; display: flex; align-items: center; height: 12px" class="pr-4">
+                <div style="flex: 1; display: flex; align-items: center; height: 12px">
                   <v-progress-linear
                     :model-value="core.load?.total ?? 0"
                     height="12"
@@ -57,6 +57,7 @@
                     </template>
                   </v-progress-linear>
                 </div>
+                <span style="width: 12px"></span>
               </v-col>
             </v-row>
           </details>
