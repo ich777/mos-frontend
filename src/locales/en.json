@@ -522,5 +522,9 @@
   "remote mount could not be mounted": "Remote Mount could not be mounted",
   "remote mount mounted successfully": "Remote Mount mounted successfully",
   "remote mount could not be unmounted": "Remote Mount could not be unmounted",
-  "remote mount unmounted successfully": "Remote Mount unmounted successfully"
+  "remote mount unmounted successfully": "Remote Mount unmounted successfully",
+  "could not load shares": "Could not load shares",
+  "please enter type and server ip first": "Please enter type and server IP first",
+  "available shares": "Available Shares",
+  "no shares found": "No Shares Found"
 }

@@ -22,7 +22,7 @@
                     <template v-slot:append>
                       <v-menu>
                         <template #activator="{ props }">
-                          <v-btn variant="text" icon v-bind="props">
+                          <v-btn variant="text" icon v-bind="props" color="onPrimary">
                             <v-icon>mdi-dots-vertical</v-icon>
                           </v-btn>
                         </template>
@@ -61,7 +61,14 @@
           <v-text-field v-model="newRemoteDialog.name" :label="$t('name')" required></v-text-field>
           <v-select v-model="newRemoteDialog.type" :items="['smb']" :label="$t('type')" required></v-select>
           <v-text-field v-model="newRemoteDialog.server" :label="$t('ip')" required></v-text-field>
-          <v-text-field v-model="newRemoteDialog.share" :label="$t('share')" required></v-text-field>
+          <v-text-field
+            v-model="newRemoteDialog.share"
+            :label="$t('share')"
+            append-inner-icon="mdi-magnify"
+            :loading="loadingShares"
+            @click:append-inner="listShares(newRemoteDialog)"
+            required
+          ></v-text-field>
           <v-text-field v-model="newRemoteDialog.username" :label="$t('username')"></v-text-field>
           <v-text-field v-model="newRemoteDialog.password" :label="$t('password')" type="password"></v-text-field>
           <v-text-field v-model="newRemoteDialog.domain" :label="$t('domain')"></v-text-field>
@@ -88,7 +95,14 @@
           <v-text-field v-model="changeDialog.name" :label="$t('name')" required></v-text-field>
           <v-select v-model="changeDialog.type" :items="['smb']" :label="$t('type')" required></v-select>
           <v-text-field v-model="changeDialog.server" :label="$t('ip')" required></v-text-field>
-          <v-text-field v-model="changeDialog.share" :label="$t('share')" required></v-text-field>
+          <v-text-field
+            v-model="changeDialog.share"
+            :label="$t('share')"
+            append-inner-icon="mdi-magnify"
+            :loading="loadingShares"
+            @click:append-inner="listShares(changeDialog)"
+            required
+          ></v-text-field>
           <v-text-field v-model="changeDialog.username" :label="$t('username')"></v-text-field>
           <v-text-field v-model="changeDialog.password" :label="$t('password')" type="password"></v-text-field>
           <v-text-field v-model="changeDialog.domain" :label="$t('domain')"></v-text-field>
@@ -114,10 +128,35 @@
         {{ $t('are you sure you want to delete this remote mount?') }}
       </v-card-text>
       <v-card-actions>
-          <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
-          <v-btn color="red" @click="deleteRemote(deleteDialog.remote)">
-            {{ $t('delete') }}
-          </v-btn>
+        <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="red" @click="deleteRemote(deleteDialog.remote)">
+          {{ $t('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Shares Dialog -->
+  <v-dialog v-model="sharesDialog" max-width="500px">
+    <v-card>
+      <v-card-title>{{ $t('available shares') }}</v-card-title>
+      <v-card-text>
+        <v-list>
+          <v-list-item
+            v-for="(share, idx) in listAllShares"
+            :key="idx"
+            @click="
+              newRemoteDialog.share = share;
+              sharesDialog = false;
+            "
+          >
+            <v-list-item-title>{{ share }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="onPrimary" text @click="sharesDialog = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -140,6 +179,9 @@ import { useI18n } from 'vue-i18n';
 
 const emit = defineEmits(['refresh-drawer']);
 const overlay = ref(false);
+const loadingShares = ref(false);
+const listAllShares = ref([]);
+const sharesDialog = ref(false);
 const { t } = useI18n();
 const remotes = ref([]);
 const newRemoteDialog = reactive({
@@ -158,7 +200,7 @@ const newRemoteDialog = reactive({
 });
 const deleteDialog = reactive({
   value: false,
-  remote: null
+  remote: null,
 });
 const changeDialog = reactive({
   value: false,
@@ -172,7 +214,7 @@ const changeDialog = reactive({
   domain: '',
   version: '',
   uid: 0,
-  gid: 0,  
+  gid: 0,
   auto_mount: true,
 });
 
@@ -409,14 +451,60 @@ const unmountRemote = async (remote) => {
   }
 };
 
+const listShares = async (remote) => {
+  if (!remote.server || !remote.type) {
+    showSnackbarError(t('please enter type and server ip first'));
+    return;
+  }
+
+  const newListShares = {
+    ...(remote.server ? { server: remote.server } : {}),
+    ...(remote.type ? { type: remote.type } : {}),
+    ...(remote.username ? { username: remote.username } : {}),
+    ...(remote.password ? { password: remote.password } : {}),
+    ...(remote.domain ? { domain: remote.domain } : {}),
+  };
+
+  loadingShares.value = true;
+  try {
+    const res = await fetch(`/api/v1/remotes/listshares`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newListShares),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('could not load shares')}|$| ${errorDetails.error || t('unknown error')}`);
+    } else {
+      listAllShares.value = await res.json();
+      if (listAllShares.value.success === false) {
+        throw new Error(`${t('connection failed')}|$| ${listAllShares.value.message || t('unknown error')}`);
+      }
+    }
+
+    sharesDialog.value = true;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    loadingShares.value = false;
+  }
+};
+
 const testConnection = async (remote) => {
+  listAllShares.value = [];
+
   const testRemote = {
     type: remote.type,
     server: remote.server,
     share: remote.share,
     username: remote.username,
     password: remote.password,
-    domain: remote.domain
+    domain: remote.domain,
   };
 
   overlay.value = true;
@@ -447,5 +535,4 @@ const testConnection = async (remote) => {
     overlay.value = false;
   }
 };
-
 </script>

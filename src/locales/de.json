@@ -522,5 +522,9 @@
   "remote mount could not be mounted": "Remote Mount konnte nicht eingehängt werden",
   "remote mount mounted successfully": "Remote Mount erfolgreich eingehängt",
   "remote mount could not be unmounted": "Remote Mount konnte nicht ausgehängt werden",
-  "remote mount unmounted successfully": "Remote Mount erfolgreich ausgehängt"
+  "remote mount unmounted successfully": "Remote Mount erfolgreich ausgehängt",
+  "could not load shares": "Freigaben konnten nicht geladen werden",
+  "please enter type and server ip first": "Bitte geben Sie zuerst den Typ und die Server-IP ein",
+  "available shares": "Verfügbare Freigaben",
+  "no shares found": "Keine Freigaben gefunden"
 }
