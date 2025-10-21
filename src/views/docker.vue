@@ -1,13 +1,13 @@
 <template>
   <v-container fluid class="d-flex justify-center">
-    <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
+    <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('docker containers') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
         <v-row>
           <v-col>
-            <v-card variant="tonal" fluid>
+            <v-card variant="tonal" fluid style="margin-bottom: 80px">
               <v-card-title>{{ $t('overview') }}</v-card-title>
               <v-card-text class="pa-0">
                 <v-list>
@@ -31,15 +31,12 @@
                             </v-menu>
                           </template>
                           <template v-slot:append>
-                            <v-btn icon small density="compact" class="ms-2"
-                              @click.stop="group.expanded = !group.expanded">
+                            <v-btn icon small density="compact" class="ms-2" @click.stop="group.expanded = !group.expanded">
                               <v-icon>{{ group.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                             </v-btn>
                           </template>
                           <v-list-item-title>{{ group.name }}</v-list-item-title>
-                          <v-list-item-subtitle>
-                            {{ group.runningCount }}/{{ group.count }} {{ $t('started') }}
-                          </v-list-item-subtitle>
+                          <v-list-item-subtitle>{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</v-list-item-subtitle>
                         </v-list-item>
                         <v-expand-transition>
                           <div v-if="group.expanded">
@@ -49,12 +46,9 @@
                                   <template v-slot:prepend>
                                     <v-menu>
                                       <template #activator="{ props }">
-                                        <v-img class="drag-handle mr-4" v-bind="props"
-                                          :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30"
-                                          height="30" style="cursor: pointer">
+                                        <v-img class="drag-handle mr-4" v-bind="props" :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30" height="30" style="cursor: pointer">
                                           <template v-slot:error>
-                                            <v-sheet class="d-flex align-center justify-center" height="100%"
-                                              width="100%">
+                                            <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
                                               <v-icon color="grey-darken-1">mdi-image-off</v-icon>
                                             </v-sheet>
                                           </template>
@@ -62,33 +56,24 @@
                                       </template>
                                       <v-list>
                                         <v-list-item
-                                          v-if="checkWebui(dockers.find(d => d.Names && d.Names[0] === containerName))"
-                                          @click="showWebui(dockers.find(d => d.Names && d.Names[0] === containerName))">
+                                          v-if="checkWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
+                                          @click="showWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
+                                        >
                                           <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
-                                          @click="openTerminal(containerName)">
+                                        <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="openTerminal(containerName)">
                                           <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State !== 'running'"
-                                          @click="startDocker(containerName)">
+                                        <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'running'" @click="startDocker(containerName)">
                                           <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
-                                          @click="stopDocker(containerName)">
+                                        <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="stopDocker(containerName)">
                                           <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
-                                          @click="restartDocker(containerName)">
+                                        <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="restartDocker(containerName)">
                                           <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
-                                          @click="killDocker(containerName)">
+                                        <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="killDocker(containerName)">
                                           <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item :to="`/docker/change/${containerName}`">
@@ -98,74 +83,98 @@
                                         <v-list-item @click="openTerminalLogs(containerName)">
                                           <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item v-if="mosDockers.find(item => item.name === containerName && item.update_available)" @click="updateDocker(containerName)">
+                                        <v-list-item v-if="mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName)">
                                           <v-list-item-title>{{ $t('update') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item v-if="!mosDockers.find(item => item.name === containerName && item.update_available)" @click="updateDocker(containerName, true)">
+                                        <v-list-item v-if="!mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName, true)">
                                           <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item
-                                          @click="openDeleteDialog(dockers.find(d => d.Names && d.Names[0] === containerName))">
+                                        <v-list-item @click="openDeleteDialog(dockers.find((d) => d.Names && d.Names[0] === containerName))">
                                           <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                                         </v-list-item>
                                       </v-list>
                                     </v-menu>
                                   </template>
                                   <v-list-item-title>{{ containerName }}</v-list-item-title>
-                                  <v-list-item-subtitle
-                                    :style="{ color: (dockers.find(d => d.Names && d.Names[0] === containerName)?.State === 'running') ? 'green' : 'red' }">
-                                    {{dockers.find(d => d.Names && d.Names[0] === containerName)?.State || '-'}}
+                                  <v-list-item-subtitle :style="{ color: dockers.find((d) => d.Names && d.Names[0] === containerName)?.State === 'running' ? 'green' : 'red' }">
+                                    {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.State || '-' }}
                                   </v-list-item-subtitle>
                                   <template v-slot:append>
                                     <template v-if="$vuetify.display.xlAndUp">
                                       <v-divider vertical class="mx-2" />
-                                      <p style="min-width:250px; max-width: 150px;">{{ $t('image') }}: {{dockers.find(d => d.Names && d.Names[0] === containerName)?.Image }}</p>
+                                      <p style="min-width: 250px; max-width: 150px">{{ $t('image') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.Image }}</p>
                                       <v-divider vertical class="mx-2" />
                                     </template>
                                     <template v-if="$vuetify.display.mdAndUp">
-                                      <p style="min-width:150px; max-width: 150px;">
+                                      <p style="min-width: 150px; max-width: 150px">
                                         {{ $t('ports') }}:
-                                        {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports && dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(port => port.PublicPort) ? dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.filter(port => port.PublicPort).map(port => port.PublicPort).join(', '): '-'}}
+                                        {{
+                                          dockers.find((d) => d.Names && d.Names[0] === containerName)?.Ports &&
+                                          dockers.find((d) => d.Names && d.Names[0] === containerName)?.Ports.some((port) => port.PublicPort)
+                                            ? dockers
+                                                .find((d) => d.Names && d.Names[0] === containerName)
+                                                ?.Ports.filter((port) => port.PublicPort)
+                                                .map((port) => port.PublicPort)
+                                                .join(', ')
+                                            : '-'
+                                        }}
                                       </p>
                                       <v-divider vertical class="mx-2" />
                                     </template>
-                                    <template
-                                      v-if="$vuetify.display.mdAndUp && dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
-                                      <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-'}}</p>
+                                    <template v-if="$vuetify.display.mdAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
+                                      <p style="min-width: 150px; max-width: 150px">
+                                        {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-' }}
+                                      </p>
                                       <v-divider vertical class="mx-2" />
                                     </template>
-                                    <template
-                                      v-if="$vuetify.display.smAndUp && dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
-                                      <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-'}}</p>
+                                    <template v-else-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
+                                      <p style="min-width: 150px; max-width: 150px">
+                                        {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-' }}
+                                      </p>
+                                      <v-divider vertical class="mx-2" />
+                                    </template>
+                                    <template v-else-if="$vuetify.display.smAndUp">
+                                      <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: -</p>
+                                      <v-divider vertical class="mx-2" />
+                                    </template>
+                                    <template v-if="$vuetify.display.smAndUp && !dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
+                                      <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode }}</p>
                                       <v-divider vertical class="mx-2" />
                                     </template>
                                     <template v-else>
-                                      <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: -</p>
-                                      <v-divider vertical class="mx-2" />
-                                    </template>
-                                    <template v-if="$vuetify.display.smAndUp">
-                                      <p v-if="!dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')"
-                                        style="min-width:150px; max-width: 150px;">
-                                        {{ $t('network') }}: {{dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode}}
-                                      </p>
+                                      <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: -</p>
                                       <v-divider vertical class="mx-2" />
                                     </template>
                                     <template
-                                      v-if="$vuetify.display.smAndUp && mosDockers && mosDockers.find(item => item.name === dockers.find(d => d.Names && d.Names[0] === containerName)?.Names[0] && item.update_available)">
-                                      <v-icon tooltip="$t('update available')" color="green"
-                                        @click="updateDocker(dockers.find(d => d.Names && d.Names[0] === containerName)?.Names[0])">
+                                      v-if="
+                                        $vuetify.display.smAndUp &&
+                                        mosDockers &&
+                                        mosDockers.find((item) => item.name === dockers.find((d) => d.Names && d.Names[0] === containerName)?.Names[0] && item.update_available)
+                                      "
+                                    >
+                                      <v-icon tooltip="$t('update available')" color="green" @click="updateDocker(dockers.find((d) => d.Names && d.Names[0] === containerName)?.Names[0])">
                                         mdi-autorenew
                                       </v-icon>
                                       <v-divider vertical class="mx-2" />
                                     </template>
                                     <v-switch
-                                      :model-value="(dockers.find(d => d.Names && d.Names[0] === containerName)?.autostart) ?? false"
-                                      color="onPrimary" hide-details
-                                      @update:model-value="val => { const d = dockers.find(d => d.Names && d.Names[0] === containerName); if (d) { d.autostart = val; switchAutostart(d); } }"
-                                      inset density="compact" />
+                                      :model-value="dockers.find((d) => d.Names && d.Names[0] === containerName)?.autostart ?? false"
+                                      color="onPrimary"
+                                      hide-details
+                                      @update:model-value="
+                                        (val) => {
+                                          const d = dockers.find((d) => d.Names && d.Names[0] === containerName);
+                                          if (d) {
+                                            d.autostart = val;
+                                            switchAutostart(d);
+                                          }
+                                        }
+                                      "
+                                      inset
+                                      density="compact"
+                                    />
                                     <v-divider vertical class="mx-2" />
-                                    <v-icon class="drag-handle"
-                                      @click="openInfoDialog(dockers.find(d => d.Names && d.Names[0] === containerName))">mdi-information-outline</v-icon>
+                                    <v-icon class="drag-handle" @click="openInfoDialog(dockers.find((d) => d.Names && d.Names[0] === containerName))">mdi-information-outline</v-icon>
                                   </template>
                                 </v-list-item>
                                 <v-divider />
@@ -179,14 +188,20 @@
                   <draggable v-model="dockers" item-key="Id" @end="onDragEnd" handle=".drag-handle">
                     <template #item="{ element: docker, index }">
                       <div>
-                        <v-list-item :id="docker.Id"
-                          v-if="!dockerGroups.some(g => g.containers && g.containers.includes(docker.Names?.[0]))">
+                        <v-list-item :id="docker.Id" v-if="!dockerGroups.some((g) => g.containers && g.containers.includes(docker.Names?.[0]))">
                           <template v-slot:prepend>
                             <v-menu>
                               <template #activator="{ props }">
-                                <v-img v-if="docker.Names && docker.Names.length > 0" class="drag-handle mr-4"
-                                  v-bind="props" :src="`/docker_icons/${docker.Names[0]}.png`" alt="docker image"
-                                  width="30" height="30" style="cursor: pointer">
+                                <v-img
+                                  v-if="docker.Names && docker.Names.length > 0"
+                                  class="drag-handle mr-4"
+                                  v-bind="props"
+                                  :src="`/docker_icons/${docker.Names[0]}.png`"
+                                  alt="docker image"
+                                  width="30"
+                                  height="30"
+                                  style="cursor: pointer"
+                                >
                                   <template v-slot:error>
                                     <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
                                       <v-icon color="grey-darken-1">mdi-image-off</v-icon>
@@ -220,10 +235,10 @@
                                 <v-list-item @click="openTerminalLogs(docker.Names[0])">
                                   <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item v-if="mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0])">
+                                <v-list-item v-if="mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0])">
                                   <v-list-item-title>{{ $t('update') }}</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item v-if="!mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0], true)">
+                                <v-list-item v-if="!mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0], true)">
                                   <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="openDeleteDialog(docker)">
@@ -239,47 +254,47 @@
                           <template v-slot:append>
                             <template v-if="$vuetify.display.xlAndUp">
                               <v-divider vertical class="mx-2" />
-                              <p style="min-width:250px; max-width: 150px;">{{ $t('image') }}: {{ docker.Image }}</p>
+                              <p style="min-width: 250px; max-width: 150px">{{ $t('image') }}: {{ docker.Image }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
                             <template v-if="$vuetify.display.mdAndUp">
-                              <p style="min-width:150px; max-width: 150px;">
+                              <p style="min-width: 150px; max-width: 150px">
                                 {{ $t('ports') }}:
                                 {{
-                                  docker.Ports && docker.Ports.some(port => port.PublicPort)
-                                    ? docker.Ports.filter(port => port.PublicPort).map(port => port.PublicPort).join(', ')
+                                  docker.Ports && docker.Ports.some((port) => port.PublicPort)
+                                    ? docker.Ports.filter((port) => port.PublicPort)
+                                        .map((port) => port.PublicPort)
+                                        .join(', ')
                                     : '-'
                                 }}
                               </p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <template v-if="$vuetify.display.mdAndUp && docker.HostConfig.NetworkMode === 'bridge'">
-                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{
-                                docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
+                            <template v-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'bridge'">
+                              <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <template v-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'host'">
-                              <p style="min-width:150px; max-width: 150px;">{{ $t('ip address') }}: {{
-                                docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
+                            <template v-else-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'host'">
+                              <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
+                              <v-divider vertical class="mx-2" />
+                            </template>
+                            <template v-else-if="$vuetify.display.smAndUp">
+                              <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: -</p>
                               <v-divider vertical class="mx-2" />
                             </template>
                             <template v-if="$vuetify.display.smAndUp">
-                              <p v-if="!docker.HostConfig.NetworkMode.startsWith('container:')"
-                                style="min-width:150px; max-width: 150px;">
-                                {{ $t('network') }}: {{ docker.HostConfig.NetworkMode }}
-                              </p>
+                              <p v-if="!docker.HostConfig.NetworkMode.startsWith('container:')" style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ docker.HostConfig.NetworkMode }}</p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <template
-                              v-if="$vuetify.display.smAndUp && mosDockers && mosDockers.find(item => item.name === docker.Names[0] && item.update_available)">
-                              <v-icon tooltip="$t('update available')" color="green"
-                                @click="updateDocker(docker.Names[0])">
-                                mdi-autorenew
-                              </v-icon>
+                            <template v-else>
+                              <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: -</p>
                               <v-divider vertical class="mx-2" />
                             </template>
-                            <v-switch v-model="docker.autostart" color="onPrimary" hide-details
-                              @change="switchAutostart(docker)" inset density="compact" />
+                            <template v-if="$vuetify.display.smAndUp && mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)">
+                              <v-icon tooltip="$t('update available')" color="green" @click="updateDocker(docker.Names[0])">mdi-autorenew</v-icon>
+                              <v-divider vertical class="mx-2" />
+                            </template>
+                            <v-switch v-model="docker.autostart" color="onPrimary" hide-details @change="switchAutostart(docker)" inset density="compact" />
                             <v-divider vertical class="mx-2" />
                             <v-icon class="drag-handle" @click="openInfoDialog(docker)">mdi-information-outline</v-icon>
                           </template>
@@ -298,8 +313,7 @@
 
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
-      <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0]
-        }}</v-card-title>
+      <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0] }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
@@ -317,22 +331,48 @@
     <v-card v-if="infoDialog.docker">
       <v-card-title class="text-h6">{{ infoDialog.docker.Names[0] }}</v-card-title>
       <v-card-text>
-        <div><strong>{{ $t('state') }}: </strong>{{ infoDialog.docker.State }}</div>
-        <div><strong>{{ $t('image') }}: </strong>{{ infoDialog.docker.Image }}</div>
-        <div><strong>{{ $t('network') }}: </strong>{{ infoDialog.docker.HostConfig.NetworkMode }}</div>
+        <div>
+          <strong>{{ $t('state') }}:</strong>
+          {{ infoDialog.docker.State }}
+        </div>
+        <div>
+          <strong>{{ $t('image') }}:</strong>
+          {{ infoDialog.docker.Image }}
+        </div>
+        <div>
+          <strong>{{ $t('network') }}:</strong>
+          {{ infoDialog.docker.HostConfig.NetworkMode }}
+        </div>
         <div v-if="infoDialog.docker.Mounts && infoDialog.docker.Mounts.length">
           <div v-for="(mount, idx) in infoDialog.docker.Mounts" :key="idx">
-            <div><strong>{{ $t('type') }}: </strong>{{ mount.Type }}</div>
-            <div><strong>{{ $t('source') }}: </strong>{{ mount.Source }} &#8594; {{ mount.Destination }}</div>
-            <div><strong>{{ $t('read/write') }}: </strong>{{ mount.RW ? 'Yes' : 'No' }}</div>
-            <div><strong>{{ $t('mode') }}: </strong>{{ mount.Mode }}</div>
-            <div><strong>{{ $t('propagation') }}: </strong>{{ mount.Propagation }}</div>
+            <div>
+              <strong>{{ $t('type') }}:</strong>
+              {{ mount.Type }}
+            </div>
+            <div>
+              <strong>{{ $t('source') }}:</strong>
+              {{ mount.Source }} &#8594; {{ mount.Destination }}
+            </div>
+            <div>
+              <strong>{{ $t('read/write') }}:</strong>
+              {{ mount.RW ? 'Yes' : 'No' }}
+            </div>
+            <div>
+              <strong>{{ $t('mode') }}:</strong>
+              {{ mount.Mode }}
+            </div>
+            <div>
+              <strong>{{ $t('propagation') }}:</strong>
+              {{ mount.Propagation }}
+            </div>
           </div>
         </div>
-        <div><strong>{{ $t('ports') }}: </strong>
+        <div>
+          <strong>{{ $t('ports') }}:</strong>
           <div v-if="infoDialog.docker.Ports && infoDialog.docker.Ports.length">
             <div v-for="(port, idx) in infoDialog.docker.Ports" :key="idx">
-              {{ port.PrivatePort }}<span v-if="port.PublicPort"> &#8594; {{ port.PublicPort }}</span>
+              {{ port.PrivatePort }}
+              <span v-if="port.PublicPort">&#8594; {{ port.PublicPort }}</span>
               ({{ port.Type }})
             </div>
           </div>
@@ -350,8 +390,7 @@
       <v-card-title class="text-h6">{{ $t('create docker group') }}</v-card-title>
       <v-card-text>
         <v-text-field v-model="createGroupDialog.name" :label="$t('group name')" required></v-text-field>
-        <v-select v-model="createGroupDialog.containers" :items="dockers.map(d => d.Names[0])"
-          :label="$t('select containers')" multiple chips></v-select>
+        <v-select v-model="createGroupDialog.containers" :items="dockers.map((d) => d.Names[0])" :label="$t('select containers')" multiple chips></v-select>
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" @click="clearCreateGroupDialog()">{{ $t('cancel') }}</v-btn>
@@ -367,8 +406,7 @@
       <v-card-title class="text-h6">{{ $t('edit docker group') }} - {{ changeGroupDialog.name }}</v-card-title>
       <v-card-text>
         <v-text-field v-model="changeGroupDialog.name" :label="$t('group name')" required></v-text-field>
-        <v-select v-model="changeGroupDialog.containers" :items="dockers.map(d => d.Names[0])"
-          :label="$t('select containers')" multiple chips></v-select>
+        <v-select v-model="changeGroupDialog.containers" :items="dockers.map((d) => d.Names[0])" :label="$t('select containers')" multiple chips></v-select>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -382,8 +420,7 @@
 
   <v-dialog v-model="deleteGroupDialog.value" max-width="500">
     <v-card>
-      <v-card-title class="text-h6" v-if="deleteGroupDialog.group">{{ $t('delete') }} - {{
-        deleteGroupDialog.group.name }}</v-card-title>
+      <v-card-title class="text-h6" v-if="deleteGroupDialog.group">{{ $t('delete') }} - {{ deleteGroupDialog.group.name }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this docker group?') }}
       </v-card-text>
@@ -398,10 +435,10 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="Primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+  <v-fab color="Primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-dots-vertical</v-icon>
     <v-speed-dial v-model="menu" location="top right" activator="parent" :itemTransition="false" transition="false">
-      <v-sheet key="speed-dial-panel" class="bg-surface elevation-8 rounded-xl pa-2 d-flex flex-column align-end" style="max-width: 250px;" >
+      <v-sheet key="speed-dial-panel" class="bg-surface elevation-8 rounded-xl pa-2 d-flex flex-column align-end" style="max-width: 250px">
         <div class="d-flex align-center justify-end ga-2" key="1">
           <span class="me-2">{{ $t('add container') }}</span>
           <v-btn icon color="onPrimary" @click="$router.push('/docker/create')">
@@ -440,7 +477,7 @@ import { ref, onMounted, reactive } from 'vue';
 import draggable from 'vuedraggable';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
-import { openTerminalPopup } from '@/composables/terminalpopup'
+import { openTerminalPopup } from '@/composables/terminalpopup';
 
 const emit = defineEmits(['refresh-drawer']);
 const { t } = useI18n();
@@ -451,26 +488,26 @@ const overlay = ref(false);
 const menu = ref(false);
 const deleteDialog = reactive({
   value: false,
-  docker: null
+  docker: null,
 });
 const infoDialog = reactive({
   value: false,
-  docker: null
+  docker: null,
 });
 const createGroupDialog = reactive({
   value: false,
   name: '',
-  containers: []
+  containers: [],
 });
 const changeGroupDialog = reactive({
   value: false,
   group: null,
   name: '',
-  containers: []
+  containers: [],
 });
 const deleteGroupDialog = reactive({
   value: false,
-  group: null
+  group: null,
 });
 
 onMounted(() => {
@@ -483,14 +520,14 @@ const getDockers = async () => {
     const [res, mosRes] = await Promise.all([
       fetch('/api/v1/docker/containers/json?all=true', {
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        }
+          Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        },
       }),
       fetch('/api/v1/docker/mos/containers', {
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        }
-      })
+          Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        },
+      }),
     ]);
 
     if (!res.ok) {
@@ -506,9 +543,9 @@ const getDockers = async () => {
     const mosResult = await mosRes.json();
 
     // Entferne führenden / von jedem Namen und initialisiere zusätzliche Properties
-    result.forEach(docker => {
+    result.forEach((docker) => {
       if (docker.Names && Array.isArray(docker.Names)) {
-        docker.Names = docker.Names.map(name => name.startsWith('/') ? name.slice(1) : name);
+        docker.Names = docker.Names.map((name) => (name.startsWith('/') ? name.slice(1) : name));
       }
       // Initialize properties to avoid mutating in template
       docker.showInfo = false;
@@ -518,8 +555,8 @@ const getDockers = async () => {
     // Sortiere docker nach dem Index in mosResult
     if (Array.isArray(mosResult)) {
       result.sort((a, b) => {
-        const objA = mosResult.find(item => item.name === a.Names[0]);
-        const objB = mosResult.find(item => item.name === b.Names[0]);
+        const objA = mosResult.find((item) => item.name === a.Names[0]);
+        const objB = mosResult.find((item) => item.name === b.Names[0]);
         const idxA = objA ? objA.index : Number.MAX_SAFE_INTEGER;
         const idxB = objB ? objB.index : Number.MAX_SAFE_INTEGER;
 
@@ -528,14 +565,13 @@ const getDockers = async () => {
     }
 
     // Übernehme autostart aus mosResult in result
-    result.forEach(docker => {
-      const mos = mosResult.find(item => item.name === docker.Names[0]);
+    result.forEach((docker) => {
+      const mos = mosResult.find((item) => item.name === docker.Names[0]);
       docker.autostart = mos ? mos.autostart : false;
     });
 
     dockers.value = result;
     mosDockers.value = mosResult;
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -546,8 +582,8 @@ const getDockerGroups = async () => {
   try {
     const res = await fetch('/api/v1/docker/mos/groups', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -556,7 +592,6 @@ const getDockerGroups = async () => {
     }
     const result = await res.json();
     dockerGroups.value = result || [];
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -569,8 +604,8 @@ const stopDocker = async (name) => {
     const res = await fetch(`/api/v1/docker/containers/${name}/stop`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
     overlay.value = false;
 
@@ -580,14 +615,13 @@ const stopDocker = async (name) => {
     }
     showSnackbarSuccess(t('docker container stopped successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
   }
-}
+};
 
 const startDocker = async (name) => {
   try {
@@ -595,8 +629,8 @@ const startDocker = async (name) => {
     const res = await fetch(`/api/v1/docker/containers/${name}/start`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -605,14 +639,13 @@ const startDocker = async (name) => {
     }
     showSnackbarSuccess(t('docker container started successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
   }
-}
+};
 
 const restartDocker = async (name) => {
   try {
@@ -620,10 +653,10 @@ const restartDocker = async (name) => {
     const res = await fetch(`/api/v1/docker/containers/${name}/restart`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: name })
+      body: JSON.stringify({ name: name }),
     });
 
     if (!res.ok) {
@@ -632,7 +665,6 @@ const restartDocker = async (name) => {
     }
     showSnackbarSuccess(t('docker container restarted successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -647,8 +679,8 @@ const killDocker = async (name) => {
     const res = await fetch(`/api/v1/docker/containers/${name}/kill`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -657,7 +689,6 @@ const killDocker = async (name) => {
     }
     showSnackbarSuccess(t('docker container stopped successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -673,10 +704,10 @@ const removeDocker = async (name) => {
     const res = await fetch(`/api/v1/docker/mos/remove`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: name })
+      body: JSON.stringify({ name: name }),
     });
 
     if (!res.ok) {
@@ -687,7 +718,6 @@ const removeDocker = async (name) => {
     showSnackbarSuccess(t('docker container removed successfully'));
     getDockers();
     clearDeleteDialog();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -703,10 +733,10 @@ const updateDocker = async (name, force_update = false) => {
     const res = await fetch(`/api/v1/docker/mos/upgrade`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updateBody)
+      body: JSON.stringify(updateBody),
     });
 
     if (!res.ok) {
@@ -715,7 +745,6 @@ const updateDocker = async (name, force_update = false) => {
     }
     showSnackbarSuccess(t('docker container updated successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -731,9 +760,9 @@ const checkForUpdates = async () => {
     const res = await fetch('/api/v1/docker/mos/update_check', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!res.ok) {
@@ -743,7 +772,6 @@ const checkForUpdates = async () => {
 
     showSnackbarSuccess(t('update check finished'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -760,10 +788,10 @@ const updateAll = async () => {
     const res = await fetch(`/api/v1/docker/mos/upgrade`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
-      }
-    })
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!res.ok) {
       const error = await res.json();
@@ -772,7 +800,6 @@ const updateAll = async () => {
 
     showSnackbarSuccess(t('docker containers updated successfully'));
     getDockers();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -789,18 +816,17 @@ const switchAutostart = async (docker) => {
     const res = await fetch(`/api/v1/docker/mos/containers`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(autostart)
+      body: JSON.stringify(autostart),
     });
 
     if (!res.ok) {
       const error = await res.json();
       throw new Error(`${t('autostart setting could not be saved')}|$| ${error.error || t('unknown error')}`);
-    }    
+    }
     showSnackbarSuccess(t('autostart setting saved successfully'));
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -824,10 +850,10 @@ const onDragEndGrp = async () => {
     const res = await fetch('/api/v1/docker/mos/groups/order', {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: newOrder
+      body: newOrder,
     });
 
     if (!res.ok) {
@@ -839,7 +865,7 @@ const onDragEndGrp = async () => {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   }
-}
+};
 
 const onDragEnd = async () => {
   const newOrder = JSON.stringify(
@@ -848,7 +874,7 @@ const onDragEnd = async () => {
         name: docker.Names[0],
         index: idx + 1,
         wait: docker.wait,
-        autostart: docker.autostart
+        autostart: docker.autostart,
       };
       return obj;
     })
@@ -858,16 +884,16 @@ const onDragEnd = async () => {
     const res = await fetch('/api/v1/docker/mos/containers', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: newOrder
+      body: newOrder,
     });
 
     if (!res.ok) {
       const error = await res.json();
       throw new Error(`${t('docker container order could not be saved')}|$| ${error.error || t('unknown error')}`);
-    }    
+    }
     showSnackbarSuccess(t('docker container order saved successfully'));
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
@@ -876,17 +902,11 @@ const onDragEnd = async () => {
 };
 
 const checkWebui = (docker) => {
-  if (
-    docker.State === 'running' &&
-    docker.Labels &&
-    docker.Labels['mos.webui'] !== undefined
-  ) {
+  if (docker.State === 'running' && docker.Labels && docker.Labels['mos.webui'] !== undefined) {
     let webui = docker.Labels['mos.webui'];
     const portMatch = webui.match(/PORT:(\d+)/);
     if (portMatch && Array.isArray(docker.Ports)) {
-      const portObj = docker.Ports.find(
-        port => port.PrivatePort === Number(portMatch[1])
-      );
+      const portObj = docker.Ports.find((port) => port.PrivatePort === Number(portMatch[1]));
       if (portObj) {
         const port = portObj.PublicPort ? portObj.PublicPort : portObj.PrivatePort;
         webui = webui.replace(/\[PORT:\d+\]/g, port);
@@ -923,7 +943,7 @@ const openTerminalLogs = async (dockerName) => {
 };
 
 const createDockerTerminalSession = async (dockerName) => {
-  const existingSessionId = await checkExistingTerminal("docker", "exec", dockerName);
+  const existingSessionId = await checkExistingTerminal('docker', 'exec', dockerName);
   if (existingSessionId) {
     return existingSessionId;
   }
@@ -932,10 +952,10 @@ const createDockerTerminalSession = async (dockerName) => {
     const res = await fetch('/api/v1/terminal/create', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ "command": "docker", "args": ["exec", "-it", dockerName, "/bin/sh"] })
+      body: JSON.stringify({ command: 'docker', args: ['exec', '-it', dockerName, '/bin/sh'] }),
     });
 
     if (!res.ok) {
@@ -945,14 +965,13 @@ const createDockerTerminalSession = async (dockerName) => {
 
     const Result = await res.json();
     return Result.sessionId;
-
   } catch (e) {
     showSnackbarError(e.message);
   }
-}
+};
 
 const createLogsTerminalSession = async (dockerName) => {
-  const existingSessionId = await checkExistingTerminal("docker", "logs", dockerName);
+  const existingSessionId = await checkExistingTerminal('docker', 'logs', dockerName);
   if (existingSessionId) {
     return existingSessionId;
   }
@@ -961,10 +980,10 @@ const createLogsTerminalSession = async (dockerName) => {
     const res = await fetch('/api/v1/terminal/create', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ "command": "docker", "args": ["logs", "-f", "--tail", "100", dockerName], readonlyOnly: true })
+      body: JSON.stringify({ command: 'docker', args: ['logs', '-f', '--tail', '100', dockerName], readonlyOnly: true }),
     });
 
     if (!res.ok) {
@@ -974,20 +993,19 @@ const createLogsTerminalSession = async (dockerName) => {
 
     const Result = await res.json();
     return Result.sessionId;
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   }
-}
+};
 
 const checkExistingTerminal = async (command, arg, dockerName) => {
   try {
     const res = await fetch(`/api/v1/terminal/sessions`, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -998,25 +1016,17 @@ const checkExistingTerminal = async (command, arg, dockerName) => {
     const Result = await res.json();
     const sessions = ref([]);
     sessions.value = Result.sessions || [];
-    const session = sessions.value.filter(
-      session =>
-        session.command === command &&
-        Array.isArray(session.args) &&
-        session.args.includes(dockerName)
-        &&
-        session.args.includes(arg)
-    );
+    const session = sessions.value.filter((session) => session.command === command && Array.isArray(session.args) && session.args.includes(dockerName) && session.args.includes(arg));
     if (session.length > 0) {
       return session[0].sessionId;
     } else {
       return null;
     }
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   }
-}
+};
 
 const createDockerGroup = async () => {
   if (!createGroupDialog.name || createGroupDialog.name.trim() === '') {
@@ -1030,7 +1040,7 @@ const createDockerGroup = async () => {
 
   const newGroup = {
     name: createGroupDialog.name.trim(),
-    containers: createGroupDialog.containers
+    containers: createGroupDialog.containers,
   };
 
   try {
@@ -1038,10 +1048,10 @@ const createDockerGroup = async () => {
     const res = await fetch('/api/v1/docker/mos/groups', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newGroup)
+      body: JSON.stringify(newGroup),
     });
     overlay.value = false;
 
@@ -1052,7 +1062,6 @@ const createDockerGroup = async () => {
     showSnackbarSuccess(t('docker group created successfully'));
     getDockerGroups();
     clearCreateGroupDialog();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1072,11 +1081,10 @@ const deleteDockerGroup = async () => {
     const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(deleteGroupDialog.group.id)}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
     });
-    
 
     if (!res.ok) {
       const error = await res.json();
@@ -1086,7 +1094,6 @@ const deleteDockerGroup = async () => {
     showSnackbarSuccess(t('docker group deleted successfully'));
     getDockerGroups();
     clearDeleteGroupDialog();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1111,7 +1118,7 @@ const updateDockerGroup = async () => {
 
   const updatedGroup = {
     name: changeGroupDialog.name.trim(),
-    containers: changeGroupDialog.containers
+    containers: changeGroupDialog.containers,
   };
 
   try {
@@ -1119,10 +1126,10 @@ const updateDockerGroup = async () => {
     const res = await fetch(`/api/v1/docker/mos/groups/${changeGroupDialog.group.id}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updatedGroup)
+      body: JSON.stringify(updatedGroup),
     });
 
     if (!res.ok) {
@@ -1133,7 +1140,6 @@ const updateDockerGroup = async () => {
     showSnackbarSuccess(t('docker group updated successfully'));
     getDockerGroups();
     clearChangeGroupDialog();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1188,5 +1194,4 @@ const clearDeleteGroupDialog = () => {
   deleteGroupDialog.value = false;
   deleteGroupDialog.group = null;
 };
-
 </script>
