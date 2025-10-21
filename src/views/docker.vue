@@ -14,7 +14,7 @@
                   <draggable v-model="dockerGroups" item-key="id" @end="onDragEndGrp" handle=".drag-handle">
                     <template #item="{ element: group, index }">
                       <div v-if="group.name !== ''">
-                        <v-list-item :id="group.id">
+                        <v-list-item :id="group.id" @click.stop="group.expanded = !group.expanded">
                           <template v-slot:prepend>
                             <v-menu>
                               <template #activator="{ props }">
@@ -441,26 +441,26 @@
       <v-sheet key="speed-dial-panel" class="bg-surface elevation-8 rounded-xl pa-2 d-flex flex-column align-end" style="max-width: 250px">
         <div class="d-flex align-center justify-end ga-2 mb-1" key="1" @click="$router.push('/docker/create')" style="cursor: pointer">
           <span class="me-2">{{ $t('add container') }}</span>
-          <v-btn icon color="onPrimary" density="comfortable">
-            <v-icon>mdi-plus</v-icon>
+          <v-btn icon color="primary" density="comfortable">
+            <v-icon color="onPrimary">mdi-plus</v-icon>
           </v-btn>
         </div>
         <div class="d-flex align-center justify-end ga-2 mb-1" key="2" @click="openCreateGroupDialog()" style="cursor: pointer">
           <span class="me-2">{{ $t('create docker group') }}</span>
-          <v-btn icon color="onPrimary" density="comfortable">
-            <v-icon>mdi-folder-plus</v-icon>
+          <v-btn icon color="primary" density="comfortable">
+            <v-icon color="onPrimary">mdi-folder-plus</v-icon>
           </v-btn>
         </div>
         <div class="d-flex align-center justify-end ga-2 mb-1" key="3" @click="checkForUpdates()" style="cursor: pointer">
           <span class="me-2">{{ $t('check for updates') }}</span>
-          <v-btn icon color="onPrimary" density="comfortable">
-            <v-icon>mdi-update</v-icon>
+          <v-btn icon color="primary" density="comfortable">
+            <v-icon color="onPrimary">mdi-update</v-icon>
           </v-btn>
         </div>
         <div class="d-flex align-center justify-end ga-2 mb-1" key="4" @click="updateAll()" style="cursor: pointer">
           <span class="me-2">{{ $t('update all') }}</span>
-          <v-btn icon color="onPrimary" density="comfortable">
-            <v-icon>mdi-refresh</v-icon>
+          <v-btn icon color="primary" density="comfortable">
+            <v-icon color="onPrimary">mdi-refresh</v-icon>
           </v-btn>
         </div>
       </v-sheet>
