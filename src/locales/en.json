@@ -532,5 +532,7 @@
   "no shares found": "No Shares Found",
   "disk successfully put to sleep": "Disk successfully put to sleep",
   "failed to put disk to sleep": "Failed to put disk to sleep",
-  "required": "Required"
+  "required": "Required",
+  "mos frontend": "MOS Frontend",
+  "mos api": "MOS API"  
 }

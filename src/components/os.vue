@@ -4,16 +4,49 @@
       {{ $t( 'mos') }}
     </v-card-title>
     <v-card-text>
-      <div>
-        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('platform') }}:</b> {{ osInfo.base[0].os_id }}</p>
-        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('name') }}:</b> {{ osInfo.base[0].os_name }}</p>
-        <p v-if="osInfo && osInfo.base && osInfo.base.length > 0"><b>{{ $t('version') }}:</b> {{ osInfo.base[0].os_version }}</p>
-        <p v-if="osInfo && osInfo.hostname"><b>{{ $t('hostname') }}:</b> {{ osInfo.hostname }}</p>
-        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos version') }}:</b> {{ osInfo.mos.version }}</p>
-        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos channel') }}:</b> {{ osInfo.mos.channel }}</p>
-        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos build') }}:</b> {{ osInfo.mos.build }}</p>
-        <p v-if="osInfo && osInfo.mos"><b>{{ $t('mos kernel') }}:</b> {{ osInfo.mos.running_kernel }}</p>
-      </div>
+      <v-row dense>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.base?.[0]?.os_id">
+        <div class="text-caption text-medium-emphasis">{{ $t('platform') }}</div>
+        <div class="text-body-2">{{ osInfo.base[0].os_id }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.base?.[0]?.os_name">
+        <div class="text-caption text-medium-emphasis">{{ $t('name') }}</div>
+        <div class="text-body-2">{{ osInfo.base[0].os_name }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.base?.[0]?.os_version">
+        <div class="text-caption text-medium-emphasis">{{ $t('version') }}</div>
+        <div class="text-body-2">{{ osInfo.base[0].os_version }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.hostname">
+        <div class="text-caption text-medium-emphasis">{{ $t('hostname') }}</div>
+        <div class="text-body-2">{{ osInfo.hostname }}</div>
+      </v-col>
+      <v-col cols="12" v-if="osInfo?.mos"><v-divider></v-divider></v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.version">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos version') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.version }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.channel">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos channel') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.channel }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.build">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos build') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.build }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.running_kernel">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos kernel') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.running_kernel }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.frontend">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos frontend') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.frontend }}</div>
+      </v-col>
+      <v-col cols="12" sm="6" md="4" v-if="osInfo?.mos?.api">
+        <div class="text-caption text-medium-emphasis">{{ $t('mos api') }}</div>
+        <div class="text-body-2">{{ osInfo.mos.api }}</div>
+      </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>

@@ -532,5 +532,7 @@
   "no shares found": "Keine Freigaben gefunden",
   "disk successfully put to sleep": "Festplatte erfolgreich in den Ruhezustand versetzt",
   "failed to put disk to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden",
-  "required": "Erforderlich"
+  "required": "Erforderlich",
+  "mos frontend": "MOS Frontend",
+  "mos api": "MOS API"
 }
