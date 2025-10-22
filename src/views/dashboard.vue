@@ -141,22 +141,15 @@ onUnmounted(() => {
 <style scoped>
 .masonry {
   column-gap: 16px;
-  column-width: 640px;
+  column-count: 2;     /* genau 2 Spalten */
 }
+
 .masonry-item {
   break-inside: avoid;
   margin: 0 0 16px;
 }
 
-.dash-card {
-  border: none !important;
-}
-
-/* Responsive Feintuning */
-@media (max-width: 1280px) {
-  .masonry { column-width: 520px; }
-}
-@media (max-width: 768px) {
-  .masonry { column-width: 100%; }
+@media (max-width: 800px) {
+  .masonry { column-count: 1; }
 }
 </style>

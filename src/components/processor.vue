@@ -41,14 +41,15 @@
       <div v-if="processor.cores && processor.cores.length">
         <details class="mt-2">
           <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline">{{ $t('cores') }}</summary>
-          <v-row dense class="ma-2">
-            <v-col v-for="(core, i) in processor.cores" :key="i" cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="d-flex align-center ma-0 pa-0" style="margin-top: 6px">
-              <div style="width: 48px; display: flex; align-items: center">
+          <div class="cores-grid">
+            <div class="core-row" v-for="(core, i) in processor.cores" :key="i">
+              <div class="core-label">
                 <small>
                   <b>CPU {{ i }}</b>
                 </small>
               </div>
-              <div style="flex: 1; display: flex; align-items: center; height: 12px">
+
+              <div class="core-bar">
                 <v-progress-linear
                   :model-value="core.load?.total ?? 0"
                   height="12"
@@ -60,9 +61,8 @@
                   </template>
                 </v-progress-linear>
               </div>
-              <span style="width: 12px"></span>
-            </v-col>
-          </v-row>
+            </div>
+          </div>
         </details>
       </div>
     </v-card-text>
@@ -101,3 +101,34 @@ const getOsInfo = async () => {
   }
 };
 </script>
+
+<style scoped>
+.cores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 6px;
+  margin: 4px;
+}
+
+.core-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.core-label {
+  width: 48px;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.core-bar {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 12px;
+}
+</style>
