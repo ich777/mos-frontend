@@ -218,7 +218,6 @@ const getNetworkSettings = async () => {
     }
 
     settingsNetwork.value = await res.json();
-    console.log(settingsNetwork.value);
     if (settingsNetwork.value.interfaces[0].ipv4.length === 0) settingsNetwork.value.interfaces[0].ipv4 = [{ dhcp: false, address: null, gateway: null, dns: [] }];
     if (settingsNetwork.value.interfaces[0].ipv6.length === 0) settingsNetwork.value.interfaces[0].ipv6 = [{ dhcp: false, address: null, gateway: null, dns: [] }];
   } catch (e) {

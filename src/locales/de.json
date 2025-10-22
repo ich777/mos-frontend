@@ -1,4 +1,7 @@
 {
+  "mos slogan": "Das bessere OS",
+  "welcome back": "Willkommen zurück",
+  "logged in successfully": "Erfolgreich angemeldet",
   "dashboard": "Dashboard",
   "users": "Benutzer",
   "disks": "Festplatten",
@@ -528,5 +531,6 @@
   "available shares": "Verfügbare Freigaben",
   "no shares found": "Keine Freigaben gefunden",
   "disk successfully put to sleep": "Festplatte erfolgreich in den Ruhezustand versetzt",
-  "failed to put disk to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden"
+  "failed to put disk to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden",
+  "required": "Erforderlich"
 }

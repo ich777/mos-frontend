@@ -1,4 +1,7 @@
 {
+  "mos slogan": "The better OS",
+  "welcome back": "Welcome back",
+  "logged in successfully": "Logged in successfully",
   "dashboard": "Dashboard",
   "users": "Users",
   "disks": "Disks",
@@ -528,5 +531,6 @@
   "available shares": "Available Shares",
   "no shares found": "No Shares Found",
   "disk successfully put to sleep": "Disk successfully put to sleep",
-  "failed to put disk to sleep": "Failed to put disk to sleep"
+  "failed to put disk to sleep": "Failed to put disk to sleep",
+  "required": "Required"
 }

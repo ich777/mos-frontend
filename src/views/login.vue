@@ -1,75 +1,176 @@
 <template>
-    <v-container max-width="600">
-        <v-spacer style="height: 20%;"></v-spacer>
-        <v-col align="center" fluid>
-            <v-img src="mos_black.png" alt="MOS Logo" max-width="150" contain />
-            <v-spacer style="height: 50px;"></v-spacer>
-            <v-col>
-                <v-card variant="tonal" fluid>
-                    <v-card-title>{{ $t('login') }}</v-card-title>
-                    <v-card-text>
-                        <form @submit.prevent="login">
-                            <v-text-field v-model="username" label="Username" @keyup.enter="login" />
-                            <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
-                                @keyup.enter="login" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                                @click:append-inner="showPassword = !showPassword" />
-                            <v-alert v-if="error" type="error" dense>{{ error }}</v-alert>
-                            <button type="submit" style="display:none"></button>
-                        </form>
-                    </v-card-text>
-                    <v-card-actions class="justify-center">
-                        <v-btn color="onPrimary" variant="outlined" @click="login" style="min-width: 200px;">{{
-                            $t('login') }}</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
+  <div class="login-wrap">
+    <v-container class="py-10" max-width="1000">
+      <v-row align="stretch" justify="center" no-gutters>
+        <!-- Left: Brand / Intro -->
+        <v-col cols="12" md="6" class="pa-6 d-flex flex-column justify-center align-center text-center">
+            <div class="brand centered">
+                <v-img src="mos_black.png" alt="MOS Logo" max-width="140" class="mx-auto mb-6" contain />
+                <h1 class="brand__title">MOS Portal</h1>
+                <p class="brand__copy">{{ t('mos slogan') }}</p>
+            </div>
         </v-col>
+
+        <v-divider
+          vertical
+          class="d-none d-md-flex"
+          style="height: auto; border-left: 1px solid color-mix(in oklab, var(--v-theme-on-surface) 10%, transparent);"
+        ></v-divider>
+
+        <!-- Right: Subtle card login -->
+        <v-col cols="12" md="6" class="pa-6">
+          <v-card class="elevated" elevation="8">
+            <v-card-text class="pa-6">
+              <h2 class="mb-1">{{ t('login') }}</h2>
+              <p class="text-medium-emphasis mb-6 text-body-2">{{ t('welcome back') }}</p>
+
+              <v-form ref="formRef" v-model="isValid" @submit.prevent="onSubmit">
+                <v-text-field
+                  v-model.trim="username"
+                  :label="t('username') || 'Username'"
+                  autocomplete="username"
+                  variant="outlined"
+                  density="comfortable"
+                  :rules="[rules.required]"
+                  @keyup.enter="onSubmit"
+                  class="mb-3"
+                />
+
+                <v-text-field
+                  v-model="password"
+                  :label="t('password') || 'Password'"
+                  :type="showPassword ? 'text' : 'password'"
+                  :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                  autocomplete="current-password"
+                  variant="outlined"
+                  density="comfortable"
+                  :rules="[rules.required]"
+                  @click:append-inner="showPassword = !showPassword"
+                  @keyup.enter="onSubmit"
+                  class="mb-1"
+                />
+
+                <v-btn type="submit" block size="large" :loading="loading" :disabled="!isValid || loading">
+                  {{ t('login') }}
+                </v-btn>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
+
+    <v-snackbar v-model="snackbar" :timeout="2400" location="bottom" variant="flat">
+      {{ t('login_success') || 'Logged in successfully.' }}
+      <template #actions>
+        <v-btn variant="text" @click="snackbar = false">OK</v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useTheme } from 'vuetify';
+import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
 const { locale, t } = useI18n();
 const theme = useTheme();
-const username = ref('')
-const password = ref('')
-const error = ref('')
-const emit = defineEmits(['refresh-drawer', 'login-success']);
+
+const username = ref('');
+const password = ref('');
+const remember = ref(true);
 const showPassword = ref(false);
+const loading = ref(false);
+const isValid = ref(false);
+const snackbar = ref(false);
+const formRef = ref(null);
 
-async function login() {
-    try {
-        const res = await fetch('/api/v1/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username: username.value, password: password.value })
-        });
+const emit = defineEmits(['refresh-drawer', 'login-success', 'open-forgot']);
 
-        // Überprüfe, ob die Antwort erfolgreich war
-        if (!res.ok) throw new Error(`${t('login failed')}: ${res.status} ${res.statusText}`);
+const rules = {
+  required: (v) => !!v || v === 0 || t('required') || 'Required',
+};
 
-        // Response in JSON umwandeln
-        const result = await res.json();
-
-        localStorage.setItem('authToken', result.token);
-        localStorage.setItem('userid', result.user.id);
-        theme.global.name.value = result.user.darkmode ? 'dark' : 'light';
-        locale.value = result.user.language || 'en'
-        theme.themes.value[theme.global.name.value].colors.primary = result.user.primary_color || '#1976D2';
-
-        // Login erfolgreich
-        error.value = '';
-        emit('refresh-drawer');
-        emit('login-success');
-    } catch (e) {
-        error.value = e.message;
-    }
-
+function toggleTheme() {
+  const current = theme.global.name.value;
+  theme.global.name.value = current === 'dark' ? 'light' : 'dark';
 }
 
+const palette = ['#1976D2', '#7C4DFF', '#009688', '#E91E63', '#FF9800'];
+function cyclePrimary() {
+  const current = theme.themes.value[theme.global.name.value].colors.primary || '#1976D2';
+  const idx = (palette.indexOf(current) + 1) % palette.length;
+  theme.themes.value[theme.global.name.value].colors.primary = palette[idx];
+}
+
+async function onSubmit() {
+  const ok = await formRef.value?.validate();
+  if (!ok) return;
+  await login();
+}
+
+async function login() {
+  try {
+    loading.value = true;
+    const res = await fetch('/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value, password: password.value }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('login failed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const result = await res.json();
+
+    localStorage.setItem('authToken', result.token);
+    localStorage.setItem('userid', result.user.id);
+    if (remember.value) localStorage.setItem('rememberedUser', username.value);
+
+    theme.global.name.value = result.user.darkmode ? 'dark' : 'light';
+    locale.value = result.user.language || 'en';
+    theme.themes.value[theme.global.name.value].colors.primary = result.user.primary_color || '#1976D2';
+
+    showSnackbarSuccess?.(t('logged in successfully'));
+    snackbar.value = true;
+
+    emit('refresh-drawer');
+    emit('login-success');
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = (e.message || '').split('|$|');
+    showSnackbarError?.(userMessage, apiErrorMessage);
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
+
+<style scoped>
+/* Subtle surface background */
+.login-wrap {
+  min-height: 100vh;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--v-theme-primary) 6%, transparent) 0%, transparent 30%),
+    linear-gradient(90deg, color-mix(in oklab, var(--v-theme-secondary) 5%, transparent) 0%, transparent 40%);
+}
+
+/* Card with gentle elevation & soft border */
+.elevated {
+  border-radius: 16px;
+  background: var(--v-theme-surface);
+  border: 1px solid color-mix(in oklab, var(--v-theme-on-surface) 10%, transparent);
+}
+
+.brand__title {
+  font-weight: 700;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.15;
+}
+.brand__copy {
+  opacity: 0.8;
+  max-width: 40ch;
+}
+</style>

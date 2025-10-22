@@ -51,7 +51,6 @@ const getPools = async () => {
       throw new Error(`${t('pools could not be loaded')}|$| ${errorDetails.error || t('unknown error')}`);
     }
     pools.value = await res.json();
-    console.log(pools.value);
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
