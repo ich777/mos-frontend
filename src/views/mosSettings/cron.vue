@@ -14,7 +14,12 @@
                     mdi-calendar-clock
                   </v-icon>
                 </template>
-                <v-list-item-title>{{ cronJob.name }}</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  {{ cronJob.name }}
+                  <v-chip v-if="cronJob.status === 'running'" class="ml-2" small color="green" text-color="white">
+                    {{ $t('running') }}
+                  </v-chip>
+                </v-list-item-title>
                 <v-list-item-subtitle>{{ cronJob.schedule }} - {{ cronJob.command }}</v-list-item-subtitle>
                     <template v-slot:append>
                       <v-menu>
@@ -30,9 +35,16 @@
                           <v-list-item @click="openDeleteCronJobDialog(cronJob)">
                             <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                           </v-list-item>
+                          <v-divider></v-divider>
                           <v-list-item @click="openChangeScriptDialog(cronJob)">
                             <v-list-item-title>{{ $t('change script') }}</v-list-item-title>
-                          </v-list-item>                          
+                          </v-list-item>
+                          <v-list-item @click="startScript(cronJob.id)">
+                            <v-list-item-title>{{ $t('start script') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="stopScript(cronJob.id)">
+                            <v-list-item-title>{{ $t('stop script') }}</v-list-item-title>
+                          </v-list-item>
                         </v-list>
                       </v-menu>
                     </template>
@@ -291,7 +303,7 @@ const changeScript = async () => {
   try {
     overlay.value = true;
     const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(changeScriptDialog.name), {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json'
@@ -309,7 +321,52 @@ const changeScript = async () => {
     overlay.value = false;
     showSnackbarError(e.message);
   }
+};
 
+const startScript = async (cronId) => {
+  try {
+    overlay.value = true;
+    const res = await fetch('/api/v1/cron/' + encodeURIComponent(cronId) + '/start', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || t('script could not be started'));
+    }
+    showSnackbarSuccess(t('script started successfully'));
+    getCron();
+  } catch (e) {
+    showSnackbarError(e.message);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const stopScript = async (cronId) => {
+  try {
+    overlay.value = true;
+    const res = await fetch('/api/v1/cron/' + encodeURIComponent(cronId) + '/stop', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || t('script could not be stopped'));
+    }
+    showSnackbarSuccess(t('script stopped successfully'));
+    getCron();
+  } catch (e) {
+    showSnackbarError(e.message);
+  } finally {
+    overlay.value = false;
+  }
 };
 
 const openCreateCronJobDialog = () => {

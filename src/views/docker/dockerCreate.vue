@@ -40,6 +40,7 @@
                             :loading="loadingContainers" clearable @update:model-value="onContainerChange"></v-select>
                         <v-text-field :label="$t('custom ip')" v-model="form.custom_ip"></v-text-field>
                         <v-text-field :label="$t('default shell')" v-model="form.default_shell"></v-text-field>
+                        <v-select :label="$t('gpu')" v-model="form.gpus" :items="gpuIds" multiple clearable chips hide-selected></v-select>
                         <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary"
                             density="compact"></v-switch>
                         <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
@@ -47,7 +48,7 @@
                         <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
                         <v-divider class="my-2"></v-divider>
                         <v-card-subtitle class="mb-2">
-                            <v-btn icon size="x-small" color="onPrimary" class="ma-1 pa-0"
+                            <v-btn icon size="x-small" color="green" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.paths.push({ name: '', mode: '', host: '', container: '' })"
                                 title="Add path" aria-label="add path">
@@ -60,7 +61,7 @@
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
                                     <div class="d-flex flex-column align-center">
-                                        <v-btn icon size="x-small" color="onPrimary" class="pa-0"
+                                        <v-btn icon size="x-small" color="green" class="pa-0"
                                             style="width:24px; height:24px; min-width:24px; margin-bottom:6px;"
                                             @click="form.paths.splice(i + 1, 0, { name: '', mode: '', host: '', container: '' })"
                                             title="Add path" aria-label="add path">
@@ -99,7 +100,7 @@
                         </div>
                         <v-divider class="my-2"></v-divider>
                         <v-card-subtitle class="mb-2">
-                            <v-btn icon size="x-small" color="onPrimary" class="ma-1 pa-0"
+                            <v-btn icon size="x-small" color="green" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.ports.push({ name: '', protocol: '', host: '', container: '' })"
                                 title="Add port" aria-label="add port">
@@ -112,7 +113,7 @@
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
                                     <div class="d-flex flex-column align-center">
-                                        <v-btn icon size="x-small" color="onPrimary" class="pa-0"
+                                        <v-btn icon size="x-small" color="green" class="pa-0"
                                             style="width:24px; height:24px; min-width:24px; margin-bottom:6px;"
                                             @click="form.ports.splice(i + 1, 0, { name: '', protocol: '', host: '', container: '' })"
                                             title="Add port" aria-label="add port">
@@ -147,7 +148,7 @@
                         </div>
                         <v-divider class="my-2"></v-divider>
                         <v-card-subtitle class="mb-2">
-                            <v-btn icon size="x-small" color="onPrimary" class="ma-1 pa-0"
+                            <v-btn icon size="x-small" color="green" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.devices.push({ name: '', host: '', container: '' })" title="Add device"
                                 aria-label="add device">
@@ -160,7 +161,7 @@
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
                                     <div class="d-flex flex-column align-center">
-                                        <v-btn icon size="x-small" color="onPrimary" class="pa-0"
+                                        <v-btn icon size="x-small" color="green" class="pa-0"
                                             style="width:24px; height:24px; min-width:24px; margin-bottom:6px;"
                                             @click="form.devices.splice(i + 1, 0, { name: '', host: '', container: '' })"
                                             title="Add device" aria-label="add device">
@@ -194,7 +195,7 @@
                         </div>
                         <v-divider class="my-2"></v-divider>
                         <v-card-subtitle class="mb-2">
-                            <v-btn icon size="x-small" color="onPrimary" class="ma-1 pa-0"
+                            <v-btn icon size="x-small" color="green" class="ma-1 pa-0"
                                 style="width:24px; height:24px; min-width:24px;"
                                 @click="form.variables.push({ name: '', key: '', value: '', mask: false })"
                                 title="Add variable" aria-label="add variable">
@@ -207,7 +208,7 @@
                             <v-row>
                                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
                                     <div class="d-flex flex-column align-center">
-                                        <v-btn icon size="x-small" color="onPrimary" class="pa-0"
+                                        <v-btn icon size="x-small" color="green" class="pa-0"
                                             style="width:24px; height:24px; min-width:24px; margin-bottom:6px;"
                                             @click="form.variables.splice(i + 1, 0, { name: '', key: '', value: '', mask: false })"
                                             title="Add variable" aria-label="add variable">
@@ -228,7 +229,7 @@
                                         </v-col>
                                         <v-col cols="6">
                                             <v-switch :label="$t('masked')" v-model="variable.mask" inset
-                                                color="onPrimary" density="compact" hide-details class="mb-4"></v-switch>
+                                                color="green" density="compact" hide-details class="mb-4"></v-switch>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mt-n8">
@@ -280,6 +281,8 @@ const loadingContainers = ref(false);
 const selectedContainer = ref('');
 const networkMode = ref('');
 const dockerUrl = ref('');
+const gpus = ref([]);
+const gpuIds = ref([]);
 const form = ref({
     selectedTemplate: '',
     name: '',
@@ -294,7 +297,8 @@ const form = ref({
     ports: [],
     paths: [],
     variables: [],
-    devices: []
+    devices: [],
+    gpus: []
 })
 const allTemplates = ref({})
 const allTemplatesMixed = ref([])
@@ -304,6 +308,7 @@ onMounted(() => {
     getAllTemplates();
     getDockerNetworks();
     getDockerContainers();
+    getGPUs();
 });
 
 const getDockerNetworks = async () => {
@@ -502,6 +507,8 @@ const fillFormFromJson = (jsonData) => {
             host: device.host || '',
             container: device.container || ''
         })) : [];
+        console.log(jsonData.gpus);
+    form.gpus = Array.isArray(jsonData.gpus) ? jsonData.gpus : [];
 
     showSnackbarSuccess(t('template loaded successfully'));
 };
@@ -541,7 +548,8 @@ const createDocker = async () => {
             name: device.name,
             host: device.host,
             container: device.container
-        }))
+        })),
+        gpus: form.gpus
     }
 
     try {
@@ -671,6 +679,7 @@ const getDockerTemplate = async (docker, installed) => {
                     host: device.host,
                     container: device.container
                 })) : [];
+            form.value.gpus = Array.isArray(result.gpus) ? result.gpus : [];
         } else {
             form.value.name = '';
             form.value.repo = '';
@@ -687,6 +696,7 @@ const getDockerTemplate = async (docker, installed) => {
             form.value.ports = [];
             form.value.variables = [];
             form.value.devices = [];
+            form.value.gpus = [];
         }
 
     } catch (e) {
@@ -695,6 +705,39 @@ const getDockerTemplate = async (docker, installed) => {
     } finally {
         overlay.value = false;
     }
+};
+
+const getGPUs = async () => {
+  try {
+    const res = await fetch('/api/v1/system/gpus', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('gpus could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+    gpus.value = await res.json();
+
+    gpuIds.value = [];
+    const vendors = ['Intel', 'AMD', 'NVIDIA'];
+    vendors.forEach((vendor) => {
+        const list = gpus.value?.[vendor];
+        if (!Array.isArray(list)) return;
+        list.forEach((gpu) => {
+            if (!gpu) return;
+            const id = gpu.pci;
+            if (id) gpuIds.value.push(id);
+        });
+    });
+    gpuIds.value = Array.from(new Set(gpuIds.value));
+
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
 };
 
 </script>

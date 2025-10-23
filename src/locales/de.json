@@ -538,5 +538,11 @@
   "update check finished": "Update-Prüfung abgeschlossen",
   "enter passphrase": "Passphrase eingeben",
   "incorrect passphrase": "Falsche Passphrase",
-  "create keyfile": "Keyfile erstellen"
+  "create keyfile": "Keyfile erstellen",
+  "script could not be started": "Skript konnte nicht gestartet werden",
+  "script started successfully": "Skript erfolgreich gestartet",
+  "script could not be stopped": "Skript konnte nicht gestoppt werden",
+  "script stopped successfully": "Skript erfolgreich gestoppt",
+  "start script": "Skript starten",
+  "stop script": "Skript stoppen"
 }
