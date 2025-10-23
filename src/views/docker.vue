@@ -414,8 +414,6 @@
           chips
           clearable
         ></v-combobox>
-
-        <!-- draggable Darstellung der ausgewählten Chips zum Umordnen -->
         <draggable v-model="changeGroupDialog.containers" class="d-flex flex-wrap mt-2" :component="'div'">
           <template #item="{ element, index }">
             <v-chip class="ma-1" closable @click:close="changeGroupDialog.containers.splice(index, 1)">

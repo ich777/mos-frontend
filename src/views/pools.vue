@@ -91,7 +91,7 @@
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item v-if="!pool.status.mounted" @click="mountPool(pool)">
+                <v-list-item v-if="!pool.status.mounted" @click="pool.config && pool.config.encrypted ? openPassphraseDialog(pool) : mountPool(pool)">
                   <v-list-item-title>{{ $t('mount pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
@@ -240,6 +240,23 @@
     </v-card>
   </v-dialog>
 
+  <v-dialog v-model="passphraseDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('enter passphrase') }}</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-text-field v-model="passphraseDialog.passphrase" :label="$t('passphrase')" type="password" :rules="[(v) => !!v || $t('passphrase is required')]" />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="passphraseDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="mountPoolWithPassphrase(passphraseDialog.pool, passphraseDialog.passphrase)" color="onPrimary">
+          {{ $t('mount') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
@@ -292,12 +309,23 @@ const deletePoolDialog = reactive({
   pool: null,
   filesystem: '',
 });
+const passphraseDialog = reactive({
+  value: false,
+  pool: null,
+  passphrase: '',
+});
 
 onMounted(async () => {
   getPools();
   getUnassignedDisks();
   getFilesystems();
 });
+
+const openPassphraseDialog = (pool) => {
+  passphraseDialog.value = true;
+  passphraseDialog.pool = pool;
+  passphraseDialog.passphrase = '';
+};
 
 const openFormatDialog = (disk) => {
   formatDialog.value = true;
@@ -651,14 +679,43 @@ const unmountPool = async (pool) => {
   }
 };
 
-const mountPool = async (pool) => {
+const mountPool = async (pool, passphrase) => {
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/pools/${pool.id}/mount`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken')
+      },
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('pool could not be mounted')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('pool mounted successfully'));
+    getPools();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const mountPoolWithPassphrase = async (pool, passphrase) => {
+  passphraseDialog.value = false;
+
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/pools/${pool.id}/mount`, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ passphrase: passphrase }),
     });
 
     if (!res.ok) {

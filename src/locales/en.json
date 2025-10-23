@@ -535,5 +535,7 @@
   "required": "Required",
   "mos frontend": "MOS Frontend",
   "mos api": "MOS API",
-  "update check finished": "Update check finished"
+  "update check finished": "Update check finished",
+  "enter passphrase": "Enter passphrase",
+  "incorrect passphrase": "Incorrect passphrase"
 }
