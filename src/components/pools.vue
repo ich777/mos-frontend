@@ -4,24 +4,27 @@
       {{ $t('pools') }}
     </v-card-title>
     <v-card-text>
-      <div v-for="(pool, index) in pools" :key="index">
-        <div class="text-subtitle-1">{{ pool.name }}</div>
-        <div class="d-flex flex-column">
-          <v-progress-linear
-            :model-value="pool.status?.usagePercent || 0"
-            height="14"
-            :color="pool.status?.usagePercent >= 90 ? 'red' : pool.status?.usagePercent >= 60 ? 'orange' : 'green'"
-            style="margin-top: 0; border-radius: 7px; overflow: hidden"
-          >
-            <template #default>
-              <span>{{ pool.status?.usagePercent?.toFixed(2) || 0 }}%</span>
-            </template>
-          </v-progress-linear>
-          <div class="d-flex justify-space-between align-center mb-2">
-            <div>{{ pool.status?.usedSpace_human || '-' }} / {{ pool.status?.totalSpace_human || '-' }}</div>
-          </div>
-        </div>
-      </div>
+      <v-list density="compact">
+        <v-list-item v-for="(pool, index) in pools" :key="index" class="px-0 py-1">
+          <v-list-item-title class="text-body-2 font-weight-medium mb-1">
+        {{ pool.name }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+        <v-progress-linear
+          :model-value="pool.status?.usagePercent || 0"
+          height="16"
+          :color="pool.status?.usagePercent >= 90 ? 'error' : pool.status?.usagePercent >= 60 ? 'warning' : 'success'"
+          rounded
+          class="mb-1"
+        >
+          <template #default>
+            <span class="text-caption">{{ pool.status?.usagePercent?.toFixed(1) || 0 }}%</span>
+          </template>
+        </v-progress-linear>
+        <div class="text-caption text-medium-emphasis">{{ pool.status?.usedSpace_human || '-' }} / {{ pool.status?.totalSpace_human || '-' }}</div>
+          </v-list-item-subtitle>
+        </v-list-item>
+      </v-list>
     </v-card-text>
   </v-card>
 </template>
