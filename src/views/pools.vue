@@ -227,8 +227,9 @@
           </div>
           <v-switch v-model="createPoolDialog.automount" :label="$t('automount')" hide-details density="compact" color="onPrimary" inset />
           <v-switch v-model="createPoolDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
-          <v-switch v-model="createPoolDialog.encrypted" :label="$t('encrypt')" hide-details density="compact" color="onPrimary" inset />
+          <v-switch v-model="createPoolDialog.encrypted" :label="$t('encrypt')" density="compact" color="onPrimary" inset />
           <v-text-field v-if="createPoolDialog.encrypted" v-model="createPoolDialog.passphrase" :label="$t('passphrase')" type="password" :rules="[(v) => !!v || $t('passphrase is required')]" />
+          <v-switch v-if="createPoolDialog.encrypted" v-model="createPoolDialog.create_keyfile" :label="$t('create keyfile')" hide-details density="compact" color="onPrimary" inset />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -301,6 +302,7 @@ const createPoolDialog = reactive({
   snapraidDevice: '',
   raidLevel: '',
   encrypted: false,
+  create_keyfile: false,
   passphrase: '',
   showAdvanced: false,
 });
@@ -343,6 +345,9 @@ const openCreatePoolDialog = (disk) => {
   createPoolDialog.comment = '';
   createPoolDialog.mergerfsOptions = 'defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs';
   createPoolDialog.snapraidDevice = '';
+  createPoolDialog.encrypted = false;
+  createPoolDialog.passphrase = '';
+  createPoolDialog.create_keyfile = true;
   createPoolDialog.raidLevel = 'raid1';
 };
 
@@ -478,7 +483,7 @@ const createPoolMergerfs = async () => {
     },
     config: {
       encrypted: createPoolDialog.encrypted,
-      create_keyfile: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted ? createPoolDialog.create_keyfile : false,
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
@@ -522,7 +527,7 @@ const createPoolMulti = async () => {
     },
     config: {
       encrypted: createPoolDialog.encrypted,
-      create_keyfile: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted ? createPoolDialog.create_keyfile : false,
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
@@ -566,7 +571,7 @@ const createPoolSingle = async () => {
     },
     config: {
       encrypted: createPoolDialog.encrypted,
-      create_keyfile: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted ? createPoolDialog.create_keyfile : false,
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
@@ -679,7 +684,7 @@ const unmountPool = async (pool) => {
   }
 };
 
-const mountPool = async (pool, passphrase) => {
+const mountPool = async (pool) => {
 
   try {
     overlay.value = true;
@@ -769,6 +774,7 @@ const clearCreatePoolDialog = () => {
   createPoolDialog.snapraidDevice = '';
   createPoolDialog.format = false;
   createPoolDialog.encrypted = false;
+  createPoolDialog.create_keyfile = true;
   createPoolDialog.passphrase = '';
 };
 

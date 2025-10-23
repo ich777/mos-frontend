@@ -537,5 +537,6 @@
   "mos api": "MOS API",
   "update check finished": "Update-Prüfung abgeschlossen",
   "enter passphrase": "Passphrase eingeben",
-  "incorrect passphrase": "Falsche Passphrase"
+  "incorrect passphrase": "Falsche Passphrase",
+  "create keyfile": "Keyfile erstellen"
 }
