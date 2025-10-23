@@ -17,7 +17,7 @@
                 <v-list-item-title class="d-flex align-center">
                   {{ cronJob.name }}
                   <v-chip v-if="cronJob.status === 'running'" class="ml-2" small color="green" text-color="white">
-                    {{ $t('running') }}
+                    {{ t('running') }}
                   </v-chip>
                 </v-list-item-title>
                 <v-list-item-subtitle>{{ cronJob.schedule }} - {{ cronJob.command }}</v-list-item-subtitle>

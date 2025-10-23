@@ -39,7 +39,17 @@
             ></v-select>
             <v-text-field :label="$t('custom ip')" v-model="form.custom_ip"></v-text-field>
             <v-text-field :label="$t('default shell')" v-model="form.default_shell"></v-text-field>
-            <v-select :label="$t('gpu')" v-model="form.gpus" :items="gpuIds" multiple clearable chips hide-selected></v-select>
+            <v-select
+                :label="$t('gpu')"
+                v-model="form.gpus"
+                :items="gpuIds"
+                item-title="value"
+                item-value="key"
+                multiple
+                clearable
+                chips
+                hide-selected
+            ></v-select>
             <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary" density="compact"></v-switch>
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
@@ -578,16 +588,19 @@ const getGPUs = async () => {
 
     gpuIds.value = [];
     const vendors = ['Intel', 'AMD', 'NVIDIA'];
+    const seen = new Set();
     vendors.forEach((vendor) => {
-        const list = gpus.value?.[vendor];
-        if (!Array.isArray(list)) return;
-        list.forEach((gpu) => {
-            if (!gpu) return;
-            const id = gpu.pci;
-            if (id) gpuIds.value.push(id);
-        });
+      const list = gpus.value?.[vendor];
+      if (!Array.isArray(list)) return;
+      list.forEach((gpu) => {
+        if (!gpu) return;
+        const pci = gpu.pci;
+        const name = gpu.name;
+        if (!pci || seen.has(pci)) return;
+        seen.add(pci);
+        gpuIds.value.push({ key: pci, value: name });
+      });
     });
-    gpuIds.value = Array.from(new Set(gpuIds.value));
 
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');

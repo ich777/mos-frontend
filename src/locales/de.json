@@ -401,7 +401,7 @@
   "docker group could not be updated": "Docker Gruppe konnte nicht aktualisiert werden",
   "docker group updated successfully": "Docker Gruppe wurde erfolgreich aktualisiert",
   "edit docker group": "Docker Gruppe bearbeiten",
-  "running": "laufen",
+  "running": "läuft",
   "stopped": "gestoppt",
   "paused": "pausiert",
   "started": "gestartet",
