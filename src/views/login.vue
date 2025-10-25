@@ -1,62 +1,62 @@
 <template>
   <div class="login-wrap">
-    <v-container class="py-10" max-width="1000">
-      <v-row align="stretch" justify="center" no-gutters>
-        <!-- Left: Brand / Intro -->
-        <v-col cols="12" md="6" class="pa-6 d-flex flex-column justify-center align-center text-center">
-            <div class="brand centered">
-                <v-img src="mos_black.png" alt="MOS Logo" max-width="140" class="mx-auto mb-6" contain />
-                <h1 class="brand__title">MOS Portal</h1>
-                <p class="brand__copy">{{ t('mos slogan') }}</p>
-            </div>
-        </v-col>
+    <v-container class="py-10 fill-height" max-width="1000">
+      <v-row align="center" justify="center" no-gutters class="fill-height">
+      <!-- Left side -->
+      <v-col cols="12" md="6" class="pa-6 d-flex flex-column justify-center align-center text-center">
+        <div class="brand centered">
+          <v-img src="mos_black.png" alt="MOS Logo" max-width="140" class="mx-auto mb-6" contain />
+          <h1 class="brand__title">MOS Portal</h1>
+          <p class="brand__copy">{{ t('mos slogan') }}</p>
+        </div>
+      </v-col>
 
-        <v-divider
-          vertical
-          class="d-none d-md-flex"
-          style="height: auto; border-left: 1px solid color-mix(in oklab, var(--v-theme-on-surface) 10%, transparent);"
-        ></v-divider>
+      <v-divider
+        vertical
+        class="d-none d-md-flex"
+        style="height: auto; border-left: 1px solid color-mix(in oklab, var(--v-theme-on-surface) 10%, transparent);"
+      ></v-divider>
 
-        <!-- Right: Subtle card login -->
-        <v-col cols="12" md="6" class="pa-6">
-          <v-card class="elevated" elevation="8">
-            <v-card-text class="pa-6">
-              <h2 class="mb-1">{{ t('login') }}</h2>
-              <p class="text-medium-emphasis mb-6 text-body-2">{{ t('welcome back') }}</p>
+      <!-- Right side -->
+      <v-col cols="12" md="6" class="pa-6 d-flex align-center">
+        <v-card class="elevated" elevation="8" style="width:100%;">
+        <v-card-text class="pa-6">
+          <h2 class="mb-1">{{ t('login') }}</h2>
+          <p class="text-medium-emphasis mb-6 text-body-2">{{ t('welcome back') }}</p>
 
-              <v-form ref="formRef" v-model="isValid" @submit.prevent="onSubmit">
-                <v-text-field
-                  v-model.trim="username"
-                  :label="t('username') || 'Username'"
-                  autocomplete="username"
-                  variant="outlined"
-                  density="comfortable"
-                  :rules="[rules.required]"
-                  @keyup.enter="onSubmit"
-                  class="mb-3"
-                />
+          <v-form ref="formRef" v-model="isValid" @submit.prevent="onSubmit">
+          <v-text-field
+            v-model.trim="username"
+            :label="t('username') || 'Username'"
+            autocomplete="username"
+            variant="outlined"
+            density="comfortable"
+            :rules="[rules.required]"
+            @keyup.enter="onSubmit"
+            class="mb-3"
+          />
 
-                <v-text-field
-                  v-model="password"
-                  :label="t('password') || 'Password'"
-                  :type="showPassword ? 'text' : 'password'"
-                  :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                  autocomplete="current-password"
-                  variant="outlined"
-                  density="comfortable"
-                  :rules="[rules.required]"
-                  @click:append-inner="showPassword = !showPassword"
-                  @keyup.enter="onSubmit"
-                  class="mb-1"
-                />
+          <v-text-field
+            v-model="password"
+            :label="t('password') || 'Password'"
+            :type="showPassword ? 'text' : 'password'"
+            :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+            autocomplete="current-password"
+            variant="outlined"
+            density="comfortable"
+            :rules="[rules.required]"
+            @click:append-inner="showPassword = !showPassword"
+            @keyup.enter="onSubmit"
+            class="mb-1"
+          />
 
-                <v-btn type="submit" block size="large" :loading="loading" :disabled="!isValid || loading">
-                  {{ t('login') }}
-                </v-btn>
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </v-col>
+          <v-btn type="submit" block size="large" :loading="loading" :disabled="!isValid || loading">
+            {{ t('login') }}
+          </v-btn>
+          </v-form>
+        </v-card-text>
+        </v-card>
+      </v-col>
       </v-row>
     </v-container>
 

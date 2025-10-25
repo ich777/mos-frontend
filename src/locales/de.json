@@ -552,5 +552,18 @@
   "auto update": "Automatische Updates",
   "update check schedule": "Automatischer Updatesintervall",
   "docker network mode": "Docker Netzwerkmodus",
-  "docker network config": "Docker Netzwerkkonfiguration"
+  "docker network config": "Docker Netzwerkkonfiguration",
+  "size": "Größe",
+  "add parity devices": "Paritätsgeräte hinzufügen",
+  "select devices to add as parity": "Wähle Geräte aus, die als Parität hinzugefügt werden sollen",
+  "remove parity devices": "Paritätsgeräte entfernen",
+  "select devices to remove from parity": "Wähle Geräte aus, die von der Parität entfernt werden sollen",
+  "no devices available": "Keine Geräte verfügbar",
+  "parity device could not be added": "Paritätsgerät konnte nicht hinzugefügt werden",
+  "parity device added successfully": "Paritätsgerät erfolgreich hinzugefügt",
+  "parity device could not be removed": "Paritätsgerät konnte nicht entfernt werden",
+  "parity device removed successfully": "Paritätsgerät erfolgreich entfernt",
+  "select parity devices to remove": "Wähle Paritätsgeräte zum Entfernen aus",
+  "unmount": "Aushängen",
+  "remove": "Entfernen"
 }

@@ -37,10 +37,13 @@
                     {{ getDiskIcon(data_device.diskType.type) }}
                   </v-icon>
                 </template>
-                <v-list-item-title>{{ data_device.device }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ data_device.filesystem }}
-                </v-list-item-subtitle>
+                <v-list-item-title>
+                  {{ data_device.device }}
+                  <v-chip color="onPrimary" size="small" class="ml-2" label>
+                    {{ data_device.filesystem }}
+                  </v-chip>
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ data_device.mountPoint }}</v-list-item-subtitle>
                 <v-progress-linear
                   v-if="data_device.storage"
                   :model-value="data_device.storage.usagePercent"
@@ -62,8 +65,13 @@
                     {{ getDiskIcon(parity_device.diskType.type) }}
                   </v-icon>
                 </template>
-                <v-list-item-title>{{ parity_device.device }}</v-list-item-title>
-                <v-list-item-subtitle>{{ parity_device.filesystem }}</v-list-item-subtitle>
+                <v-list-item-title>
+                  {{ parity_device.device }}
+                  <v-chip color="onPrimary" size="small" class="ml-2" label>
+                    {{ parity_device.filesystem }}
+                  </v-chip>
+                </v-list-item-title>
+                <v-list-item-subtitle>{{ parity_device.mountPoint }}</v-list-item-subtitle>
                 <v-progress-linear
                   v-if="parity_device.storage"
                   :model-value="parity_device.storage.usagePercent"
@@ -96,6 +104,12 @@
                 </v-list-item>
                 <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
                   <v-list-item-title>{{ $t('unmount pool') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.type === 'mergerfs'" @click="openAddParityDevicesDialog(pool)">
+                  <v-list-item-title>{{ $t('add parity devices') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openRemoveParityDevicesDialog(pool)">
+                  <v-list-item-title>{{ $t('remove parity devices') }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -149,6 +163,7 @@
     </v-container>
   </v-container>
 
+  <!-- Format Dialog -->
   <v-dialog v-model="formatDialog.value" max-width="400">
     <v-card>
       <v-card-title>{{ $t('confirm format') }}</v-card-title>
@@ -175,6 +190,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Delete Pool Dialog -->
   <v-dialog v-model="deletePoolDialog.value" max-width="400">
     <v-card>
       <v-card-title>{{ $t('confirm delete') }}</v-card-title>
@@ -190,6 +206,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Create Pool Dialog -->
   <v-dialog v-model="createPoolDialog.value" max-width="600">
     <v-card>
       <v-card-title>{{ $t('create pool') }}</v-card-title>
@@ -241,6 +258,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Passphrase Dialog -->
   <v-dialog v-model="passphraseDialog.value" max-width="600">
     <v-card>
       <v-card-title>{{ $t('enter passphrase') }}</v-card-title>
@@ -253,6 +271,58 @@
         <v-btn @click="passphraseDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="mountPoolWithPassphrase(passphraseDialog.pool, passphraseDialog.passphrase)" color="onPrimary">
           {{ $t('mount') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Add Parity Devices Dialog -->
+  <v-dialog v-model="addParityDevicesDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('add parity devices') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select devices to add as parity') }}</p>
+        <v-form>
+          <v-select
+            v-model="addParityDevicesDialog.devices"
+            :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []"
+            :label="$t('devices')"
+            :multiple="true"
+            dense
+          />
+          <v-switch v-model="addParityDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="addParityDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="addMergerfsParityDevice(addParityDevicesDialog.pool.id, addParityDevicesDialog.devices, addParityDevicesDialog.format)" color="onPrimary">
+          {{ $t('add') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Remove Parity Devices Dialog -->
+  <v-dialog v-model="removeParityDevicesDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('remove parity devices') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select parity devices to remove') }}</p>
+        <v-form>
+          <v-select
+            v-model="removeParityDevicesDialog.devices"
+            :items="removeParityDevicesDialog.pool ? removeParityDevicesDialog.pool.parity_devices.map((device) => device.device) : []"
+            :label="$t('devices')"
+            :multiple="true"
+            dense
+          />
+          <v-switch v-model="removeParityDevicesDialog.unmount" :label="$t('unmount')" hide-details density="compact" color="onPrimary" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="removeParityDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="removeMergerfsParityDevice(removeParityDevicesDialog.pool.id, removeParityDevicesDialog.devices, removeParityDevicesDialog.unmount)" color="onPrimary">
+          {{ $t('remove') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -316,6 +386,18 @@ const passphraseDialog = reactive({
   pool: null,
   passphrase: '',
 });
+const addParityDevicesDialog = reactive({
+  value: false,
+  pool: null,
+  devices: [],
+  format: false
+});
+const removeParityDevicesDialog = reactive({
+  value: false,
+  pool: null,
+  devices: [],
+  unmount: true
+});
 
 onMounted(async () => {
   getPools();
@@ -328,12 +410,10 @@ const openPassphraseDialog = (pool) => {
   passphraseDialog.pool = pool;
   passphraseDialog.passphrase = '';
 };
-
 const openFormatDialog = (disk) => {
   formatDialog.value = true;
   formatDialog.disk = disk;
 };
-
 const openCreatePoolDialog = (disk) => {
   createPoolDialog.value = true;
   createPoolDialog.disk = disk;
@@ -350,10 +430,21 @@ const openCreatePoolDialog = (disk) => {
   createPoolDialog.create_keyfile = true;
   createPoolDialog.raidLevel = 'raid1';
 };
-
 const openDeletePoolDialog = (pool) => {
   deletePoolDialog.value = true;
   deletePoolDialog.pool = pool;
+};
+const openAddParityDevicesDialog = (pool) => {
+  addParityDevicesDialog.value = true;
+  addParityDevicesDialog.pool = pool;
+  addParityDevicesDialog.devices = [];
+  addParityDevicesDialog.format = false;
+};
+const openRemoveParityDevicesDialog = (pool) => {
+  removeParityDevicesDialog.value = true;
+  removeParityDevicesDialog.pool = pool;
+  removeParityDevicesDialog.devices = [];
+  removeParityDevicesDialog.unmount = true;
 };
 
 const getPools = async () => {
@@ -421,16 +512,15 @@ const getFilesystems = async () => {
 
 const formatDisk = async () => {
   formatDialog.value = false;
-
   const formatDiskData = {
     device: formatDialog.disk.name,
     filesystem: formatDialog.filesystem,
     partition: formatDialog.partition,
     wipeExisting: formatDialog.wipeExisting,
   };
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/disks/format`, {
       method: 'POST',
       headers: {
@@ -487,9 +577,9 @@ const createPoolMergerfs = async () => {
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/mergerfs`, {
       method: 'POST',
       headers: {
@@ -531,9 +621,9 @@ const createPoolMulti = async () => {
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/multi`, {
       method: 'POST',
       headers: {
@@ -575,9 +665,9 @@ const createPoolSingle = async () => {
     },
     passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
   };
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/single`, {
       method: 'POST',
       headers: {
@@ -606,8 +696,9 @@ const createPoolSingle = async () => {
 
 const deletePool = async (poolId) => {
   deletePoolDialog.value = false;
+  overlay.value = true;
+
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/${poolId}`, {
       method: 'DELETE',
       headers: {
@@ -633,8 +724,9 @@ const deletePool = async (poolId) => {
 };
 
 const switchAutomount = async (pool) => {
+  overlay.value = true;
+
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/${pool.id}/automount`, {
       method: 'POST',
       headers: {
@@ -660,8 +752,9 @@ const switchAutomount = async (pool) => {
 };
 
 const unmountPool = async (pool) => {
+  overlay.value = true;
+
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/${pool.id}/unmount`, {
       method: 'POST',
       headers: {
@@ -685,13 +778,13 @@ const unmountPool = async (pool) => {
 };
 
 const mountPool = async (pool) => {
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/${pool.id}/mount`, {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken')
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
 
@@ -711,9 +804,9 @@ const mountPool = async (pool) => {
 
 const mountPoolWithPassphrase = async (pool, passphrase) => {
   passphraseDialog.value = false;
+  overlay.value = true;
 
   try {
-    overlay.value = true;
     const res = await fetch(`/api/v1/pools/${pool.id}/mount`, {
       method: 'POST',
       headers: {
@@ -729,6 +822,72 @@ const mountPoolWithPassphrase = async (pool, passphrase) => {
     }
     showSnackbarSuccess(t('pool mounted successfully'));
     getPools();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const addMergerfsParityDevice = async (poolId, devices, format) => {
+  overlay.value = true;
+  const addParityData = {
+    devices: devices,
+    format: format,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/${poolId}/parity/add`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(addParityData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('parity device could not be added')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('parity device added successfully'));
+    getPools();
+    addParityDevicesDialog.value = false;
+
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const removeMergerfsParityDevice = async (poolId, devices, unmount) => {
+  overlay.value = true;
+  const removeParityData = {
+    devices: devices,
+    unmount: unmount,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/${poolId}/parity/remove`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(removeParityData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('parity device could not be removed')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('parity device removed successfully'));
+    getPools();
+    removeParityDevicesDialog.value = false;
+
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -777,7 +936,6 @@ const clearCreatePoolDialog = () => {
   createPoolDialog.create_keyfile = true;
   createPoolDialog.passphrase = '';
 };
-
 const clearFormatDialog = () => {
   formatDialog.value = false;
   formatDialog.disk = null;
@@ -785,7 +943,6 @@ const clearFormatDialog = () => {
   formatDialog.partition = true;
   formatDialog.wipeExisting = true;
 };
-
 const clearDeletePoolDialog = () => {
   deletePoolDialog.value = false;
   deletePoolDialog.pool = null;

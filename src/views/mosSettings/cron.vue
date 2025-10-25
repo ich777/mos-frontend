@@ -62,7 +62,7 @@
       <v-card-title>{{ $t('create cron job') }}</v-card-title>
       <v-card-text>
         <v-form>
-          <v-switch v-model="createCronJobDialog.enabled" :label="$t('enabled')" inset color="onPrimary"></v-switch>
+          <v-switch v-model="createCronJobDialog.enabled" :label="$t('enabled')" inset color="green"></v-switch>
           <v-text-field v-model="createCronJobDialog.name" :label="$t('name')" required></v-text-field>
           <v-text-field v-model="createCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
           <v-text-field v-model="createCronJobDialog.command" :label="$t('command')" required></v-text-field>
@@ -83,7 +83,7 @@
       <v-card-title>{{ $t('change cron job') }}</v-card-title>
       <v-card-text>
         <v-form>
-          <v-switch v-model="changeCronJobDialog.enabled" :label="$t('enabled')" inset color="onPrimary"></v-switch>
+          <v-switch v-model="changeCronJobDialog.enabled" :label="$t('enabled')" inset color="green"></v-switch>
           <v-text-field v-model="changeCronJobDialog.name" :label="$t('name')" required></v-text-field>
           <v-text-field v-model="changeCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
           <v-text-field v-model="changeCronJobDialog.command" :label="$t('command')" required></v-text-field>
@@ -125,7 +125,7 @@
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" @click="changeScriptDialog.value = false">{{ $t('close') }}</v-btn>
-        <v-btn color="onPrimary" @click="changeScript()">{{ $t('save') }}</v-btn>
+        <v-btn color="onPrimary" @click="changeScript(changeScriptDialog.id)">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -278,10 +278,10 @@ const deleteCronJob = async () => {
   }
 };
 
-const getScript = async (cronJobName) => {
+const getScript = async (cronId) => {
   try {
     overlay.value = true;
-    const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(cronJobName), {
+    const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(cronId), {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
       }
@@ -299,11 +299,11 @@ const getScript = async (cronJobName) => {
   }
 };
 
-const changeScript = async () => {
+const changeScript = async ( cronId ) => {
   try {
     overlay.value = true;
-    const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(changeScriptDialog.name), {
-      method: 'POST',
+    const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(cronId), {
+      method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json'
@@ -396,7 +396,7 @@ const openDeleteCronJobDialog = (cronJob) => {
 const openChangeScriptDialog = async (cronJob) => {
   changeScriptDialog.value = true;
   try {
-    const script = await getScript(cronJob.name);
+    const script = await getScript(cronJob.id);
     changeScriptDialog.name = script.name;
     changeScriptDialog.path = script.path;
     changeScriptDialog.size = script.size;

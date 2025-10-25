@@ -549,5 +549,21 @@
   "update check interval": "Update check interval",
   "interval": "Interval",
   "auto update": "Auto update",
-  "auto update schedule": "Auto update schedule"
+  "auto update schedule": "Auto update schedule",
+  "update check schedule": "Update check schedule",
+  "docker network mode": "Docker network mode",
+  "docker network config": "Docker network config",
+  "size": "Size",
+  "add parity devices": "Add parity devices",
+  "select devices to add as parity": "Select devices to add as parity",
+  "remove parity devices": "Remove parity devices",
+  "select devices to remove from parity": "Select devices to remove from parity",
+  "no devices available": "No devices available",
+  "parity device could not be added": "Parity device could not be added",
+  "parity device added successfully": "Parity device added successfully",
+  "parity device could not be removed": "Parity device could not be removed",
+  "parity device removed successfully": "Parity device removed successfully",
+  "select parity devices to remove": "Select parity devices to remove",
+  "unmount": "Unmount",
+  "remove": "Remove"
 }
