@@ -571,5 +571,18 @@
   "snapraid operation": "SnapRAID operation",
   "operation": "Operation",
   "perform": "Perform",
-  "operation running": "Operation running"
+  "operation running": "Operation running",
+  "persist history": "Persist history",
+  "display": "Display",
+  "display settings": "Display settings",
+  "powersave": "Powersave",
+  "powerdown (sec)": "Powerdown (sec)",
+  "timeout (sec)": "Timeout (sec)",
+  "on": "On",
+  "off": "Off",
+  "notification sounds": "Notification sounds",
+  "sound on reboot": "Sound on reboot",
+  "sound on shutdown": "Sound on shutdown",
+  "sound on error": "Sound on error",
+  "sound on startup": "Sound on startup"
 }

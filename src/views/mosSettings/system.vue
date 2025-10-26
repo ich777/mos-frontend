@@ -17,9 +17,26 @@
                             item-value="governor"></v-select>
                         <v-text-field :label="$t('global spindown (min)')" type="number"
                             v-model="settingsSystem.global_spindown"></v-text-field>
+                        <v-switch :label="$t('persist history')" color="green" inset density="compact"
+                            v-model="settingsSystem.persist_history"></v-switch>
+                        <v-divider class="my-2"></v-divider>
+                        <h3 class="mb-2">{{ $t('display settings') }}</h3>
+                        <v-select :items="['on', 'off']" :label="$t('powersave')" v-model="settingsSystem.display.powersave"></v-select>
+                        <v-text-field :label="$t('powerdown (sec)')" type="number"
+                            v-model="settingsSystem.display.powerdown"></v-text-field>
+                        <v-text-field :label="$t('timeout (sec)')" type="number"
+                            v-model="settingsSystem.display.timeout"></v-text-field>
+                        <v-divider class="my-2"></v-divider>
+                        <h3 class="mb-2">{{ $t('notification sounds') }}</h3>
+                        <v-switch :label="$t('sound on reboot')" color="green" inset density="compact"
+                            v-model="settingsSystem.notification_sound.reboot"></v-switch>
+                        <v-switch :label="$t('sound on shutdown')" color="green" inset density="compact"
+                            v-model="settingsSystem.notification_sound.shutdown"></v-switch>
+                        <v-switch :label="$t('sound on startup')" color="green" inset density="compact"
+                            v-model="settingsSystem.notification_sound.startup"></v-switch>
                         <v-divider class="my-2"></v-divider>
                         <h3 class="mb-2">{{ $t('ntp') }}</h3>
-                        <v-switch :label="$t('ntp enabled')" color="onPrimary" inset density="compact"
+                        <v-switch :label="$t('ntp enabled')" color="green" inset density="compact"
                             v-model="settingsSystem.ntp.enabled"></v-switch>
                         <v-text-field :label="$t('ntp mode')" v-model="settingsSystem.ntp.mode"></v-text-field>
                         <v-row>
@@ -32,7 +49,7 @@
                             <v-col cols="12" class="py-0 mb-6">
                                 <div class="d-flex align-center my-2">
                                     <v-divider class="flex-grow-1"></v-divider>
-                                    <v-btn class="mx-4" icon="mdi-plus" color="onPrimary" size="small" density="compact"
+                                    <v-btn class="mx-4" icon="mdi-plus" color="green" size="small" density="compact"
                                         @click="settingsSystem.ntp.servers.push('')"
                                         aria-label="Add NTP server"></v-btn>
                                     <v-divider class="flex-grow-1"></v-divider>
@@ -75,6 +92,7 @@ const settingsSystem = ref({
     hostname: "",
     keymap: "",
     timezone: "",
+    persist_history: true,
     ntp: {
         enabled: false,
         mode: "",
@@ -83,6 +101,16 @@ const settingsSystem = ref({
     global_spindown: 0,
     cpufreq: {
         governor: ""
+    },
+    notification_sound: {
+        reboot: false,
+        shutdown: false,
+        startup: false
+    },
+    display: {
+        powerdown: 60,
+        powersave: "on",
+        timeout: 30
     }
 });
 const keymaps = ref([]);

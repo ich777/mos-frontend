@@ -571,5 +571,18 @@
   "snapraid operation": "SnapRAID Operation",
   "operation": "Operation",
   "perform": "Ausführen",
-  "operation running": "Operation läuft"
+  "operation running": "Operation läuft",
+  "persist history": "Verlauf speichern",
+  "display": "Anzeigen",
+  "display settings": "Anzeigeeinstellungen",
+  "powersave": "Energiesparmodus",
+  "powerdown (sec)": "Ausschalten (Sek.)",
+  "timeout (sec)": "Zeitüberschreitung (Sek.)",
+  "on": "An",
+  "off": "Aus",
+  "notification sounds": "Benachrichtigungstöne",
+  "sound on reboot": "Ton bei Neustart",
+  "sound on shutdown": "Ton bei Herunterfahren",
+  "sound on error": "Ton bei Fehler",
+  "sound on startup": "Ton bei Start"
 }
