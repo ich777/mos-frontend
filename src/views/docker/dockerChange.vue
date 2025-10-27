@@ -562,8 +562,10 @@ const updateDocker = async () => {
       const error = await res.json();
       throw new Error(`${t('docker container could not be changed')}|$| ${error.error || t('unknown error')}`);
     }
-    showSnackbarSuccess(t('docker container changed successfully'));
+    
     goBackSafely();
+    showSnackbarSuccess(t('docker container changed successfully'));
+
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -609,12 +611,15 @@ const getGPUs = async () => {
 };
 
 const goBackSafely = () => {
-  if (window.history.state?.back) {
-    requestAnimationFrame(() => {
-      setTimeout(() => router.back(), 0);
-    });
+  const canGoBack =
+    window.history.length > 1 &&
+    document.referrer &&
+    new URL(document.referrer).origin === window.location.origin;
+
+  if (canGoBack) {
+    router.back();
   } else {
-    router.go('/docker');
+    router.push('/docker');
   }
 };
 

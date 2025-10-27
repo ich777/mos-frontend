@@ -628,12 +628,15 @@ const createDocker = async () => {
 };
 
 const goBackSafely = () => {
-  if (window.history.state?.back) {
-    requestAnimationFrame(() => {
-      setTimeout(() => router.back(), 0);
-    });
+  const canGoBack =
+    window.history.length > 1 &&
+    document.referrer &&
+    new URL(document.referrer).origin === window.location.origin;
+
+  if (canGoBack) {
+    router.back();
   } else {
-    router.go('/docker');
+    router.push('/docker');
   }
 };
 
