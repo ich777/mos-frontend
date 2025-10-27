@@ -1,9 +1,4 @@
 <template>
-  <v-card variant="tonal">
-    <v-card-title>
-      {{ $t('mos') }}
-    </v-card-title>
-    <v-card-text>
       <v-row dense>
         <v-col cols="6" sm="6" md="4" xl="3" v-if="osInfo?.base?.[0]?.os_id">
           <div class="text-caption text-medium-emphasis"><strong>{{ $t('platform') }}</strong></div>
@@ -49,8 +44,6 @@
           <div class="text-body-2" :title="osInfo.mos.api" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ osInfo.mos.api }}</div>
         </v-col>
       </v-row>
-    </v-card-text>
-  </v-card>
 </template>
 
 <script setup>

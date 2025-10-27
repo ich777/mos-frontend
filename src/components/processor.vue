@@ -1,49 +1,59 @@
 <template>
-  <v-card variant="tonal">
-    <v-card-title class="d-flex align-center justify-space-between">
-      <span>{{ $t('processor') }}</span>
-      <div class="d-flex align-center justify-end" style="gap: 8px">
-        <v-chip v-if="temp && temp.main != null" size="small">Main {{ temp.main }}°C</v-chip>
-        <v-chip v-if="temp && temp.min != null" size="small">Min {{ temp.min }} °C</v-chip>
-        <v-chip v-if="temp && temp.max != null" size="small">Max {{ temp.max }} °C</v-chip>
+  <!--<v-col cols="6" sm="6" md="4" xl="3" v-if="osInfo && osInfo.cpu">
+    <v-chip v-if="temp && temp.main != null" size="small">Main {{ temp.main }}°C</v-chip>
+    <v-chip v-if="temp && temp.min != null" size="small">Min {{ temp.min }} °C</v-chip>
+    <v-chip v-if="temp && temp.max != null" size="small">Max {{ temp.max }} °C</v-chip>
+  </div>-->
+  <v-row dense>
+    <v-col cols="6" sm="6" md="6" xl="6" v-if="osInfo && osInfo.cpu">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('brand') }}</strong>
       </div>
-    </v-card-title>
-    <v-card-text>
-      <p v-if="osInfo && osInfo.cpu">
-        <b>{{ osInfo.cpu.manufacturer }}, {{ osInfo.cpu.brand }}</b>
-      </p>
-      <p v-if="processor.info.architecture !== undefined">
-        <b>{{ $t('architecture') }}:</b>
-        {{ processor.info.architecture }}
-      </p>
-      <p v-if="osInfo.cpu?.cores !== undefined && osInfo.cpu?.physicalCores !== undefined">
-        <b>{{ $t('cores') }}:</b>
-        {{ osInfo.cpu.physicalCores }} / {{ osInfo.cpu.cores }}
-      </p>
-      <v-divider class="mt-2 mb-2"></v-divider>
-      <v-row class="align-center">
-        <v-col cols="auto" class="d-flex align-center" style="width: 60px">
-          <b>{{ $t('load') }}:</b>
-        </v-col>
-        <v-col class="d-flex align-center" style="height: 14px">
-          <v-progress-linear
-            :model-value="processor.load"
-            height="14"
-            :color="processor.load >= 90 ? 'red' : processor.load >= 60 ? 'orange' : 'green'"
-            style="margin-top: 0; border-radius: 7px; overflow: hidden"
-          >
-            <template #default>
-              <span>{{ processor.load.toFixed(2) }}%</span>
-            </template>
-          </v-progress-linear>
-        </v-col>
-      </v-row>
+      <div class="text-body-2" :title="osInfo.base[0].os_id" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ osInfo.cpu.manufacturer }}, {{ osInfo.cpu.brand }}</div>
+    </v-col>
+    <v-col cols="6" sm="6" md="6" xl="6" v-if="processor.info.architecture !== undefined">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('architecture') }}</strong>
+      </div>
+      <div class="text-body-2" :title="processor.info.architecture" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ processor.info.architecture }}</div>
+    </v-col>
+    <v-col cols="6" sm="6" md="3" xl="3" v-if="osInfo.cpu?.cores !== undefined && osInfo.cpu?.physicalCores !== undefined">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('cores') }}</strong>
+      </div>
+      <div class="text-body-2" :title="processor.info.architecture" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ osInfo.cpu.physicalCores }} / {{ osInfo.cpu.cores }}</div>
+    </v-col>
+    <v-col cols="6" sm="6" md="3" xl="3" v-if="temp.main != null || temp.min != null || temp.max != null">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('temperature / min / max') }}</strong>
+      </div>
+      <span v-if="temp.main != null" class="text-body-2" :title="temp.main" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ temp.main }}°C</span> 
+      <span v-if="temp.min != null" class="text-body-2" :title="temp.min" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">/ {{ temp.min }}°C</span>
+      <span v-if="temp.max != null" class="text-body-2" :title="temp.max" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">/ {{ temp.max }}°C</span>
+    </v-col>
+    <v-divider class="mt-2 mb-2"></v-divider>
+    <v-col cols="auto" class="d-flex align-center text-caption" style="width: 60px">
+      <strong>{{ $t('load') }}:</strong>
+    </v-col>
+    <v-col class="d-flex align-center">
+      <v-progress-linear
+        :model-value="processor.load"
+        height="14"
+        :color="processor.load >= 90 ? 'red' : processor.load >= 60 ? 'orange' : 'green'"
+        style="margin-top: 0; border-radius: 7px; overflow: hidden"
+      >
+        <template #default>
+          <span><small>{{ processor.load.toFixed(2) }}%</small></span>
+        </template>
+      </v-progress-linear>
+    </v-col>
+    <v-col cols="12" sm="12" md="12" xl="12">
       <div v-if="processor.cores && processor.cores.length">
         <details class="mt-2">
           <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline">{{ $t('cores') }}</summary>
           <div class="cores-grid">
             <div class="core-row" v-for="(core, i) in processor.cores" :key="i">
-              <div class="core-label">
+              <div class="core-label text-body-2">
                 <small>
                   <b>CPU {{ i }}</b>
                 </small>
@@ -57,7 +67,7 @@
                   style="margin-top: 2px; border-radius: 6px; overflow: hidden; width: 100%"
                 >
                   <template #default>
-                    <span>{{ Number(core.load?.total ?? 0).toFixed(2) }}%</span>
+                    <span><small>{{ Number(core.load?.total ?? 0).toFixed(2) }}%</small></span>
                   </template>
                 </v-progress-linear>
               </div>
@@ -65,8 +75,8 @@
           </div>
         </details>
       </div>
-    </v-card-text>
-  </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script setup>

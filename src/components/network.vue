@@ -1,26 +1,27 @@
 <template>
-  <v-card variant="tonal">
-    <v-card-title class="d-flex align-center justify-space-between">
-      <span>{{ $t('network') }}</span>
+  <div>
+    <!--<div class="d-flex align-center justify-space-between mb-2">
       <v-chip size="small" v-if="nic?.interface">{{ nic.interface }}</v-chip>
-    </v-card-title>
-    <v-card-text>
-      <template v-if="nic">
-        <p v-if="nic.type"><b>{{ $t('type') }}:</b> {{ nic.type }}</p>
-        <p v-if="nic.state"><b>{{ $t('state') }}:</b> {{ nic.state }}</p>
-        <p v-if="nic.ip4"><b>{{ $t('ip4') }}:</b> {{ nic.ip4 }}</p>
-        <p v-if="nic.ip6"><b>{{ $t('ip6') }}:</b> {{ nic.ip6 }}</p>
-        <p v-if="nic.mac"><b>{{ $t('mac') }}:</b> {{ nic.mac }}</p>
-        <v-divider class="my-2" />
-        <div class="chart-wrapper">
-          <canvas ref="chartEl" aria-label="Network throughput history"></canvas>
-        </div>
-      </template>
-      <template v-else>
-        <p>{{ $t('no network interface found') }}</p>
-      </template>
-    </v-card-text>
-  </v-card>
+    </div>-->
+
+    <template v-if="nic" >
+      <p v-if="nic.type"><b>{{ $t('type') }}:</b> {{ nic.type }}</p>
+      <p v-if="nic.state"><b>{{ $t('state') }}:</b> {{ nic.state }}</p>
+      <p v-if="nic.ip4"><b>{{ $t('ip4') }}:</b> {{ nic.ip4 }}</p>
+      <p v-if="nic.ip6"><b>{{ $t('ip6') }}:</b> {{ nic.ip6 }}</p>
+      <p v-if="nic.mac"><b>{{ $t('mac') }}:</b> {{ nic.mac }}</p>
+
+      <v-divider class="my-2" />
+
+      <div class="chart-wrapper">
+        <canvas ref="chartEl" aria-label="Network throughput history"></canvas>
+      </div>
+    </template>
+
+    <template v-else>
+      <p>{{ $t('no network interface found') }}</p>
+    </template>
+  </div>
 </template>
 
 <script setup>
@@ -50,7 +51,6 @@ function clampHistory() {
   trim(labels); trim(seriesRx); trim(seriesTx); trim(seriesTotal)
 }
 
-// Bytes/s → schöner Text (B/s, KB/s, MB/s, GB/s)
 function formatBytesPerSec(bytesPerSec) {
   if (bytesPerSec == null || isNaN(bytesPerSec)) return '–'
   const abs = Math.abs(bytesPerSec)
@@ -74,34 +74,34 @@ function initChart() {
         { label: 'Total', data: seriesTotal, borderColor: '#ff9800', fill: false, tension: 0.25, pointRadius: 0, borderWidth: 2 }
       ]
     },
-options: {
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: false,
-  normalized: true,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: {
-      position: 'top',
-      labels: {
-        usePointStyle: true,
-        pointStyle: 'line'
-      }
-    },
-    tooltip: {
-      callbacks: {
-        label: (ctx) => `${ctx.dataset.label}: ${formatBytesPerSec(ctx.parsed.y)}`
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      normalized: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'line'
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${formatBytesPerSec(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
+        y: {
+          beginAtZero: true,
+          ticks: { callback: (v) => formatBytesPerSec(v) }
+        }
       }
     }
-  },
-  scales: {
-    x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
-    y: {
-      beginAtZero: true,
-      ticks: { callback: (v) => formatBytesPerSec(v) }
-    }
-  }
-}
   }))
 }
 
@@ -159,6 +159,16 @@ onBeforeUnmount(() => { if (chart) { chart.destroy(); chart = null } })
 </script>
 
 <style scoped>
+.network-widget {
+  background: var(--v-theme-surface);
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.title {
+  font-weight: 600;
+}
 .chart-wrapper {
   position: relative;
   width: 100%;

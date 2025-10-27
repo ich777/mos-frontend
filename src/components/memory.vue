@@ -1,92 +1,83 @@
 <template>
-  <v-card variant="tonal">
-    <v-card-title>
-      {{ $t('memory') }}
-    </v-card-title>
-    <v-card-text>
-      <p v-if="mem.total_human">
-        {{ $t('total') }}: {{ mem.total_human }}
-      </p>
-      <v-divider class="my-2"></v-divider>
-      <div class="memory-bar-container">
-        <div class="memory-segment actual-used" :style="{ width: getMemUsedPercentage() + '%' }"
-          :title="`Used: ${mem.used_human || 0}%`">
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;">
-            {{ mem.used_human || 0 }}
-          </div>
-        </div>
-        <div class="memory-segment free" :style="{ width: getMemFreePercentage() + '%' }"
-          :title="`Free: ${mem.free_human || 0}%`">
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;">
-            {{ mem.free_human || 0 }}
-          </div>
+  <row dense>
+    <v-col cols="6" sm="6" md="4" xl="3" v-if="mem.total_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('total') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.total_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.total_human }}
+      </div>
+    </v-col>
+    <v-divider class="my-2"></v-divider>
+    <div class="memory-bar-container">
+      <div class="memory-segment actual-used" :style="{ width: getMemUsedPercentage() + '%' }" :title="`Used: ${mem.used_human || 0}`">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%">
+          {{ mem.used_human || 0 }}
         </div>
       </div>
-      <div class="memory-legend mt-2">
-        <div class="legend-item">
-          <div class="legend-color actual-used"></div>
-          <span class="text-caption">{{ $t('used') }} ({{ getMemUsedPercentage() }}%)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color free"></div>
-          <span class="text-caption">{{ $t('free') }} ({{ getMemFreePercentage() }}%)</span>
+      <div class="memory-segment free" :style="{ width: getMemFreePercentage() + '%' }" :title="`Free: ${mem.free_human || 0}`">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%">
+          {{ mem.free_human || 0 }}
         </div>
       </div>
-      <v-divider class="my-2"></v-divider>
-      <div class="memory-bar-container">
-        <div class="memory-segment actual-used" :style="{ width: (mem.percentage?.actuallyUsed || 0) + '%' }"
-          :title="`Actually Used: ${mem.percentage?.actuallyUsed || 0}%`">
-        </div>
-        <div class="memory-segment caches" :style="{ width: (mem.percentage?.dirtyCaches || 0) + '%' }"
-          :title="`Dirty Caches: ${mem.percentage?.dirtyCaches || 0}%`">
-        </div>
-        <div class="memory-segment free" :style="{ width: getRealFreePercentage() + '%' }"
-          :title="`Free: ${getRealFreePercentage()}%`">
-        </div>
+    </div>
+    <div class="memory-legend mt-2">
+      <div class="legend-item">
+        <div class="legend-color actual-used"></div>
+        <span class="text-caption">{{ $t('used') }} ({{ getMemUsedPercentage() }}%)</span>
       </div>
-      <!-- Legend -->
-      <div class="memory-legend mt-2">
-        <div class="legend-item">
-          <div class="legend-color actual-used"></div>
-          <span class="text-caption">{{ $t('actual usage') }} ({{ mem.percentage?.actuallyUsed || 0 }}%)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color caches"></div>
-          <span class="text-caption">{{ $t('dirty caches') }} ({{ mem.percentage?.dirtyCaches || 0 }}%)</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color free"></div>
-          <span class="text-caption">{{ $t('free') }} ({{ getRealFreePercentage() }}%)</span>
-        </div>
+      <div class="legend-item">
+        <div class="legend-color free"></div>
+        <span class="text-caption">{{ $t('free') }} ({{ getMemFreePercentage() }}%)</span>
       </div>
-    </v-card-text>
-  </v-card>
+    </div>
+    <v-divider class="my-2"></v-divider>
+    <div class="memory-bar-container">
+      <div class="memory-segment actual-used" :style="{ width: (mem.percentage?.actuallyUsed || 0) + '%' }" :title="`Actually Used: ${mem.percentage?.actuallyUsed || 0}%`"></div>
+      <div class="memory-segment caches" :style="{ width: (mem.percentage?.dirtyCaches || 0) + '%' }" :title="`Dirty Caches: ${mem.percentage?.dirtyCaches || 0}%`"></div>
+      <div class="memory-segment free" :style="{ width: getRealFreePercentage() + '%' }" :title="`Free: ${getRealFreePercentage()}%`"></div>
+    </div>
+    <!-- Legend -->
+    <div class="memory-legend mt-2">
+      <div class="legend-item">
+        <div class="legend-color actual-used"></div>
+        <span class="text-caption">{{ $t('actual usage') }} ({{ mem.percentage?.actuallyUsed || 0 }}%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color caches"></div>
+        <span class="text-caption">{{ $t('dirty caches') }} ({{ mem.percentage?.dirtyCaches || 0 }}%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color free"></div>
+        <span class="text-caption">{{ $t('free') }} ({{ getRealFreePercentage() }}%)</span>
+      </div>
+    </div>
+  </row>
 </template>
 
 <script setup>
-import { toRefs, computed } from 'vue'
+import { toRefs, computed } from 'vue';
 
 const props = defineProps({
-  memory: { type: Object, default: () => ({}) }
-})
+  memory: { type: Object, default: () => ({}) },
+});
 const { memory } = toRefs(props);
 const mem = computed(() => memory.value ?? {});
 
 const getRealFreePercentage = () => {
-  const actuallyUsed = mem.value.percentage?.actuallyUsed || 0
-  const dirtyCaches = mem.value.percentage?.dirtyCaches || 0
-  return Math.max(0, 100 - actuallyUsed - dirtyCaches)
-}
+  const actuallyUsed = mem.value.percentage?.actuallyUsed || 0;
+  const dirtyCaches = mem.value.percentage?.dirtyCaches || 0;
+  return Math.max(0, 100 - actuallyUsed - dirtyCaches);
+};
 
 const getMemFreePercentage = () => {
   const total = mem.value.total || 1;
-  return Math.round((mem.value.free || 0) / total * 100);
-}
+  return Math.round(((mem.value.free || 0) / total) * 100);
+};
 
 const getMemUsedPercentage = () => {
   return Math.round(((mem.value.used || 0) / (mem.value.total || 1)) * 100);
-}
-
+};
 </script>
 
 <style scoped>
@@ -116,7 +107,7 @@ const getMemUsedPercentage = () => {
 }
 
 .memory-segment.actual-used {
-  background: rgb(255,165,0);
+  background: rgb(255, 165, 0);
 }
 
 .memory-segment.caches {
@@ -146,7 +137,7 @@ const getMemUsedPercentage = () => {
 }
 
 .legend-color.actual-used {
-  background: rgb(255,165,0);
+  background: rgb(255, 165, 0);
 }
 
 .legend-color.caches {
