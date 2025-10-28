@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal" fluid>
+        <v-card   fluid>
           <v-card-text>
             <v-text-field :label="$t('name')" v-model="form.name" readonly></v-text-field>
             <v-text-field :label="$t('repository')" v-model="form.repo" required></v-text-field>

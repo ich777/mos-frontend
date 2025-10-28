@@ -5,7 +5,7 @@
         <h2>{{ $t('network services') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal">
+        <v-card  >
           <v-card-text>
             <v-form>
               <h3 class="mb-2 pb-4">{{ $t('interfaces') }}</h3>

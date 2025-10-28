@@ -1,51 +1,45 @@
 <template>
   <v-container fluid class="d-flex justify-center">
     <v-container style="width: 100%; max-width: 1920px" class="pa-0">
-      <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
+      <v-container fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('users') }}</h2>
       </v-container>
-      <v-container fluid class="pa-0">
-        <v-row>
-          <v-col cols="12" sm="12" md="12" lg="12" xl="12">
-            <v-card variant="tonal" fluid style="margin-bottom: 80px">
-              <v-card-title>{{ $t('overview') }}</v-card-title>
-              <v-card-text class="pa-0">
-                <v-list>
-                  <v-list-item v-for="user in users" :key="user.id">
-                    <v-list-item-title>
-                      {{ user.username }}
-                      <v-chip v-if="user.samba_user" color="onPrimary" size="small" class="ml-2" label>
-                        {{ $t('samba') }}
-                      </v-chip>
-                    </v-list-item-title>
-                    <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
-                    <template v-slot:prepend>
-                      <v-icon>mdi-account</v-icon>
-                    </template>
-                    <template v-slot:append>
-                      <v-menu>
-                        <template #activator="{ props }">
-                          <v-btn variant="text" icon v-bind="props" color="onPrimary">
-                            <v-icon>mdi-dots-vertical</v-icon>
-                          </v-btn>
-                        </template>
-                        <v-list>
-                          <v-list-item @click="openChangeDialog(user)">
-                            <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item @click="openDeleteDialog(user)">
-                            <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </template>
-                  </v-list-item>
-                </v-list>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-card>
+        <v-list class="pa-0 bg-transparent">
+          <template v-for="(user, idx) in users" :key="user.id">
+            <v-list-item>
+              <v-list-item-title>
+                {{ user.username }}
+                <v-chip v-if="user.samba_user" color="onPrimary" size="small" class="ml-2" label>
+                  {{ $t('samba') }}
+                </v-chip>
+              </v-list-item-title>
+              <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
+              <template v-slot:prepend>
+                <v-icon>mdi-account</v-icon>
+              </template>
+              <template v-slot:append>
+                <v-menu>
+                  <template #activator="{ props }">
+                    <v-btn variant="text" icon v-bind="props" color="onPrimary">
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item @click="openChangeDialog(user)">
+                      <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="openDeleteDialog(user)">
+                      <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </template>
+            </v-list-item>
+            <v-divider v-if="idx < users.length - 1" inset />
+          </template>
+        </v-list>
+      </v-card>
     </v-container>
   </v-container>
 

@@ -5,7 +5,7 @@
         <h2>{{ $t('docker service') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal">
+        <v-card  >
           <v-card-text>
             <v-form>
               <v-switch :label="$t('docker service')" inset density="compact" v-model="settingsDocker.enabled" color="green"></v-switch>

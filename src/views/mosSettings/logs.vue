@@ -5,7 +5,7 @@
         <h2>{{ $t('logs') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal">
+        <v-card  >
           <v-card-text>
             <v-row>
               <v-col cols="12" md="6">

@@ -5,7 +5,7 @@
         <h2>{{ $t('lxc service') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal">
+        <v-card  >
           <v-card-text>
             <v-form>
               <v-switch :label="$t('lxc service')" color="onPrimary" inset density="compact"

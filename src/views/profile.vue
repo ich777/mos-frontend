@@ -20,11 +20,11 @@
           hide-details prepend-inner-icon="mdi-palette" />
         <h3 class="mt-4 d-flex align-center">
           {{ $t('admin api tokens') }}
-          <v-btn icon size="small" class="ml-2" @click="openAdminTokenDialog()" color="onPrimary" variant="tonal">
+          <v-btn icon size="small" class="ml-2" @click="openAdminTokenDialog()" color="onPrimary"  >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </h3>
-        <v-card v-for="token in adminTokens" :key="token.id" class="mt-4" variant="tonal">
+        <v-card v-for="token in adminTokens" :key="token.id" class="mt-4"  >
           <v-card-title class="d-flex justify-space-between align-center">
             <div>
               {{ token.name }}

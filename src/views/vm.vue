@@ -7,7 +7,7 @@
       <v-container fluid class="pa-0">
         <v-row>
           <v-col>
-            <v-card variant="tonal" fluid>
+            <v-card   fluid>
               <v-card-title>{{ $t('overview') }}</v-card-title>
               <v-card-text class="pa-0">
                 <draggable v-model="vms" item-key="Id">

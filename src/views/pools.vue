@@ -6,7 +6,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-skeleton-loader v-if="poolsLoading" type="card" />
-        <v-card variant="tonal" v-for="pool in pools" :key="pool.id" fluid class="mb-4 pa-0">
+        <v-card v-for="pool in pools" :key="pool.id" fluid class="mb-4 pa-0">
           <v-card-title class="d-flex align-center">
             <span>{{ pool.name }}</span>
             <v-spacer />
@@ -105,9 +105,18 @@
                 <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
                   <v-list-item-title>{{ $t('unmount pool') }}</v-list-item-title>
                 </v-list-item>
-                <v-divider></v-divider>
                 <v-list-item @click="openDeletePoolDialog(pool)">
                   <v-list-item-title>{{ $t('delete pool') }}</v-list-item-title>
+                </v-list-item>
+                <v-divider v-if="pool.type === 'mergerfs'"></v-divider>
+                <v-list-item @click="openAddMergerfsDevicesDialog(pool)">
+                  <v-list-item-title>{{ $t('add devices') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.type === 'mergerfs'" @click="openRemoveMergerfsDevicesDialog(pool)">
+                  <v-list-item-title>{{ $t('remove devices') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.type === 'mergerfs'" @click="openReplaceMergerfsDeviceDialog(pool)">
+                  <v-list-item-title>{{ $t('replace device') }}</v-list-item-title>
                 </v-list-item>
                 <v-divider v-if="pool.type === 'mergerfs'"></v-divider>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openAddParityDevicesDialog(pool)">
@@ -126,12 +135,12 @@
             </v-menu>
           </v-card-actions>
         </v-card>
-        <v-card v-if="pools.length === 0 && !poolsLoading" variant="tonal" fluid class="mb-4 ml-0 mr-0 pa-0">
+        <v-card v-if="pools.length === 0 && !poolsLoading" fluid class="mb-4 ml-0 mr-0 pa-0">
           <v-card-text class="pa-4">
             {{ $t('no pools have been created yet') }}
           </v-card-text>
         </v-card>
-        <v-card variant="tonal" fluid style="margin-bottom: 80px">
+        <v-card fluid style="margin-bottom: 80px">
           <v-card-title>{{ $t('unassigned disks') }}</v-card-title>
           <v-skeleton-loader v-if="unassignedDisksLoading" type="list-item" />
           <v-card-text class="pa-0">
@@ -288,6 +297,81 @@
     </v-card>
   </v-dialog>
 
+  <!-- Add Mergerfs Device Dialog -->
+  <v-dialog v-model="addMergerfsDevicesDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('add devices') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select devices to add to pool') }}</p>
+        <v-form>
+          <v-select v-model="addMergerfsDevicesDialog.devices" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('devices')" :multiple="true" dense />
+          <v-switch v-model="addMergerfsDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="addMergerfsDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="addMergerfsDevices(addMergerfsDevicesDialog.pool.id, addMergerfsDevicesDialog.devices, addMergerfsDevicesDialog.format)" color="onPrimary">
+          {{ $t('add') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Remove MergerfsDevice Dialog -->
+  <v-dialog v-model="removeMergerfsDevicesDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('remove devices') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select devices to remove from pool') }}</p>
+        <v-form>
+          <v-select
+            v-model="removeMergerfsDevicesDialog.devices"
+            :items="removeMergerfsDevicesDialog.pool ? removeMergerfsDevicesDialog.pool.data_devices.map((device) => device.device) : []"
+            :label="$t('devices')"
+            :multiple="true"
+            dense
+          />
+          <v-switch v-model="removeMergerfsDevicesDialog.unmount" :label="$t('unmount')" hide-details density="compact" color="onPrimary" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="removeMergerfsDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="removeMergerfsDevice(removeMergerfsDevicesDialog.pool.id, removeMergerfsDevicesDialog.devices, removeMergerfsDevicesDialog.unmount)" color="red">
+          {{ $t('remove') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Replace Mergerfs Device Dialog -->
+  <v-dialog v-model="replaceMergerfsDeviceDialog.value" max-width="600">
+    <v-card>
+      <v-card-title>{{ $t('replace device') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select device to replace') }}</p>
+        <v-form>
+          <v-select
+            v-model="replaceMergerfsDeviceDialog.oldDevice"
+            :items="replaceMergerfsDeviceDialog.pool ? replaceMergerfsDeviceDialog.pool.data_devices.map((device) => device.device) : []"
+            :label="$t('old device')"
+            dense
+          />
+          <v-select v-model="replaceMergerfsDeviceDialog.newDevice" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('new device')" dense />
+          <v-switch v-model="replaceMergerfsDeviceDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="replaceMergerfsDeviceDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn
+          @click="replaceMergerfsDevice(replaceMergerfsDeviceDialog.pool.id, replaceMergerfsDeviceDialog.oldDevice, replaceMergerfsDeviceDialog.newDevice, replaceMergerfsDeviceDialog.format)"
+          color="red"
+        >
+          {{ $t('replace') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Add Parity Devices Dialog -->
   <v-dialog v-model="addParityDevicesDialog.value" max-width="600">
     <v-card>
@@ -347,12 +431,7 @@
             :label="$t('old device')"
             dense
           />
-          <v-select
-            v-model="replaceParityDeviceDialog.newDevice"
-            :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []"
-            :label="$t('new device')"
-            dense
-          />
+          <v-select v-model="replaceParityDeviceDialog.newDevice" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('new device')" dense />
           <v-switch v-model="replaceParityDeviceDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
         </v-form>
       </v-card-text>
@@ -377,7 +456,11 @@
         <v-form>
           <v-select
             v-model="snapraidOperationDialog.operation"
-            :items="(snapraidOperationDialog.pool && snapraidOperationDialog.pool.status && snapraidOperationDialog.pool.status.parity_operation) ? ['sync','check','scrub','status','force_stop'] : ['sync','check','scrub','status']"
+            :items="
+              snapraidOperationDialog.pool && snapraidOperationDialog.pool.status && snapraidOperationDialog.pool.status.parity_operation
+                ? ['sync', 'check', 'scrub', 'status', 'force_stop']
+                : ['sync', 'check', 'scrub', 'status']
+            "
             :label="$t('operation')"
             dense
           />
@@ -474,13 +557,50 @@ const replaceParityDeviceDialog = reactive({
   newDevice: null,
   format: false,
 });
+const addMergerfsDevicesDialog = reactive({
+  value: false,
+  pool: null,
+  devices: [],
+  format: false,
+});
+const removeMergerfsDevicesDialog = reactive({
+  value: false,
+  pool: null,
+  devices: [],
+  unmount: true,
+});
+const replaceMergerfsDeviceDialog = reactive({
+  value: false,
+  pool: null,
+  oldDevice: null,
+  newDevice: null,
+  format: false,
+});
 
 onMounted(async () => {
   getPools();
   getUnassignedDisks();
   getFilesystems();
 });
-
+const openAddMergerfsDevicesDialog = (pool) => {
+  addMergerfsDevicesDialog.value = true;
+  addMergerfsDevicesDialog.pool = pool;
+  addMergerfsDevicesDialog.devices = [];
+  addMergerfsDevicesDialog.format = false;
+};
+const openRemoveMergerfsDevicesDialog = (pool) => {
+  removeMergerfsDevicesDialog.value = true;
+  removeMergerfsDevicesDialog.pool = pool;
+  removeMergerfsDevicesDialog.devices = [];
+  removeMergerfsDevicesDialog.unmount = true;
+};
+const openReplaceMergerfsDeviceDialog = (pool) => {
+  replaceMergerfsDeviceDialog.value = true;
+  replaceMergerfsDeviceDialog.pool = pool;
+  replaceMergerfsDeviceDialog.oldDevice = null;
+  replaceMergerfsDeviceDialog.newDevice = null;
+  replaceMergerfsDeviceDialog.format = false;
+};
 const openReplaceParityDeviceDialog = (pool) => {
   replaceParityDeviceDialog.value = true;
   replaceParityDeviceDialog.pool = pool;
@@ -1000,7 +1120,7 @@ const replaceMergerfsParityDevice = async (poolId, oldDevice, newDevice, format)
   const replaceParityData = {
     oldDevice: oldDevice,
     newDevice: newDevice,
-    format: format
+    format: format,
   };
 
   try {
@@ -1030,7 +1150,6 @@ const replaceMergerfsParityDevice = async (poolId, oldDevice, newDevice, format)
 
 const performSnapraidOperation = async (poolId, operation) => {
   overlay.value = true;
-  snapraidOperationDialog.value = false;
   const commandData = {
     operation: operation,
   };
@@ -1040,7 +1159,7 @@ const performSnapraidOperation = async (poolId, operation) => {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(commandData),
     });
@@ -1050,6 +1169,106 @@ const performSnapraidOperation = async (poolId, operation) => {
       throw new Error(`${t('snapraid operation could not be executed')}|$| ${errorDetails.error || t('unknown error')}`);
     }
     showSnackbarSuccess(t('snapraid operation executed successfully'));
+    getPools();
+    getUnassignedDisks();
+    snapraidOperationDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const addMergerfsDevices = async (poolId, devices, format) => {
+  overlay.value = true;
+  const addDeviceData = {
+    devices: devices,
+    format: format,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/${poolId}/devices/add`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(addDeviceData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('device could not be added')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('device added successfully'));
+    getPools();
+    getUnassignedDisks();
+    addDeviceDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const removeMergerfsDevice = async (poolId, devices, unmount) => {
+  overlay.value = true;
+  const removeDeviceData = {
+    devices: devices,
+    unmount: unmount,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/${poolId}/devices/remove`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(removeDeviceData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('device could not be removed')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('device removed successfully'));
+    getPools();
+    getUnassignedDisks();
+    removeDeviceDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const replaceMergerfsDevice = async (poolId, oldDevice, newDevice, format) => {
+  overlay.value = true;
+  const replaceDeviceData = {
+    oldDevice: oldDevice,
+    newDevice: newDevice,
+    format: format,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/${poolId}/devices/replace`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(replaceDeviceData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('device could not be replaced')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('device replaced successfully'));
     getPools();
     getUnassignedDisks();
   } catch (e) {

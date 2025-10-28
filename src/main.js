@@ -38,7 +38,18 @@ const vuetify = createVuetify({
         }
       }
     }
-  }  
+  },
+  defaults: {
+      VCard: {
+        style: {
+          background: 'rgb(var(--v-theme-background))',
+          borderRadius: '12px',
+          padding: '0px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.06)',
+          border: '1px solid color-mix(in srgb, rgb(var(--v-theme-on-surface)) 15%, transparent)',
+        },
+      },
+    },  
 })
 
 const i18n = createI18n({

@@ -14,7 +14,7 @@
       <v-container fluid class="pa-0">
         <v-row>
           <v-col>
-            <v-card v-if="notifications.length > 0" variant="tonal" fluid>
+            <v-card v-if="notifications.length > 0"   fluid>
               <v-card-text class="pa-0">
                 <v-list>
                     <v-list-item v-for="(notification, index) in notifications" :key="notification.id"
@@ -38,7 +38,7 @@
                 </v-list>
               </v-card-text>
             </v-card>
-            <v-card v-if="notifications.length === 0" variant="tonal">
+            <v-card v-if="notifications.length === 0"  >
               <v-card-text class="pa-0">
                 <v-list class="pa-0" style="background-color: transparent;">
                   <template v-if="notifications.length === 0">

@@ -5,7 +5,7 @@
                 <h2>{{ $t('system') }}</h2>
             </v-container>
             <v-container fluid class="pa-0">
-                <v-card variant="tonal">
+                <v-card  >
                     <v-card-text>
                         <v-text-field :label="$t('hostname')" v-model="settingsSystem.hostname"></v-text-field>
                         <v-select :items="keymaps" :label="$t('keymap')" v-model="settingsSystem.keymap"

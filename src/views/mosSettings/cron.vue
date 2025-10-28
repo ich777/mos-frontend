@@ -5,7 +5,7 @@
         <h2>{{ $t('cron jobs') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal">
+        <v-card  >
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item v-for="(cronJob, index) in cronJobs" :key="index">

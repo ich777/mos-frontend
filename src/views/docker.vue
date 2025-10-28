@@ -7,7 +7,7 @@
       <v-container fluid class="pa-0">
         <v-row>
           <v-col>
-            <v-card variant="tonal" fluid style="margin-bottom: 80px">
+            <v-card   fluid style="margin-bottom: 80px">
               <v-card-title>{{ $t('overview') }}</v-card-title>
               <v-card-text class="pa-0">
                 <v-list>

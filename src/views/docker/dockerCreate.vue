@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card variant="tonal" fluid>
+        <v-card   fluid>
           <v-card-text>
             <v-select :items="allTemplatesMixed || []" :label="$t('template')" v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense outlined></v-select>
             <v-row>
