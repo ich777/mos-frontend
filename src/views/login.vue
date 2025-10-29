@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrap">
     <v-container class="py-10 fill-height" max-width="1000">
-      <v-row align="center" justify="center" no-gutters class="fill-height">
+      <v-row align="center" justify="center" no-gutters :class="$vuetify.display.mdAndUp ? 'fill-height' : ''">
         <!-- Left side -->
         <v-col cols="12" md="6" class="pa-6 d-flex flex-column justify-center align-center text-center">
           <div class="brand centered">
