@@ -1204,7 +1204,7 @@ const addMergerfsDevices = async (poolId, devices, format) => {
     showSnackbarSuccess(t('device added successfully'));
     getPools();
     getUnassignedDisks();
-    addDeviceDialog.value = false;
+    addMergerfsDevicesDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1237,7 +1237,7 @@ const removeMergerfsDevice = async (poolId, devices, unmount) => {
     showSnackbarSuccess(t('device removed successfully'));
     getPools();
     getUnassignedDisks();
-    removeDeviceDialog.value = false;
+    removeMergerfsDevicesDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1271,6 +1271,7 @@ const replaceMergerfsDevice = async (poolId, oldDevice, newDevice, format) => {
     showSnackbarSuccess(t('device replaced successfully'));
     getPools();
     getUnassignedDisks();
+    replaceMergerfsDeviceDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
