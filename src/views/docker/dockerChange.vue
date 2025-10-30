@@ -161,10 +161,24 @@
                   </v-row>
                   <v-row class="mt-n8">
                     <v-col cols="6">
-                      <v-text-field :label="$t('host')" type="number" v-model="port.host" density="compact" hide-details></v-text-field>
+                      <v-text-field 
+                        :label="$t('host')" 
+                        type="text" 
+                        v-model="port.host" 
+                        density="compact" 
+                        hide-details="auto"
+                        :rules="[v => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
+                      ></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field :label="$t('container')" type="number" v-model="port.container" density="compact" hide-details></v-text-field>
+                      <v-text-field 
+                        :label="$t('container')" 
+                        type="text" 
+                        v-model="port.container" 
+                        density="compact" 
+                        hide-details="auto"
+                        :rules="[v => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-col>
