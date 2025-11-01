@@ -44,6 +44,7 @@
     </v-container>
   </v-container>
 
+  <!-- Create Dialog -->
   <v-dialog v-model="createDialog.value" max-width="500">
     <v-card>
       <v-card-title>{{ $t('create share') }}</v-card-title>
@@ -53,8 +54,15 @@
           <v-text-field v-model="createDialog.subPath" :label="$t('sub path')" required />
           <v-select v-model="createDialog.poolName" :items="pools" item-title="name" item-value="name"
             :label="$t('pool')" required />
-          <v-select v-model="createDialog.selectedUser" :items="smbUsers" item-title="username" item-value="username"
-            :label="$t('smb user')" required return-object />
+            <v-select
+            v-model="createDialog.selectedUser"
+            :items="smbUsers"
+            item-title="username"
+            item-value="username"
+            :label="$t('smb user')"
+            required
+            multiple
+            />
           <v-text-field v-model="createDialog.comment" :label="$t('comment')" clearable />
           <v-divider></v-divider>
           <v-btn variant="text" @click="createDialog.showAdvanced = !createDialog.showAdvanced" class="mb-4">
@@ -97,6 +105,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Delete Dialog -->
   <v-dialog v-model="deleteDialog.value" max-width="400">
     <v-card>
       <v-card-title>{{ $t('confirm delete') }}</v-card-title>
@@ -115,6 +124,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Edit Dialog -->
   <v-dialog v-model="editDialog.value" max-width="500">
     <v-card>
       <v-card-title>{{ $t('edit share') }}</v-card-title>
@@ -188,7 +198,7 @@ const createDialog = reactive({
   shareName: '',
   poolName: null,
   subPath: '',
-  selectedUser: null,
+  selectedUser: [],
   comment: '',
   enabled: true,
   browseable: true,
@@ -235,6 +245,8 @@ onMounted(() => {
 
 const openCreatePoolDialog = () => {
   createDialog.value = true;
+  clearCreateDialog();
+
 };
 
 const openDeleteDialog = (share) => {
@@ -329,8 +341,8 @@ const createShare = async () => {
     read_only: createDialog.read_only,
     guest_ok: createDialog.guest_ok,
     force_root: createDialog.force_root,
-    valid_users: [createDialog.selectedUser?.username],
-    write_list: [createDialog.selectedUser?.username],
+    valid_users: createDialog.selectedUser,
+    write_list: createDialog.selectedUser,
     create_mask: createDialog.create_mask,
     directory_mask: createDialog.directory_mask,
     inherit_permissions: createDialog.inherit_permissions,
@@ -436,7 +448,7 @@ const clearCreateDialog = () => {
   createDialog.shareName = '';
   createDialog.poolName = null;
   createDialog.subPath = '';
-  createDialog.selectedUser = null;
+  createDialog.selectedUser = [];
   createDialog.comment = '';
   createDialog.enabled = true;
   createDialog.browseable = true;
