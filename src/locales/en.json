@@ -595,5 +595,17 @@
   "select device to replace parity": "Select device to replace parity",
   "old device": "Old device",
   "new device": "New device",
-  "replace": "Replace"
+  "replace": "Replace",
+  "device could not be added": "Device could not be added",
+  "device added successfully": "Device added successfully",
+  "device could not be removed": "Device could not be removed",
+  "device removed successfully": "Device removed successfully",
+  "device could not be replaced": "Device could not be replaced",
+  "device replaced successfully": "Device replaced successfully",
+  "add devices": "Add devices",
+  "remove devices": "Remove devices",
+  "replace device": "Replace device",
+  "select devices to add to pool": "Select devices to add to pool",
+  "select devices to remove from pool": "Select devices to remove from pool",
+  "select device to replace in pool": "Select device to replace in pool"
 }

@@ -5,7 +5,8 @@
         <h2>{{ $t('lxc service') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card  >
+        <v-skeleton-loader :loading="lxcServiceLoading" type="card" class="w-100">
+        <v-card class="w-100">
           <v-card-text>
             <v-form>
               <v-switch :label="$t('lxc service')" color="onPrimary" inset density="compact"
@@ -16,6 +17,7 @@
             </v-form>
           </v-card-text>
         </v-card>
+        </v-skeleton-loader>
       </v-container>
     </v-container>
   </v-container>
@@ -44,6 +46,7 @@ const settingsLXC = ref({
 });
 const overlay = ref(false);
 const { t } = useI18n();
+const lxcServiceLoading = ref(true);
 
 onMounted(() => {
   getLXCService();
@@ -62,6 +65,8 @@ const getLXCService = async () => {
 
   } catch (e) {
     showSnackbarError(e.message);
+  } finally {
+    lxcServiceLoading.value = false;
   }
 };
 

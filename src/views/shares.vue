@@ -1,17 +1,16 @@
 <template>
   <v-container fluid class="d-flex justify-center">
-    <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
+    <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('shares') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-row>
-          <v-col>
-            <v-card   fluid style="margin-bottom: 80px">
-              <v-card-title>{{ $t('overview') }}</v-card-title>
-              <v-card-text class="pa-0">
-                <v-list>
-                  <v-list-item v-for="share in shares">
+        <v-skeleton-loader :loading="sharesLoading" type="card" class="w-100">
+          <v-card style="margin-bottom: 80px" class="w-100">
+            <v-card-text class="pa-0">
+              <v-list class="bg-transparent">
+                <template v-for="(share, index) in shares" :key="share.id ?? share.name">
+                  <v-list-item>
                     <template v-slot:prepend>
                       <v-icon>mdi-folder</v-icon>
                     </template>
@@ -35,11 +34,12 @@
                       </v-menu>
                     </template>
                   </v-list-item>
-                </v-list>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+                  <v-divider v-if="index < shares.length - 1" inset />
+                </template>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-skeleton-loader>
       </v-container>
     </v-container>
   </v-container>
@@ -52,17 +52,8 @@
         <v-form>
           <v-text-field v-model="createDialog.shareName" :label="$t('share name')" required autofocus />
           <v-text-field v-model="createDialog.subPath" :label="$t('sub path')" required />
-          <v-select v-model="createDialog.poolName" :items="pools" item-title="name" item-value="name"
-            :label="$t('pool')" required />
-            <v-select
-            v-model="createDialog.selectedUser"
-            :items="smbUsers"
-            item-title="username"
-            item-value="username"
-            :label="$t('smb user')"
-            required
-            multiple
-            />
+          <v-select v-model="createDialog.poolName" :items="pools" item-title="name" item-value="name" :label="$t('pool')" required />
+          <v-select v-model="createDialog.selectedUser" :items="smbUsers" item-title="username" item-value="username" :label="$t('smb user')" required multiple />
           <v-text-field v-model="createDialog.comment" :label="$t('comment')" clearable />
           <v-divider></v-divider>
           <v-btn variant="text" @click="createDialog.showAdvanced = !createDialog.showAdvanced" class="mb-4">
@@ -72,26 +63,17 @@
             <div v-if="createDialog.showAdvanced">
               <v-text-field v-model="createDialog.create_mask" :label="$t('create mask')" required />
               <v-text-field v-model="createDialog.directory_mask" :label="$t('directory mask')" required />
-              <v-switch v-model="createDialog.force_root" :label="$t('force root')" inset hide-details density="compact"
-                class="ml-4" color="onPrimary" />
-              <v-switch v-model="createDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details
-                density="compact" class="ml-4" color="onPrimary" />
-              <v-switch v-model="createDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details
-                density="compact" class="ml-4" color="onPrimary" />
-              <v-switch v-model="createDialog.preserve_case" :label="$t('preserve case')" inset hide-details
-                density="compact" class="ml-4" color="onPrimary" />
-              <v-switch v-model="createDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details
-                density="compact" class="ml-4" color="onPrimary" />
+              <v-switch v-model="createDialog.force_root" :label="$t('force root')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+              <v-switch v-model="createDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+              <v-switch v-model="createDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+              <v-switch v-model="createDialog.preserve_case" :label="$t('preserve case')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+              <v-switch v-model="createDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
             </div>
           </v-slide-y-transition>
-          <v-switch v-model="createDialog.enabled" :label="$t('enabled')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="createDialog.browseable" :label="$t('browseable')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="createDialog.read_only" :label="$t('read only')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="createDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
+          <v-switch v-model="createDialog.enabled" :label="$t('enabled')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="createDialog.browseable" :label="$t('browseable')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="createDialog.read_only" :label="$t('read only')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="createDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -133,30 +115,17 @@
           <v-text-field v-model="editDialog.name" :label="$t('share name')" readonly />
           <v-text-field v-model="editDialog.path" :label="$t('path')" readonly />
           <v-text-field v-model="editDialog.comment" :label="$t('comment')" clearable />
-          <v-select v-model="editDialog.valid_users"
-            :items="Array.isArray(smbUsers) ? smbUsers.map(user => user.username) : []" :label="$t('read rights')"
-            multiple />
-          <v-select v-model="editDialog.write_list"
-            :items="Array.isArray(smbUsers) ? smbUsers.map(user => user.username) : []" :label="$t('write rights')"
-            multiple />
-          <v-switch v-model="editDialog.enabled" :label="$t('enabled')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.browseable" :label="$t('browseable')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.read_only" :label="$t('read only')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.force_root" :label="$t('force root')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details
-            density="compact" class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details
-            density="compact" class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.preserve_case" :label="$t('preserve case')" inset hide-details density="compact"
-            class="ml-4" color="onPrimary" />
-          <v-switch v-model="editDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details
-            density="compact" class="ml-4" color="onPrimary" />
+          <v-select v-model="editDialog.valid_users" :items="Array.isArray(smbUsers) ? smbUsers.map((user) => user.username) : []" :label="$t('read rights')" multiple />
+          <v-select v-model="editDialog.write_list" :items="Array.isArray(smbUsers) ? smbUsers.map((user) => user.username) : []" :label="$t('write rights')" multiple />
+          <v-switch v-model="editDialog.enabled" :label="$t('enabled')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.browseable" :label="$t('browseable')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.read_only" :label="$t('read only')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.force_root" :label="$t('force root')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.inherit_permissions" :label="$t('inherit permissions')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.hide_dot_files" :label="$t('hide dot files')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.preserve_case" :label="$t('preserve case')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
+          <v-switch v-model="editDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details density="compact" class="ml-4" color="onPrimary" />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -172,8 +141,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon
-    @click="openCreatePoolDialog()">
+  <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -205,15 +173,15 @@ const createDialog = reactive({
   read_only: false,
   guest_ok: false,
   force_root: false,
-  create_mask: "0664",
-  directory_mask: "0775",
+  create_mask: '0664',
+  directory_mask: '0775',
   inherit_permissions: true,
   hide_dot_files: false,
   preserve_case: true,
   case_sensitive: true,
   policies: [],
   createDirectory: true,
-  showAdvanced: false
+  showAdvanced: false,
 });
 const editDialog = reactive({
   value: false,
@@ -229,24 +197,25 @@ const editDialog = reactive({
   preserve_case: true,
   case_sensitive: true,
   write_list: [],
-  valid_users: []
+  valid_users: [],
 });
 const deleteDialog = reactive({
   value: false,
   share: null,
-  deleteDirectory: false
+  deleteDirectory: false,
 });
+const sharesLoading = ref(true);
 
-onMounted(() => {
-  getShares();
+onMounted(async () => {
+  await getShares();
+  await getPools();
+  sharesLoading.value = false;
   getSmbUsers();
-  getPools();
 });
 
 const openCreatePoolDialog = () => {
   createDialog.value = true;
   clearCreateDialog();
-
 };
 
 const openDeleteDialog = (share) => {
@@ -277,8 +246,8 @@ const getShares = async () => {
   try {
     const res = await fetch('/api/v1/shares', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
@@ -289,7 +258,6 @@ const getShares = async () => {
     } else {
       shares.value = [];
     }
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -299,14 +267,13 @@ const getPools = async () => {
   try {
     const res = await fetch('/api/v1/pools', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error(t('pools could not be loaded'));
     const result = await res.json();
     pools.value = result;
-
   } catch (e) {
     showSnackbarError(e.message);
     return [];
@@ -317,13 +284,12 @@ const getSmbUsers = async () => {
   try {
     const res = await fetch('/api/v1/auth/users?samba_user=true', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error(t('smb users could not be loaded'));
     smbUsers.value = await res.json();
-
   } catch (e) {
     showSnackbarError(e.message);
     return [];
@@ -350,7 +316,7 @@ const createShare = async () => {
     preserve_case: createDialog.preserve_case,
     case_sensitive: createDialog.case_sensitive,
     policies: createDialog.policies,
-    createDirectory: createDialog.createDirectory
+    createDirectory: createDialog.createDirectory,
   };
 
   try {
@@ -359,7 +325,7 @@ const createShare = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
       body: JSON.stringify(newShare),
     });
@@ -392,7 +358,7 @@ const updateShare = async (shareDialog) => {
     preserve_case: shareDialog.preserve_case,
     case_sensitive: shareDialog.case_sensitive,
     write_list: shareDialog.write_list,
-    valid_users: shareDialog.valid_users
+    valid_users: shareDialog.valid_users,
   };
   try {
     overlay.value = true;
@@ -400,7 +366,7 @@ const updateShare = async (shareDialog) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
       body: JSON.stringify(editShare),
     });
@@ -426,10 +392,10 @@ const deleteShare = async () => {
     const res = await fetch(`/api/v1/shares/smb/${encodeURIComponent(deleteDialog.share.id)}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(delShare)
+      body: JSON.stringify(delShare),
     });
     overlay.value = false;
 
@@ -437,7 +403,6 @@ const deleteShare = async () => {
     showSnackbarSuccess(t('share deleted successfully'));
     getShares();
     clearDeleteDialog();
-
   } catch (e) {
     overlay.value = false;
     showSnackbarError(e.message);
@@ -455,8 +420,8 @@ const clearCreateDialog = () => {
   createDialog.read_only = false;
   createDialog.guest_ok = false;
   createDialog.force_root = false;
-  createDialog.create_mask = "0664";
-  createDialog.directory_mask = "0775";
+  createDialog.create_mask = '0664';
+  createDialog.directory_mask = '0775';
   createDialog.inherit_permissions = true;
   createDialog.hide_dot_files = false;
   createDialog.preserve_case = true;
@@ -482,5 +447,4 @@ const clearDeleteDialog = () => {
   deleteDialog.share = null;
   deleteDialog.deleteDirectory = false;
 };
-
 </script>

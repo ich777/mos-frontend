@@ -5,47 +5,62 @@
         <h2>{{ $t('docker service') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card  >
-          <v-card-text>
-            <v-form>
-              <v-switch :label="$t('docker service')" inset density="compact" v-model="settingsDocker.enabled" color="green"></v-switch>
-              <v-text-field v-model="settingsDocker.directory" :label="$t('directory')" required></v-text-field>
-              <v-text-field v-model="settingsDocker.appdata" :label="$t('appdata')" required></v-text-field>
-              <v-text-field v-model="settingsDocker.filesystem" :label="$t('filesystem')" required></v-text-field>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-select v-model="settingsDocker.docker_net.mode" :items="['bridge', 'host', 'none']" :label="$t('docker network mode')" dense></v-select>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-combobox v-model="settingsDocker.docker_net.config" :label="$t('docker network config')" multiple chips dense></v-combobox>
-                </v-col>
-              </v-row>
-              <v-text-field v-model.number="settingsDocker.start_wait" :label="$t('start wait')" type="number" min="0" dense></v-text-field>
-              <v-divider class="my-2"></v-divider>
-              <v-row class="align-center">
-                <v-col cols="12" md="4">
-                  <v-switch v-model="settingsDocker.update_check.enabled" :label="$t('update check')" inset density="compact" color="green"></v-switch>
-                </v-col>
-                <v-col cols="12" md="8">
-                  <v-text-field v-model="settingsDocker.update_check.update_check_schedule" :label="$t('update check schedule')" :disabled="!settingsDocker.update_check.enabled" dense></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row class="align-center">
-                <v-col cols="12" md="4">
-                  <v-switch v-model="settingsDocker.update_check.auto_update.enabled" :label="$t('auto update')" inset density="compact" :disabled="!settingsDocker.update_check.enabled" color="green"></v-switch>
-                </v-col>
-                <v-col cols="12" md="8">
-                  <v-text-field
-                    v-model="settingsDocker.update_check.auto_update.auto_update_schedule"
-                    :label="$t('auto update schedule')"
-                    :disabled="!settingsDocker.update_check.enabled || !settingsDocker.update_check.auto_update.enabled"
-                    dense
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-form>
-          </v-card-text>
-        </v-card>
+        <v-skeleton-loader :loading="dockerServiceLoading" type="card" class="w-100">
+          <v-card class="w-100">
+            <v-card-text>
+              <v-form>
+                <v-switch :label="$t('docker service')" inset density="compact" v-model="settingsDocker.enabled" color="green"></v-switch>
+                <v-text-field v-model="settingsDocker.directory" :label="$t('directory')" required></v-text-field>
+                <v-text-field v-model="settingsDocker.appdata" :label="$t('appdata')" required></v-text-field>
+                <v-text-field v-model="settingsDocker.filesystem" :label="$t('filesystem')" required></v-text-field>
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-select v-model="settingsDocker.docker_net.mode" :items="['bridge', 'host', 'none']" :label="$t('docker network mode')" dense hide-details="auto"></v-select>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-combobox v-model="settingsDocker.docker_net.config" :label="$t('docker network config')" multiple chips></v-combobox>
+                  </v-col>
+                </v-row>
+                <v-text-field v-model.number="settingsDocker.start_wait" :label="$t('start wait')" type="number" min="0"></v-text-field>
+                <v-divider class="my-2"></v-divider>
+                <v-row class="align-center">
+                  <v-col cols="12" md="4">
+                    <v-switch v-model="settingsDocker.update_check.enabled" :label="$t('update check')" inset color="green" hide-details></v-switch>
+                  </v-col>
+                  <v-col cols="12" md="8">
+                    <v-text-field
+                      v-model="settingsDocker.update_check.update_check_schedule"
+                      :label="$t('update check schedule')"
+                      :disabled="!settingsDocker.update_check.enabled"
+                      dense
+                      hide-details="auto"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row class="align-center">
+                  <v-col cols="12" md="4">
+                    <v-switch
+                      v-model="settingsDocker.update_check.auto_update.enabled"
+                      :label="$t('auto update')"
+                      inset
+                      density="compact"
+                      :disabled="!settingsDocker.update_check.enabled"
+                      color="green" hide-details
+                    ></v-switch>
+                  </v-col>
+                  <v-col cols="12" md="8">
+                    <v-text-field
+                      v-model="settingsDocker.update_check.auto_update.auto_update_schedule"
+                      :label="$t('auto update schedule')"
+                      :disabled="!settingsDocker.update_check.enabled || !settingsDocker.update_check.auto_update.enabled"
+                      dense hide-details="auto"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-skeleton-loader>
       </v-container>
     </v-container>
   </v-container>
@@ -84,6 +99,7 @@ const settingsDocker = ref({
     },
   },
 });
+const dockerServiceLoading = ref(true);
 const overlay = ref(false);
 const { t } = useI18n();
 const emit = defineEmits(['refresh-drawer']);
@@ -104,6 +120,8 @@ const getDockerService = async () => {
     settingsDocker.value = await res.json();
   } catch (e) {
     showSnackbarError(e.message);
+  } finally {
+    dockerServiceLoading.value = false;
   }
 };
 

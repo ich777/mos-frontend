@@ -14,8 +14,7 @@
         <v-app-bar-nav-icon variant="text" @click.stop="toggleDrawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
         <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
-        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end"
-          :offset-x="14" :offset-y="14">
+        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" :offset-x="14" :offset-y="14">
           <v-btn icon to="/notifications" variant="text" aria-label="Notifications">
             <v-icon>mdi-bell</v-icon>
           </v-btn>
@@ -78,8 +77,8 @@
   <v-dialog v-model="logoutDialog" width="auto">
     <v-card max-width="400" prepend-icon="mdi-logout" :text="$t('do you want to logout?')" :title="$t('logout')">
       <template v-slot:actions>
-        <v-btn class="ms-auto" color="onPrimary"  :text="$t('cancel')" @click="logoutDialog = false"></v-btn>
-        <v-btn class="ms-auto" color="onPrimary"  :text="$t('ok')" @click="doLogout"></v-btn>
+        <v-btn class="ms-auto" color="onPrimary" :text="$t('cancel')" @click="logoutDialog = false"></v-btn>
+        <v-btn class="ms-auto" color="onPrimary" :text="$t('ok')" @click="doLogout"></v-btn>
       </template>
     </v-card>
   </v-dialog>
@@ -97,19 +96,19 @@
       </div>
     </v-expand-transition>
   </v-snackbar>
-
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import Login from './views/login.vue'
-import FirstSetup from './views/firstSetup.vue'
-import { useSnackbar, showSnackbarError, showSnackbarSuccess } from './composables/snackbar'
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import Login from './views/login.vue';
+import FirstSetup from './views/firstSetup.vue';
+import { useSnackbar, showSnackbarError, showSnackbarSuccess } from './composables/snackbar';
 import { useTheme } from 'vuetify';
 import { useI18n } from 'vue-i18n';
 import { getContrast } from 'vuetify/lib/util/colorUtils';
+import { io } from 'socket.io-client';
 
-const { snackbar, snackbarText, snackbarColor, snackbarIcon, snackbarApiError, snackbarShowErrorDetails } = useSnackbar()
+const { snackbar, snackbarText, snackbarColor, snackbarIcon, snackbarApiError, snackbarShowErrorDetails } = useSnackbar();
 const theme = useTheme();
 const { locale, t } = useI18n();
 const tab = ref('');
@@ -123,31 +122,38 @@ const mosServices = ref({});
 const appBarColor = 'primary';
 const notificationsBadge = ref(false);
 const showErrorDetails = ref(false);
+let socket = null;
 
 onMounted(async () => {
   if (tab.value === '') {
-    tab.value = 'dashboard'
+    tab.value = 'dashboard';
   }
   await checkLoggedIn();
   if (loggedIn.value) {
     getNotificationsBadge();
+    //getNotificationWS();
     await getMosServices();
     getDrawerState();
   }
-})
+});
+
+onUnmounted(() => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+});
 
 const backgroundColor = computed(() => {
   return theme.current.value.colors[appBarColor];
-})
+});
 const isDark = computed(() => {
   const contrast = getContrast(backgroundColor.value, '#fff');
   return contrast < 2.7;
-})
+});
 const logoSrc = computed(() => {
-  return isDark.value
-    ? 'mos_black.png'
-    : 'mos_white.png'
-})
+  return isDark.value ? 'mos_black.png' : 'mos_white.png';
+});
 
 const checkLoggedIn = async () => {
   if (localStorage.getItem('authToken')) {
@@ -162,7 +168,7 @@ const checkLoggedIn = async () => {
     loggedIn.value = false;
   }
   loginChecked.value = true;
-}
+};
 
 function checkTokenExpired(token) {
   if (token) {
@@ -188,8 +194,8 @@ const getUserProfile = async () => {
     const res = await fetch('/api/v1/auth/profile', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('Not logged in');
@@ -202,14 +208,13 @@ const getUserProfile = async () => {
     localStorage.setItem('userid', result.id);
 
     loggedIn.value = true;
-
   } catch (e) {
     loggedIn.value = false;
   }
-}
+};
 
 function handleLoginSuccess() {
-  loggedIn.value = true
+  loggedIn.value = true;
   getMosServices();
 }
 
@@ -221,10 +226,10 @@ function handleSetupComplete() {
 function doLogout() {
   localStorage.removeItem('authToken');
   localStorage.removeItem('userid');
-  tab.value = 'dashboard'
-  loggedIn.value = false
-  drawer.value = false
-  logoutDialog.value = false
+  tab.value = 'dashboard';
+  loggedIn.value = false;
+  drawer.value = false;
+  logoutDialog.value = false;
 }
 
 const changeDarkMode = async () => {
@@ -240,20 +245,19 @@ const changeDarkMode = async () => {
     const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'darkmode': targetTheme === 'dark' ? true : false })
-    })
+      body: JSON.stringify({ darkmode: targetTheme === 'dark' ? true : false }),
+    });
 
     if (!res.ok) throw new Error('API-Error');
 
     const result = await res.json();
 
     theme.global.name.value = result.darkmode ? 'dark' : 'light';
-    locale.value = result.language || 'en'
+    locale.value = result.language || 'en';
     theme.themes.value[theme.global.name.value].colors.primary = result.primary_color || '#1976D2';
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -264,40 +268,38 @@ const getMosServices = async () => {
     const res = await fetch('/api/v1/mos/services', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
     mosServices.value = await res.json();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
-}
+};
 
 const checkFirstSetup = async () => {
   try {
     const res = await fetch('/api/v1/auth/firstsetup', {
-      method: 'GET'
+      method: 'GET',
     });
 
     if (!res.ok) throw new Error('API-Error');
 
     const result = await res.json();
     return result.firstsetup;
-
   } catch (e) {
     return false;
   }
-}
+};
 
 const getNotificationsBadge = async () => {
   try {
     const res = await fetch('/api/v1/notifications?read=false&limit=1', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
@@ -308,10 +310,37 @@ const getNotificationsBadge = async () => {
     } else {
       notificationsBadge.value = false;
     }
-
   } catch (e) {
     showSnackbarError(e.message);
   }
+};
+
+const getNotificationWS = () => {
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    showSnackbarError('No auth token found');
+    return;
+  }
+
+  const socket = io('http://192.168.1.2:999', {
+    transports: ['websocket'],
+    upgrade: false,
+  });
+
+  socket.on('connect', () => {
+    socket.emit('subscribe-notifications', { token: authToken });
+    console.log('Connected to notification socket');
+  });
+
+  socket.on('connect_error', (err) => {
+    showSnackbarError(`Connection error: ${err.message}`);
+    console.log('Failed to connect to notification socket');
+  });
+
+  socket.on('notification', (data) => {
+    notificationsBadge.value = true;
+    showSnackbarSuccess(t('new notification received'), 'mdi-bell-alert', data);
+  });
 };
 
 const toggleDrawer = () => {
@@ -330,5 +359,4 @@ const getDrawerState = () => {
     drawer.value = true;
   }
 };
-
 </script>

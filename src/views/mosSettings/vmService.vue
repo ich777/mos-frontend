@@ -5,7 +5,8 @@
         <h2>{{ $t('vm service') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card  >
+        <v-skeleton-loader :loading="vmServiceLoading" type="card" class="w-100">
+        <v-card class="w-100">
           <v-card-text>
             <v-form>
               <v-switch :label="$t('enabled')" color="onPrimary" inset density="compact" v-model="vmSettings.enabled">
@@ -15,6 +16,7 @@
             </v-form>
           </v-card-text>
         </v-card>
+        </v-skeleton-loader>
       </v-container>
     </v-container>
   </v-container>
@@ -43,6 +45,7 @@ const vmSettings = ref({
 });
 const { t } = useI18n();
 const overlay = ref(false);
+const vmServiceLoading = ref(true);
 
 onMounted(() => {
   getVMService();
@@ -61,6 +64,8 @@ const getVMService = async () => {
 
   } catch (e) {
     showSnackbarError(e.message);
+  } finally {
+    vmServiceLoading.value = false;
   }
 };
 

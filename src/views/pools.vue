@@ -90,7 +90,7 @@
             </v-list>
           </v-card-text>
           <v-card-actions>
-            <v-switch v-model="pool.automount" :label="$t('automount')" inset hide-details density="compact" color="onPrimary" @change="switchAutomount(pool)" />
+            <v-switch v-model="pool.automount" :label="$t('automount')" inset hide-details density="compact" color="green" @change="switchAutomount(pool)" />
             <v-spacer />
             <v-menu>
               <template #activator="{ props }">

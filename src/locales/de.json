@@ -554,6 +554,7 @@
   "update check interval": "Update Prüfintervall",
   "interval": "Intervall",
   "auto update": "Automatische Updates",
+  "auto update schedule": "Automatischer Update-Zeitplan",
   "update check schedule": "Automatischer Updatesintervall",
   "docker network mode": "Docker Netzwerkmodus",
   "docker network config": "Docker Netzwerkkonfiguration",

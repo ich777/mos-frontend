@@ -5,7 +5,7 @@
         <h2>{{ $t('users') }}</h2>
       </v-container>
       <v-card>
-        <v-list class="pa-0 bg-transparent">
+        <v-list class="bg-transparent">
           <template v-for="(user, idx) in users" :key="user.id">
             <v-list-item>
               <v-list-item-title>
