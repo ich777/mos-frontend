@@ -557,7 +557,6 @@ const fillFormFromJson = (jsonData) => {
         container: device.container || '',
       }))
     : [];
-  console.log(jsonData.gpus);
   form.gpus = Array.isArray(jsonData.gpus) ? jsonData.gpus : [];
 
   showSnackbarSuccess(t('template loaded successfully'));

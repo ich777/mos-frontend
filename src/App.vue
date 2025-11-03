@@ -14,8 +14,8 @@
         <v-app-bar-nav-icon variant="text" @click.stop="toggleDrawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
         <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
-        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" :offset-x="14" :offset-y="14">
-          <v-btn icon to="/notifications" variant="text" aria-label="Notifications">
+        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" :offset-x="14" :offset-y="14" @refresh-notifications-badge="getNotificationsBadge()">
+          <v-btn icon variant="text" aria-label="Notifications">
             <v-icon>mdi-bell</v-icon>
           </v-btn>
         </v-badge>
@@ -83,13 +83,12 @@
     </v-card>
   </v-dialog>
 
-  <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="showErrorDetails ? -1 : 3000" :width="isWideScreen ? 800 : 'auto'" multiLine location="bottom center" max-height="500">
+  <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="showErrorDetails ? -1 : 3000" :width="isWideScreen ? 800 : 'auto'" multiLine :location="snackbarPosition" max-height="500">
+    {{ snackbarText }}
     <template #actions>
-      <v-icon v-if="snackbarIcon" class="me-2">{{ snackbarIcon }}</v-icon>
       <v-btn v-if="snackbarApiError != ''" text @click="showErrorDetails = !showErrorDetails" color="white">{{ showErrorDetails ? $t('less details') : $t('details') }}</v-btn>
       <v-btn text @click="snackbar = false" color="white">{{ $t('close') }}</v-btn>
     </template>
-    {{ snackbarText }}
     <v-expand-transition>
       <div v-if="showErrorDetails != ''" class="mt-2">
         {{ snackbarApiError }}
@@ -106,9 +105,8 @@ import { useSnackbar, showSnackbarError, showSnackbarSuccess } from './composabl
 import { useTheme } from 'vuetify';
 import { useI18n } from 'vue-i18n';
 import { getContrast } from 'vuetify/lib/util/colorUtils';
-import { io } from 'socket.io-client';
 
-const { snackbar, snackbarText, snackbarColor, snackbarIcon, snackbarApiError, snackbarShowErrorDetails } = useSnackbar();
+const { snackbar, snackbarText, snackbarColor, snackbarIcon, snackbarApiError, snackbarShowErrorDetails, snackbarPosition } = useSnackbar();
 const theme = useTheme();
 const { locale, t } = useI18n();
 const tab = ref('');
@@ -122,7 +120,12 @@ const mosServices = ref({});
 const appBarColor = 'primary';
 const notificationsBadge = ref(false);
 const showErrorDetails = ref(false);
-let socket = null;
+const RECONNECT_MAX_DELAY = 15000;
+const RECONNECT_BASE_DELAY = 1000;
+
+let ws = null;
+let reconnectTimer = null;
+let reconnectAttempts = 0;
 
 onMounted(async () => {
   if (tab.value === '') {
@@ -131,17 +134,14 @@ onMounted(async () => {
   await checkLoggedIn();
   if (loggedIn.value) {
     getNotificationsBadge();
-    //getNotificationWS();
+    connectNotificationWS();
     await getMosServices();
     getDrawerState();
   }
 });
 
 onUnmounted(() => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
+  cleanupWS();
 });
 
 const backgroundColor = computed(() => {
@@ -305,42 +305,10 @@ const getNotificationsBadge = async () => {
     if (!res.ok) throw new Error('API-Error');
     let notification = await res.json();
 
-    if (notification.length > 0) {
-      notificationsBadge.value = true;
-    } else {
-      notificationsBadge.value = false;
-    }
+    notificationsBadge.value = notification.length > 0;
   } catch (e) {
     showSnackbarError(e.message);
   }
-};
-
-const getNotificationWS = () => {
-  const authToken = localStorage.getItem('authToken');
-  if (!authToken) {
-    showSnackbarError('No auth token found');
-    return;
-  }
-
-  const socket = io('http://192.168.1.2:999', {
-    transports: ['websocket'],
-    upgrade: false,
-  });
-
-  socket.on('connect', () => {
-    socket.emit('subscribe-notifications', { token: authToken });
-    console.log('Connected to notification socket');
-  });
-
-  socket.on('connect_error', (err) => {
-    showSnackbarError(`Connection error: ${err.message}`);
-    console.log('Failed to connect to notification socket');
-  });
-
-  socket.on('notification', (data) => {
-    notificationsBadge.value = true;
-    showSnackbarSuccess(t('new notification received'), 'mdi-bell-alert', data);
-  });
 };
 
 const toggleDrawer = () => {
@@ -359,4 +327,58 @@ const getDrawerState = () => {
     drawer.value = true;
   }
 };
+
+// WS START --------------------------------------
+function connectNotificationWS() {
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    showSnackbarError('No auth token found');
+    return;
+  }
+
+  ws = new WebSocket('/api/v1/notify');
+
+  ws.onopen = () => {
+    reconnectAttempts = 0;
+    try {
+      ws.send(JSON.stringify({ type: 'subscribe-notifications' }));
+    } catch {}
+  };
+
+  ws.onerror = (ev) => {
+    showSnackbarError('Notification connection error');
+  };
+
+  ws.onclose = (ev) => {
+    scheduleReconnect();
+  };
+
+  ws.onmessage = (ev) => {
+    const msg = JSON.parse(ev.data);
+    if (msg?.type === 'ping') {
+      ws?.send?.(JSON.stringify({ type: 'pong' }));
+    } else {
+      notificationsBadge.value = true;
+      showSnackbarSuccess(msg?.message || 'New notification received', 'mdi-bell', 'top center');
+    }
+  };
+}
+
+function scheduleReconnect() {
+  cleanupWS(false);
+  const delay = Math.min(RECONNECT_BASE_DELAY * Math.pow(2, reconnectAttempts++), RECONNECT_MAX_DELAY);
+  reconnectTimer = window.setTimeout(connectNotificationWS, delay);
+}
+
+function cleanupWS(clearTimer = true) {
+  try {
+    ws?.close();
+  } catch {}
+  ws = null;
+  if (clearTimer && reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+}
+// WS ENDE --------------------------------------
 </script>

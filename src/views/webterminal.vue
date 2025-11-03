@@ -36,7 +36,6 @@ onMounted(async () => {
     socket = io('/terminal', { path: '/api/v1/socket.io/' });
 
     socket.on('connect', () => {
-        console.log('WebSocket connected');
         // Session-Infos senden
         socket.emit('join-session', {
             sessionId: sessions.value[0].sessionId,
@@ -46,7 +45,6 @@ onMounted(async () => {
 
     // Wait for join confirmation
     socket.on('session-joined', (data) => {
-        console.log('Session joined:', data);
         term.write(t('connection to mos terminal established') + '\r\n');
         // Trigger initial prompt
         socket.emit('terminal-input', '\n');

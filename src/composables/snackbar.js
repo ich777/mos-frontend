@@ -6,23 +6,26 @@ const snackbarColor = ref('')
 const snackbarIcon = ref('')
 const snackbarApiError = ref('')
 const snackbarShowErrorDetails = ref(false)
+const snackbarPosition = ref('bottom center')
 
-export function showSnackbarSuccess(text) {
+export function showSnackbarSuccess(text, icon = 'mdi-success', position = 'bottom center') {
   snackbarText.value = text
   snackbarColor.value = 'success'
   snackbar.value = true
-  snackbarIcon.value = 'mdi-success'
+  snackbarIcon.value = icon
   snackbarApiError.value = ''
+  snackbarPosition.value = position
   snackbarShowErrorDetails.value = false
 }
 
-export function showSnackbarError(text, errorText = '') {
+export function showSnackbarError(text, errorText = '', icon = 'mdi-error', position = 'bottom center') {
   snackbarText.value = text
   snackbarColor.value = 'error'
   snackbar.value = true
-  snackbarIcon.value = 'mdi-error'
+  snackbarIcon.value = icon
   snackbarApiError.value = errorText
   snackbarShowErrorDetails.value = false
+  snackbarPosition.value = position
 }
 
 export function useSnackbar() {
@@ -32,6 +35,7 @@ export function useSnackbar() {
     snackbarColor,
     snackbarIcon,
     snackbarApiError,
-    snackbarShowErrorDetails
+    snackbarShowErrorDetails,
+    snackbarPosition
   }
 }

@@ -20,7 +20,12 @@ export default defineConfig({
       "/ws": {
         target: "ws://192.168.1.2:3000",
         ws: true,
-      }
+      },
+      "/api/v1/notify": {
+        target: "http://192.168.1.2",
+        changeOrigin: true,
+        ws: true,
+      },      
     },
   },
   resolve: {

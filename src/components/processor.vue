@@ -1,9 +1,4 @@
 <template>
-  <!--<v-col cols="6" sm="6" md="4" xl="3" v-if="osInfo && osInfo.cpu">
-    <v-chip v-if="temp && temp.main != null" size="small">Main {{ temp.main }}°C</v-chip>
-    <v-chip v-if="temp && temp.min != null" size="small">Min {{ temp.min }} °C</v-chip>
-    <v-chip v-if="temp && temp.max != null" size="small">Max {{ temp.max }} °C</v-chip>
-  </div>-->
   <v-row dense>
     <v-col cols="6" sm="6" md="6" xl="6" v-if="osInfo && osInfo.cpu">
       <div class="text-caption text-medium-emphasis">
@@ -27,7 +22,7 @@
       <div class="text-caption text-medium-emphasis" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
         <strong>{{ $t('temperature / min / max') }}</strong>
       </div>
-      <span v-if="temp.main != null" class="text-body-2" :title="temp.main" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ temp.main }}°C</span> 
+      <span v-if="temp.main != null" class="text-body-2" :title="temp.main" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ temp.main }}°C</span>
       <span v-if="temp.min != null" class="text-body-2" :title="temp.min" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">/ {{ temp.min }}°C</span>
       <span v-if="temp.max != null" class="text-body-2" :title="temp.max" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">/ {{ temp.max }}°C</span>
     </v-col>
@@ -43,7 +38,9 @@
         style="margin-top: 0; border-radius: 7px; overflow: hidden"
       >
         <template #default>
-          <span><small>{{ processor.load.toFixed(2) }}%</small></span>
+          <span>
+            <small>{{ processor.load.toFixed(2) }}%</small>
+          </span>
         </template>
       </v-progress-linear>
     </v-col>
@@ -67,7 +64,9 @@
                   style="margin-top: 2px; border-radius: 6px; overflow: hidden; width: 100%"
                 >
                   <template #default>
-                    <span><small>{{ Number(core.load?.total ?? 0).toFixed(2) }}%</small></span>
+                    <span>
+                      <small>{{ Number(core.load?.total ?? 0).toFixed(2) }}%</small>
+                    </span>
                   </template>
                 </v-progress-linear>
               </div>
@@ -107,7 +106,7 @@ const getOsInfo = async () => {
     if (!res.ok) throw new Error('API-Error');
     osInfo.value = await res.json();
   } catch (e) {
-    console.log(e);
+    console.error('Failed to load OS info:', e);
   }
 };
 </script>
