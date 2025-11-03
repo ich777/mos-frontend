@@ -607,5 +607,10 @@
   "replace device": "Replace device",
   "select devices to add to pool": "Select devices to add to pool",
   "select devices to remove from pool": "Select devices to remove from pool",
-  "select device to replace in pool": "Select device to replace in pool"
+  "select device to replace in pool": "Select device to replace in pool",
+  "unused docker images": "Unused Docker Images",
+  "no unused images found": "No unused images found",
+  "image id": "Image ID",
+  "unused image could not be removed": "Unused image could not be removed",
+  "unused image removed successfully": "Unused image removed successfully"
 }

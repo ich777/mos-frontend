@@ -308,6 +308,7 @@
     </v-container>
   </v-container>
 
+  <!-- Delete Dialog -->
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteDialog.docker">{{ $t('delete') }} {{ deleteDialog.docker.Names[0] }}</v-card-title>
@@ -324,6 +325,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Info Dialog -->
   <v-dialog v-model="infoDialog.value" max-width="500">
     <v-card v-if="infoDialog.docker">
       <v-card-title class="text-h6">{{ infoDialog.docker.Names[0] }}</v-card-title>
@@ -382,6 +384,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Create Group Dialog -->
   <v-dialog v-model="createGroupDialog.value" max-width="600">
     <v-card>
       <v-card-title class="text-h6">{{ $t('create docker group') }}</v-card-title>
@@ -398,6 +401,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Change Group Dialog -->
   <v-dialog v-model="changeGroupDialog.value" max-width="600">
     <v-card>
       <v-card-title class="text-h6">{{ $t('edit docker group') }} - {{ changeGroupDialog.name }}</v-card-title>
@@ -423,6 +427,7 @@
     </v-card>
   </v-dialog>
 
+  <!-- Delete Group Dialog -->
   <v-dialog v-model="deleteGroupDialog.value" max-width="500">
     <v-card>
       <v-card-title class="text-h6" v-if="deleteGroupDialog.group">{{ $t('delete') }} - {{ deleteGroupDialog.group.name }}</v-card-title>
@@ -435,6 +440,35 @@
         <v-btn color="red" @click="deleteDockerGroup()">
           {{ $t('delete') }}
         </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Unused Images Dialog -->
+  <v-dialog v-model="unusedImagesDialog.value" max-width="600">
+    <v-card>
+      <v-card-title class="text-h6">{{ $t('unused docker images') }}</v-card-title>
+      <v-card-text>
+        <div v-if="unusedImages.length === 0">{{ $t('no unused images found') }}</div>
+        <v-list v-else>
+          <template v-for="(image, index) in unusedImages" :key="index">
+            <v-list-item>
+              <template v-slot:append>
+                <v-btn variant="text" icon color="red" @click="removeUnusedImage(image.id)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+              <v-list-item-content>
+                <v-list-item-title>{{ image.repository }}</v-list-item-title>
+                <v-list-item-subtitle>{{ image.tag }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider v-if="index < unusedImages.length - 1" />
+          </template>
+        </v-list>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="onPrimary" text @click="unusedImagesDialog.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -456,13 +490,19 @@
             <v-icon color="onPrimary">mdi-folder-plus</v-icon>
           </v-btn>
         </div>
-        <div class="d-flex align-center justify-end ga-2 mb-1" key="3" @click="checkForUpdates()" style="cursor: pointer">
+        <div class="d-flex align-center justify-end ga-2 mb-1" key="3" @click="openUnusedImagesDialog()" style="cursor: pointer">
+          <span class="me-2">{{ $t('unused docker images') }}</span>
+          <v-btn icon color="primary" density="comfortable">
+            <v-icon color="onPrimary">mdi-image-off</v-icon>
+          </v-btn>
+        </div>
+        <div class="d-flex align-center justify-end ga-2 mb-1" key="4" @click="checkForUpdates()" style="cursor: pointer">
           <span class="me-2">{{ $t('check for updates') }}</span>
           <v-btn icon color="primary" density="comfortable">
             <v-icon color="onPrimary">mdi-update</v-icon>
           </v-btn>
         </div>
-        <div class="d-flex align-center justify-end ga-2 mb-1" key="4" @click="updateAll()" style="cursor: pointer">
+        <div class="d-flex align-center justify-end ga-2 mb-1" key="5" @click="updateAll()" style="cursor: pointer">
           <span class="me-2">{{ $t('update all') }}</span>
           <v-btn icon color="primary" density="comfortable">
             <v-icon color="onPrimary">mdi-refresh</v-icon>
@@ -491,6 +531,7 @@ const dockerGroups = ref([]);
 const mosDockers = ref([]);
 const overlay = ref(false);
 const menu = ref(false);
+const unusedImages = ref([]);
 const deleteDialog = reactive({
   value: false,
   docker: null,
@@ -513,6 +554,10 @@ const changeGroupDialog = reactive({
 const deleteGroupDialog = reactive({
   value: false,
   group: null,
+});
+const unusedImagesDialog = reactive({
+  value: false,
+  images: [],
 });
 
 onMounted(() => {
@@ -1153,6 +1198,62 @@ const updateDockerGroup = async () => {
   }
 };
 
+const getUnusedImages = async () => {
+  try {
+    overlay.value = true;
+    const res = await fetch('/api/v1/docker/mos/unusedimages', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken')
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('unused images could not be removed')}|$| ${error.error || t('unknown error')}`);
+    }
+    const result = await res.json();
+    unusedImages.value = result || [];
+
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const removeUnusedImage = async (imageId) => {
+  const removeImageData = [
+    imageId
+  ]
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/unusedimages`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(removeImageData),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('unused image could not be removed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('unused image removed successfully'));
+    await getUnusedImages();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
 const showWebui = (docker) => {
   window.open(`${docker.webui}`, '_blank');
 };
@@ -1199,4 +1300,9 @@ const clearDeleteGroupDialog = () => {
   deleteGroupDialog.value = false;
   deleteGroupDialog.group = null;
 };
+const openUnusedImagesDialog = async () => {
+  await getUnusedImages();
+  unusedImagesDialog.value = true;
+};
+
 </script>

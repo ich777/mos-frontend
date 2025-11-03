@@ -608,5 +608,10 @@
   "replace device": "Gerät ersetzen",
   "select devices to add to pool": "Wähle Geräte zum Hinzufügen zum Pool aus",
   "select devices to remove from pool": "Wähle Geräte zum Entfernen aus dem Pool aus",
-  "select device to replace in pool": "Wähle das Gerät aus, das im Pool ersetzt werden soll"
+  "select device to replace in pool": "Wähle das Gerät aus, das im Pool ersetzt werden soll",
+  "unused docker images": "Docker Images bereinigen",
+  "no unused images found": "Keine nicht verwendeten Images gefunden",
+  "image id": "Image ID",
+  "unused image could not be removed": "Nicht verwendetes Image konnte nicht entfernt werden",
+  "unused image removed successfully": "Nicht verwendetes Image erfolgreich entfernt"
 }
