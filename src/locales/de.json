@@ -616,5 +616,8 @@
   "unused image removed successfully": "Nicht verwendetes Image erfolgreich entfernt",
   "mark all as read": "Alle als gelesen markieren",
   "are you sure you want to mark all notifications as read?": "Bist du sicher, dass du alle Benachrichtigungen als gelesen markieren möchtest?",
-  "all notifications could not be marked as read": "Alle Benachrichtigungen konnten nicht als gelesen markiert werden"
+  "all notifications could not be marked as read": "Alle Benachrichtigungen konnten nicht als gelesen markiert werden",
+  "enable ipv6": "IPv6 aktivieren",
+  "enable ipv4": "IPv4 aktivieren"
+
 }

@@ -444,7 +444,7 @@
   "proxies could not be loaded": "Proxies could not be loaded",
   "proxies": "Proxies",
   "proxy": "Proxy",
-    "http proxy": "HTTP Proxy",
+  "http proxy": "HTTP Proxy",
   "https proxy": "HTTPS Proxy",
   "ftp proxy": "FTP Proxy",
   "no proxy": "No Proxy",
@@ -615,5 +615,7 @@
   "unused image removed successfully": "Unused image removed successfully",
   "mark all as read": "Mark all as read",
   "are you sure you want to mark all notifications as read?": "Are you sure you want to mark all notifications as read?",
-  "all notifications could not be marked as read": "All notifications could not be marked as read"
+  "all notifications could not be marked as read": "All notifications could not be marked as read",
+  "enable ipv4": "Enable IPv4",
+  "enable ipv6": "Enable IPv6"
 }
