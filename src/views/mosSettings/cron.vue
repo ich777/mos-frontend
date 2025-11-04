@@ -145,6 +145,7 @@
 import { onMounted, ref, reactive } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
+import { id } from 'vuetify/locale';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const cronJobs = ref([]);
@@ -173,6 +174,7 @@ const deleteCronJobDialog = reactive({
 });
 const changeScriptDialog = reactive({
   value: false,
+  id: '',
   name: '',
   path: '',
   size: 0,
@@ -397,6 +399,7 @@ const openChangeScriptDialog = async (cronJob) => {
   changeScriptDialog.value = true;
   try {
     const script = await getScript(cronJob.id);
+    changeScriptDialog.id = cronJob.id;
     changeScriptDialog.name = script.name;
     changeScriptDialog.path = script.path;
     changeScriptDialog.size = script.size;
