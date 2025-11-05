@@ -6,7 +6,6 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-card fluid>
-          <v-card-title>{{ $t('overview') }}</v-card-title>
           <v-card-text class="pa-0">
             <v-list>
               <draggable v-model="lxcs" item-key="Id" @end="onDragEnd" handle=".drag-handle">

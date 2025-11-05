@@ -5,7 +5,7 @@
         <h2>{{ $t('cron jobs') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card  >
+        <v-card>
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item v-for="(cronJob, index) in cronJobs" :key="index">
@@ -145,7 +145,6 @@
 import { onMounted, ref, reactive } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
-import { id } from 'vuetify/locale';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const cronJobs = ref([]);

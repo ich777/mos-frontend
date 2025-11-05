@@ -620,10 +620,15 @@
   "enable ipv6": "Enable IPv6",
   "execCommand copy failed": "ExecCommand copy failed",
   "clipboard api not available in this context": "Clipboard API not available in this context",
-  "update drivers": "Update Drivers",
-  "please select the driver you want to update!": "Please select the driver you want to update!",
+  "install drivers": "Install Drivers",
+  "please select the driver you want to install!": "Please select the driver you want to install!",
   "driver": "Driver",
-  "driver update could not be initiated": "Driver update could not be initiated",
-  "driver update initiated successfully": "Driver update initiated successfully",
-  "failed to fetch drivers": "Failed to fetch drivers"
+  "driver install could not be initiated": "Driver install could not be initiated",
+  "driver install initiated successfully": "Driver install initiated successfully",
+  "failed to fetch drivers": "Failed to fetch drivers",
+  "drivers": "Drivers",
+  "no drivers installed": "No drivers installed",
+  "failed to remove drivers": "Failed to remove drivers",
+  "drivers removed successfully": "Drivers removed successfully",
+  "failed to fetch installed drivers": "Failed to fetch installed drivers"
 }

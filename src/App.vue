@@ -75,11 +75,11 @@
     <Toaster :position="sonnerPosition" :richColors="true" :theme="theme.global.name.value === 'dark' ? 'dark' : 'light'" :expand="true" />
   </v-app>
 
-  <v-dialog v-model="logoutDialog" width="auto">
+  <v-dialog v-model="logoutDialog" width="auto" min-width="400">
     <v-card max-width="400" prepend-icon="mdi-logout" :text="$t('do you want to logout?')" :title="$t('logout')">
       <template v-slot:actions>
-        <v-btn class="ms-auto" color="onPrimary" :text="$t('cancel')" @click="logoutDialog = false"></v-btn>
-        <v-btn class="ms-auto" color="onPrimary" :text="$t('ok')" @click="doLogout"></v-btn>
+        <v-btn color="onPrimary" :text="$t('cancel')" @click="logoutDialog = false"></v-btn>
+        <v-btn color="onPrimary" :text="$t('ok')" @click="doLogout"></v-btn>
       </template>
     </v-card>
   </v-dialog>

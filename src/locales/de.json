@@ -621,10 +621,15 @@
   "enable ipv4": "IPv4 aktivieren",
   "execCommand copy failed": "Kopieren mit execCommand fehlgeschlagen",
   "clipboard api not available in this context": "Clipboard-API in diesem Kontext nicht verfügbar",
-  "update drivers": "Treiber aktualisieren",
-  "please select the driver you want to update!": "Bitte wähle den Treiber aus, den du aktualisieren möchtest!",
+  "install drivers": "Treiber installieren",
+  "please select the driver you want to install!": "Bitte wähle den Treiber aus, den du installieren möchtest!",
   "driver": "Treiber",
-  "driver update could not be initiated": "Treiberaktualisierung konnte nicht gestartet werden",
-  "driver update initiated successfully": "Treiberaktualisierung erfolgreich gestartet",
-  "failed to fetch drivers": "Treiber konnten nicht abgerufen werden"
+  "driver install could not be initiated": "Treiberinstallation konnte nicht gestartet werden",
+  "driver install initiated successfully": "Treiberinstallation erfolgreich gestartet",
+  "failed to fetch drivers": "Treiber konnten nicht abgerufen werden",
+  "drivers": "Treiber",
+  "no drivers installed": "Keine Treiber installiert",
+  "failed to remove driver": "Treiber konnten nicht entfernt werden",
+  "driver removed successfully": "Treiber erfolgreich entfernt",
+  "failed to fetch installed drivers": "Installierte Treiber konnten nicht abgerufen werden"
 }

@@ -36,7 +36,7 @@
                 </v-menu>
               </template>
             </v-list-item>
-            <v-divider v-if="idx < users.length - 1" inset />
+            <v-divider v-if="idx < users.length - 1" />
           </template>
         </v-list>
       </v-card>

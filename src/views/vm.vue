@@ -5,8 +5,7 @@
         <h2>{{ $t('vm') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid>
-          <v-card-title>{{ $t('overview') }}</v-card-title>
+        <v-card>
           <v-card-text class="pa-0">
             <draggable v-model="vms" item-key="Id">
               <template #item="{ element: vm, index }">

@@ -453,15 +453,13 @@
         <v-list v-else>
           <template v-for="(image, index) in unusedImages" :key="index">
             <v-list-item>
+              <v-list-item-title>{{ image.repository }}</v-list-item-title>
+              <v-list-item-subtitle>{{ image.tag }}</v-list-item-subtitle>
               <template v-slot:append>
                 <v-btn variant="text" icon color="red" @click="removeUnusedImage(image.id)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
-              </template>
-              <v-list-item-content>
-                <v-list-item-title>{{ image.repository }}</v-list-item-title>
-                <v-list-item-subtitle>{{ image.tag }}</v-list-item-subtitle>
-              </v-list-item-content>
+              </template>              
             </v-list-item>
             <v-divider v-if="index < unusedImages.length - 1" />
           </template>
@@ -1205,7 +1203,7 @@ const getUnusedImages = async () => {
     const res = await fetch('/api/v1/docker/mos/unusedimages', {
       method: 'GET',
       headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken')
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
 
@@ -1215,7 +1213,6 @@ const getUnusedImages = async () => {
     }
     const result = await res.json();
     unusedImages.value = result || [];
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1225,9 +1222,7 @@ const getUnusedImages = async () => {
 };
 
 const removeUnusedImage = async (imageId) => {
-  const removeImageData = [
-    imageId
-  ]
+  const removeImageData = [imageId];
 
   try {
     overlay.value = true;
@@ -1305,5 +1300,4 @@ const openUnusedImagesDialog = async () => {
   await getUnusedImages();
   unusedImagesDialog.value = true;
 };
-
 </script>
