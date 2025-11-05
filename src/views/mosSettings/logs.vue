@@ -17,13 +17,21 @@
                 @keyup.enter="getLogFileContent(selectedLog)" />
               </v-col>
             </v-row>
-            <v-textarea 
-              v-model="logFileContent" 
-              :label="$t('log content')" 
-              outlined 
-              readonly 
-              style="flex-grow: 1; height: calc(100vh - 340px);" 
-            />
+            <div
+              style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0,0,0,0.12); border-radius: 4px;"
+            >
+              <div
+              v-for="(line, idx) in logFileContent.split('\n')"
+              :key="idx"
+              :style=" /error/i.test(line)
+                ? { background: '#ffebee', color: '#b71c1c', padding: '2px 6px', display: 'block' }
+                : /warn(?:ing)?/i.test(line)
+                ? { background: '#fff8e1', color: '#ff6f00', padding: '2px 6px', display: 'block' }
+                : { padding: '2px 6px', display: 'block' } "
+              >
+              {{ line }}
+              </div>
+            </div>
           </v-card-text>
         </v-card>
       </v-container>
@@ -43,7 +51,7 @@ import { useI18n } from 'vue-i18n';
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const logs = ref([]);
 const selectedLog = ref('');
-const logFileContent = ref([]);
+const logFileContent = ref('');
 const lines = ref(10000);
 const overlay = ref(false);
 const { t } = useI18n();
