@@ -24,6 +24,15 @@
                           <v-list-item v-if="vm.state === 'running'" @click="stopVM(vm.name)">
                             <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                           </v-list-item>
+                          <v-list-item v-if="vm.state === 'running'" @click="killVM(vm.name)">
+                            <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="vm.state === 'running'" @click="restartVM(vm.name)">
+                            <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="vm.state === 'running'" @click="resetVM(vm.name)">
+                            <v-list-item-title>{{ $t('reset') }}</v-list-item-title>
+                          </v-list-item>
                         </v-list>
                       </v-menu>
                     </template>
@@ -32,7 +41,7 @@
                       {{ vm.state }}
                     </v-list-item-subtitle>
                     <template v-slot:append>
-                      <v-switch v-model="vm.autostart" color="onPrimary" hide-details inset density="compact" />
+                      <v-switch v-model="vm.autostart" color="green" hide-details inset density="compact" @change="switchAutostart(vm)" />
                     </template>
                   </v-list-item>
                   <v-divider v-if="index < vms.length - 1" />
@@ -77,7 +86,7 @@ const fetchVMs = async () => {
     if (!res.ok) throw new Error('API-Error');
     vms.value = await res.json();
   } catch (e) {
-    showSnackbarError(e.message);
+    showSnackbarError(t('Could not fetch VMs'));
   }
 };
 
@@ -90,14 +99,19 @@ const stopVM = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('VM could not be stopped'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('VM could not be stopped')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('VM shutdown initiated'));
     fetchVMs();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -110,14 +124,124 @@ const startVM = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('VM could not be started'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('VM could not be started')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('VM started successfully'));
     fetchVMs();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
+
+const killVM = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/machines/${name}/kill`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('VM could not be killed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('VM killed successfully'));
+    fetchVMs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const resetVM = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/machines/${name}/reset`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('VM could not be reset')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('VM reset successfully'));
+    fetchVMs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const restartVM = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/machines/${name}/restart`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('VM could not be restarted')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('VM restarted successfully'));
+    fetchVMs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const switchAutostart = async (vm) => {
+  const autostartBody = { enabled: vm.autostart };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/machines/${vm.name}/autostart`, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(autostartBody),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not switch autostart')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('autostart setting updated'));
+    fetchVMs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
 </script>

@@ -33,6 +33,15 @@
                             <v-list-item v-if="lxc.state === 'running'" @click="killLXC(lxc.name)">
                               <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                             </v-list-item>
+                            <v-list-item v-if="lxc.state === 'running'" @click="restartLXC(lxc.name)">
+                              <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item v-if="lxc.state === 'running'" @click="freezeLXC(lxc.name)">
+                              <v-list-item-title>{{ $t('freeze') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item v-if="lxc.state === 'frozen'" @click="unfreezeLXC(lxc.name)">
+                              <v-list-item-title>{{ $t('unfreeze') }}</v-list-item-title>
+                            </v-list-item>
                             <v-list-item @click="openDeleteDialog(lxc)">
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                             </v-list-item>
@@ -47,7 +56,7 @@
                         {{ lxc.state }}
                       </v-list-item-subtitle>
                       <template v-slot:append>
-                        <v-switch v-model="lxc.autostart" color="onPrimary" hide-details @change="switchAutostart(lxc)" inset density="compact" />
+                        <v-switch v-model="lxc.autostart" color="green" hide-details @change="switchAutostart(lxc)" inset density="compact" />
                       </template>
                     </v-list-item>
                     <v-divider v-if="index < lxcs.length - 1" />
@@ -57,14 +66,6 @@
             </v-list>
           </v-card-text>
         </v-card>
-        <v-row class="mt-4">
-          <v-col class="d-flex justify-end">
-            <v-btn color="onPrimary" @click="openCreateDialog()" class="ml-2">
-              <v-icon left>mdi-plus</v-icon>
-              {{ $t('create') }}
-            </v-btn>
-          </v-col>
-        </v-row>
       </v-container>
     </v-container>
   </v-container>
@@ -106,6 +107,11 @@
     </v-card>
   </v-dialog>
 
+  <!-- Floating Action Button -->
+  <v-fab @click="openCreateDialog()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
+    <v-icon>mdi-plus</v-icon>
+  </v-fab>
+
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
@@ -127,7 +133,7 @@ const createDialog = reactive({
   value: false,
   name: '',
   distribution: null,
-  releases: null,
+  release: null,
   architectures: null,
 });
 const deleteDialog = reactive({
@@ -155,8 +161,15 @@ const getLXCs = async () => {
       }),
     ]);
 
-    if (!res.ok) throw new Error('API-Error');
-    if (!mosRes.ok) throw new Error('API-Error');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc containers could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+    if (!mosRes.ok) {
+      const error = await mosRes.json();
+      throw new Error(`${t('lxc mos data could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
     const result = await res.json();
     const mosResult = await mosRes.json();
 
@@ -179,7 +192,8 @@ const getLXCs = async () => {
 
     lxcs.value = result;
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   }
 };
 
@@ -191,7 +205,10 @@ const getImages = async () => {
       },
     });
 
-    if (!res.ok) throw new Error('API-Error');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc images could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
     const imagesResult = await res.json();
 
     images.value = Object.keys(imagesResult.distributions).map((key) => ({
@@ -199,7 +216,8 @@ const getImages = async () => {
       releases: imagesResult.distributions[key],
     }));
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   }
 };
 
@@ -212,14 +230,19 @@ const stopLXC = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc container could not be stopped'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be stopped')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc container stopped successfully'));
     getLXCs();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -232,14 +255,19 @@ const startLXC = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc container could not be started'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be started')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc container started successfully'));
     getLXCs();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -252,14 +280,19 @@ const killLXC = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc container could not be killed'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be killed')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc container killed successfully'));
     getLXCs();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -282,15 +315,20 @@ const createLXC = async () => {
       },
       body: JSON.stringify(newLXC),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc container could not be created'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be created')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc container created successfully'));
     getLXCs();
     clearCreateDialog();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -304,15 +342,20 @@ const removeLXC = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc container could not be removed'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be removed')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc container removed successfully'));
     getLXCs();
     clearDeleteDialog();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -341,13 +384,14 @@ const createLXCTerminalSession = async (lxcName) => {
 
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || t('failed to create terminal session'));
-    }
+      throw new Error(`${t('failed to create terminal session')}|$| ${error.error || t('unknown error')}`);
+    }    
 
     const Result = await res.json();
     return Result.sessionId;
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   }
 };
 
@@ -364,13 +408,18 @@ const switchAutostart = async (lxc) => {
       },
       body: JSON.stringify(autostart),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('autostart setting could not be saved'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('autostart setting could not be saved')}|$| ${error.error || t('unknown error')}`);
+    }    
+
     showSnackbarSuccess(t('autostart setting saved successfully'));
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -396,10 +445,90 @@ const onDragEnd = async () => {
       body: newOrder,
     });
 
-    if (!res.ok) throw new Error(t('lxc container order could not be saved'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container order could not be saved')}|$| ${error.error || t('unknown error')}`);
+    }   
+
     showSnackbarSuccess(t('lxc container order saved successfully'));
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const restartLXC = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/lxc/containers/${name}/restart`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be restarted')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('lxc container restarted successfully'));
+    getLXCs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const freezeLXC = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/lxc/containers/${name}/freeze`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be freezed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('lxc container freezed successfully'));
+    getLXCs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const unfreezeLXC = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/lxc/containers/${name}/unfreeze`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc container could not be unfreezed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('lxc container unfreezed successfully'));
+    getLXCs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
   }
 };
 
@@ -407,21 +536,18 @@ const openDeleteDialog = (lxc) => {
   deleteDialog.value = true;
   deleteDialog.lxc = lxc;
 };
-
 const clearDeleteDialog = () => {
   deleteDialog.value = false;
   deleteDialog.lxc = null;
 };
-
 const openCreateDialog = () => {
   createDialog.value = true;
 };
-
 const clearCreateDialog = () => {
   createDialog.value = false;
   createDialog.name = '';
   createDialog.distribution = null;
-  createDialog.releases = null;
+  createDialog.release = null;
   createDialog.arch = null;
 };
 
