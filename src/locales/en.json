@@ -631,5 +631,6 @@
   "failed to remove drivers": "Failed to remove drivers",
   "drivers removed successfully": "Drivers removed successfully",
   "failed to fetch installed drivers": "Failed to fetch installed drivers",
-  "network interfaces": "Network Interfaces"
+  "network interfaces": "Network Interfaces",
+  "docker start parameters": "Docker Start Parameters"
 }

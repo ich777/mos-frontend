@@ -632,5 +632,6 @@
   "failed to remove driver": "Treiber konnten nicht entfernt werden",
   "driver removed successfully": "Treiber erfolgreich entfernt",
   "failed to fetch installed drivers": "Installierte Treiber konnten nicht abgerufen werden",
-  "network interfaces": "Netzwerkschnittstellen"
+  "network interfaces": "Netzwerkschnittstellen",
+  "docker start parameters": "Docker Startparameter"
 }

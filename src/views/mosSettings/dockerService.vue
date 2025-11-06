@@ -15,10 +15,10 @@
                 <v-text-field v-model="settingsDocker.filesystem" :label="$t('filesystem')" required></v-text-field>
                 <v-row>
                   <v-col cols="12" md="6">
-                    <v-select v-model="settingsDocker.docker_net.mode" :items="['bridge', 'host', 'none']" :label="$t('docker network mode')" dense hide-details="auto"></v-select>
+                    <v-select v-model="settingsDocker.docker_net.mode" :items="['ipvlan', 'macvlan']" :label="$t('docker network mode')" dense hide-details="auto"></v-select>
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-combobox v-model="settingsDocker.docker_net.config" :label="$t('docker network config')" multiple chips></v-combobox>
+                    <v-combobox v-model="settingsDocker.docker_net.config" :label="$t('docker start parameters')" multiple chips></v-combobox>
                   </v-col>
                 </v-row>
                 <v-text-field v-model.number="settingsDocker.start_wait" :label="$t('start wait')" type="number" min="0"></v-text-field>
