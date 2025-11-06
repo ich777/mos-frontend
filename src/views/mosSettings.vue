@@ -42,8 +42,11 @@
             <v-btn color="primary" width="250px" to="/mosSettings/system">{{ $t('system') }}</v-btn>
           </v-col>
           <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/network">{{ $t('network') }}</v-btn>
+            <v-btn color="primary" width="250px" to="/mosSettings/networkInterfaces">{{ $t('network interfaces') }}</v-btn>
           </v-col>
+          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
+            <v-btn color="primary" width="250px" to="/mosSettings/networkServices">{{ $t('network services') }}</v-btn>
+          </v-col>          
         </v-row>
         <v-divider class="mb-4 mt-4"></v-divider>
         <v-row>

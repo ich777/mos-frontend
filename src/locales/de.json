@@ -581,8 +581,8 @@
   "display": "Anzeigen",
   "display settings": "Anzeigeeinstellungen",
   "powersave": "Energiesparmodus",
-  "powerdown (sec)": "Ausschalten (Sek.)",
-  "timeout (sec)": "Zeitüberschreitung (Sek.)",
+  "powerdown (min)": "Ausschalten (Min.)",
+  "timeout (min)": "Zeitüberschreitung (Min.)",
   "on": "An",
   "off": "Aus",
   "notification sounds": "Benachrichtigungstöne",
@@ -631,5 +631,6 @@
   "no drivers installed": "Keine Treiber installiert",
   "failed to remove driver": "Treiber konnten nicht entfernt werden",
   "driver removed successfully": "Treiber erfolgreich entfernt",
-  "failed to fetch installed drivers": "Installierte Treiber konnten nicht abgerufen werden"
+  "failed to fetch installed drivers": "Installierte Treiber konnten nicht abgerufen werden",
+  "network interfaces": "Netzwerkschnittstellen"
 }

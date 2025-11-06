@@ -16,8 +16,9 @@ import mosSettings from "../views/mosSettings.vue";
 import mosSettingsDocker from "../views/mosSettings/dockerService.vue";
 import mosSettingsLXC from "../views/mosSettings/lxcService.vue";
 import mosSettingsVm from "../views/mosSettings/vmService.vue";
-import mosSettingsNetwork from "../views/mosSettings/network.vue";
-import mosSettingsSstem from "../views/mosSettings/system.vue";
+import mosSettingsNetworkInterfaces from "../views/mosSettings/networkInterfaces.vue";
+import mosSettingsNetworkServices from "../views/mosSettings/networkServices.vue";
+import mosSettingsSystem from "../views/mosSettings/system.vue";
 import mosSettingsCron from "../views/mosSettings/cron.vue";
 import mosSettingsLogs from "../views/mosSettings/logs.vue";
 import mosSettingsDrivers from "../views/mosSettings/drivers.vue";
@@ -45,8 +46,9 @@ const routes = [
   { path: "/mosSettings/docker", component: mosSettingsDocker, meta: { title: "MOS Settings - Docker", description: "Manage Docker settings" } },
   { path: "/mosSettings/lxc", component: mosSettingsLXC, meta: { title: "MOS Settings - LXC", description: "Manage LXC settings" } },
   { path: "/mosSettings/vm", component: mosSettingsVm, meta: { title: "MOS Settings - VM", description: "Manage VM settings" } },
-  { path: "/mosSettings/network", component: mosSettingsNetwork, meta: { title: "MOS Settings - Network", description: "Manage Network settings" } },
-  { path: "/mosSettings/system", component: mosSettingsSstem, meta: { title: "MOS Settings - System", description: "Manage System settings" } },
+  { path: "/mosSettings/networkInterfaces", component: mosSettingsNetworkInterfaces, meta: { title: "MOS Settings - Network Interfaces", description: "Manage Network Interfaces settings" } },
+  { path: "/mosSettings/networkServices", component: mosSettingsNetworkServices, meta: { title: "MOS Settings - Network Services", description: "Manage Network Services settings" } },
+  { path: "/mosSettings/system", component: mosSettingsSystem, meta: { title: "MOS Settings - System", description: "Manage System settings" } },
   { path: "/mosSettings/cron", component: mosSettingsCron, meta: { title: "MOS Settings - Cron", description: "Manage Cron jobs" } },
   { path: "/mosSettings/logs", component: mosSettingsLogs, meta: { title: "MOS Settings - Logs", description: "View system logs" } },
   { path: "/mosSettings/drivers", component: mosSettingsDrivers, meta: { title: "MOS Settings - Drivers", description: "Manage device drivers" } },

@@ -22,9 +22,9 @@
                         <v-divider class="my-2"></v-divider>
                         <h3 class="mb-2">{{ $t('display settings') }}</h3>
                         <v-select :items="['on', 'off']" :label="$t('powersave')" v-model="settingsSystem.display.powersave"></v-select>
-                        <v-text-field :label="$t('powerdown (sec)')" type="number"
+                        <v-text-field :label="$t('powerdown (min)')" type="number"
                             v-model="settingsSystem.display.powerdown"></v-text-field>
-                        <v-text-field :label="$t('timeout (sec)')" type="number"
+                        <v-text-field :label="$t('timeout (min)')" type="number"
                             v-model="settingsSystem.display.timeout"></v-text-field>
                         <v-divider class="my-2"></v-divider>
                         <h3 class="mb-2">{{ $t('notification sounds') }}</h3>

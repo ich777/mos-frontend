@@ -580,8 +580,8 @@
   "display": "Display",
   "display settings": "Display settings",
   "powersave": "Powersave",
-  "powerdown (sec)": "Powerdown (sec)",
-  "timeout (sec)": "Timeout (sec)",
+  "powerdown (min)": "Powerdown (min)",
+  "timeout (min)": "Timeout (min)",
   "on": "On",
   "off": "Off",
   "notification sounds": "Notification sounds",
@@ -630,5 +630,6 @@
   "no drivers installed": "No drivers installed",
   "failed to remove drivers": "Failed to remove drivers",
   "drivers removed successfully": "Drivers removed successfully",
-  "failed to fetch installed drivers": "Failed to fetch installed drivers"
+  "failed to fetch installed drivers": "Failed to fetch installed drivers",
+  "network interfaces": "Network Interfaces"
 }
