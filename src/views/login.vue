@@ -28,7 +28,6 @@
                   variant="outlined"
                   density="comfortable"
                   :rules="[rules.required]"
-                  @keyup.enter="onSubmit"
                   class="mb-3"
                 />
 
@@ -42,10 +41,8 @@
                   density="comfortable"
                   :rules="[rules.required]"
                   @click:append-inner="showPassword = !showPassword"
-                  @keyup.enter="onSubmit"
                   class="mb-1"
                 />
-
                 <v-btn type="submit" block size="large" :loading="loading" :disabled="!isValid || loading">
                   {{ t('login') }}
                 </v-btn>
@@ -55,13 +52,6 @@
         </v-col>
       </v-row>
     </v-container>
-
-    <v-snackbar v-model="snackbar" :timeout="2400" location="bottom" variant="flat">
-      {{ t('login_success') || 'Logged in successfully.' }}
-      <template #actions>
-        <v-btn variant="text" @click="snackbar = false">OK</v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -73,41 +63,27 @@ import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
 const { locale, t } = useI18n();
 const theme = useTheme();
-
 const username = ref('');
 const password = ref('');
 const remember = ref(true);
 const showPassword = ref(false);
 const loading = ref(false);
 const isValid = ref(false);
-const snackbar = ref(false);
 const formRef = ref(null);
 
-const emit = defineEmits(['refresh-drawer', 'login-success', 'open-forgot']);
+const emit = defineEmits(['refresh-drawer', 'login-success']);
 
 const rules = {
   required: (v) => !!v || v === 0 || t('required') || 'Required',
 };
 
-function toggleTheme() {
-  const current = theme.global.name.value;
-  theme.global.name.value = current === 'dark' ? 'light' : 'dark';
-}
-
-const palette = ['#1976D2', '#7C4DFF', '#009688', '#E91E63', '#FF9800'];
-function cyclePrimary() {
-  const current = theme.themes.value[theme.global.name.value].colors.primary || '#1976D2';
-  const idx = (palette.indexOf(current) + 1) % palette.length;
-  theme.themes.value[theme.global.name.value].colors.primary = palette[idx];
-}
-
-async function onSubmit() {
+const onSubmit = async () => {
   const ok = await formRef.value?.validate();
   if (!ok) return;
   await login();
 }
 
-async function login() {
+const login = async () => {
   try {
     loading.value = true;
     const res = await fetch('/api/v1/auth/login', {
@@ -132,7 +108,6 @@ async function login() {
     theme.themes.value[theme.global.name.value].colors.primary = result.user.primary_color || '#1976D2';
 
     showSnackbarSuccess?.(t('logged in successfully'));
-    snackbar.value = true;
 
     emit('refresh-drawer');
     emit('login-success');
