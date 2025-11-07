@@ -13,7 +13,7 @@ const snackbarPosition = ref('bottom center')
 
 export function showSnackbarSuccess(
   text,
-  icon = 'mdi-success',
+  icon = 'mdi-check-circle',
   position = 'bottom center',
   duration = 3000
 ) {
@@ -26,7 +26,7 @@ export function showSnackbarSuccess(
 export function showSnackbarError(
   text,
   errorText = '',
-  icon = 'mdi-error',
+  icon = 'mdi-alert-circle',
   position = 'bottom center',
   durationWhenNoDetails = 3000
 ) {
@@ -54,7 +54,7 @@ export function showSnackbarInfo(
 
 export function showSnackbarWarning(
   text,
-  icon = 'mdi-alert',
+  icon = 'mdi-alert-circle',
   position = 'bottom center',
   duration = 3000
 ) {

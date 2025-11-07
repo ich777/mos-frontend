@@ -19,18 +19,8 @@
             <v-card-text class="pa-6">
               <h2 class="mb-1">{{ t('login') }}</h2>
               <p class="text-medium-emphasis mb-6 text-body-2">{{ t('welcome back') }}</p>
-
               <v-form ref="formRef" v-model="isValid" @submit.prevent="onSubmit">
-                <v-text-field
-                  v-model.trim="username"
-                  :label="t('username') || 'Username'"
-                  autocomplete="username"
-                  variant="outlined"
-                  density="comfortable"
-                  :rules="[rules.required]"
-                  class="mb-3"
-                />
-
+                <v-text-field v-model.trim="username" :label="t('username') || 'Username'" autocomplete="username" variant="outlined" density="comfortable" :rules="[rules.required]" class="mb-3" />
                 <v-text-field
                   v-model="password"
                   :label="t('password') || 'Password'"
@@ -81,7 +71,7 @@ const onSubmit = async () => {
   const ok = await formRef.value?.validate();
   if (!ok) return;
   await login();
-}
+};
 
 const login = async () => {
   try {
@@ -101,6 +91,7 @@ const login = async () => {
 
     localStorage.setItem('authToken', result.token);
     localStorage.setItem('userid', result.user.id);
+    localStorage.setItem('byte_format', result.user.byte_format || 'binary');
     if (remember.value) localStorage.setItem('rememberedUser', username.value);
 
     theme.global.name.value = result.user.darkmode ? 'dark' : 'light';
@@ -117,7 +108,7 @@ const login = async () => {
   } finally {
     loading.value = false;
   }
-}
+};
 </script>
 
 <style scoped>

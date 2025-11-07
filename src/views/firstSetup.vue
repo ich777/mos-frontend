@@ -50,7 +50,7 @@
               :error="password2 === '' && step2Error"
               :error-messages="password2 === '' && step2Error ? [$t('this field is required')] : password2 !== password && step2Error ? [$t('password is not the same')] : []"
             ></v-text-field>
-            <v-switch v-model="sambaUser" :label="$t('samba user')" inset color="onPrimary" />
+            <v-switch v-model="sambaUser" :label="$t('samba user')" inset color="green" />
           </v-card-text>
         </v-card>
       </template>

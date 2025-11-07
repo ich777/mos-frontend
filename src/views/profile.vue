@@ -1,30 +1,21 @@
 <template>
   <v-container fluid class="d-flex justify-center">
-    <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
+    <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('user profile') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-select 
-          v-model="selectedLanguage" 
-          :items="languages" 
-          :item-title="(lang) => $t(lang)" 
-          :item-value="(lang) => lang" 
-          :label="$t('language')"
-          required 
-          @update:modelValue="changeLanguage()" 
-        />
-        <v-select v-model="selectedByteFormat" :items="byte_format" item-title="name" item-value="name"
-          :label="$t('byte unit')" required @update:modelValue="changeByteUnit()" />
-        <v-text-field :label="$t('uicolor')" v-model="color" @update:modelValue="changePrimaryColor(color)" type="color"
-          hide-details prepend-inner-icon="mdi-palette" />
+        <v-select v-model="selectedLanguage" :items="languages" :item-title="(lang) => $t(lang)" :item-value="(lang) => lang" :label="$t('language')" required @update:modelValue="changeLanguage()" />
+        <v-select v-model="selectedByteFormat" :items="byte_format" item-title="name" item-value="name" :label="$t('byte unit')" required @update:modelValue="changeByteUnit()" />
+        <h3>{{ $t('uicolor') }}</h3>
+        <v-color-picker v-model="color" show-swatches hide-canvas hide-sliders hide-inputs @update:modelValue="changePrimaryColor" />
         <h3 class="mt-4 d-flex align-center">
           {{ $t('admin api tokens') }}
-          <v-btn icon size="small" class="ml-2" @click="openAdminTokenDialog()" color="onPrimary"  >
+          <v-btn icon size="small" class="ml-2" @click="openAdminTokenDialog()" color="onPrimary">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </h3>
-        <v-card v-for="token in adminTokens" :key="token.id" class="mt-4"  >
+        <v-card v-for="token in adminTokens" :key="token.id" class="mt-4">
           <v-card-title class="d-flex justify-space-between align-center">
             <div>
               {{ token.name }}
@@ -32,9 +23,15 @@
             </div>
           </v-card-title>
           <v-card-text>
-            <v-text-field v-model="token.token" :type="showPassword ? 'text' : 'password'" readonly label="Token"
-              hide-details :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append-inner="showPassword = !showPassword" />
+            <v-text-field
+              v-model="token.token"
+              :type="showPassword ? 'text' : 'password'"
+              readonly
+              label="Token"
+              hide-details
+              :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+              @click:append-inner="showPassword = !showPassword"
+            />
           </v-card-text>
           <v-card-actions>
             <v-row class="d-flex justify-end">
@@ -70,7 +67,6 @@
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
-
 </template>
 
 <script setup>
@@ -93,7 +89,7 @@ const adminTokens = ref([]);
 const createAdminTokenDialog = reactive({
   value: false,
   name: '',
-  description: ''
+  description: '',
 });
 const showPassword = ref(false);
 
@@ -113,14 +109,13 @@ const getUser = async () => {
     const res = await fetch(`/api/v1/auth/profile`, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
     const user = await res.json();
     selectedByteFormat.value = user.byte_format || 'binary';
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -131,14 +126,13 @@ const getAdminTokens = async () => {
     const res = await fetch(`/api/v1/auth/admin-tokens`, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
     adminTokens.value = await res.json();
     createAdminTokenDialog.value = false;
-
   } catch (e) {
     showSnackbarError(e.message);
   } finally {
@@ -149,7 +143,7 @@ const getAdminTokens = async () => {
 const createAdminToken = async (name) => {
   const newAdminToken = {
     name: createAdminTokenDialog.name,
-    description: createAdminTokenDialog.description
+    description: createAdminTokenDialog.description,
   };
 
   try {
@@ -157,16 +151,15 @@ const createAdminToken = async (name) => {
     const res = await fetch(`/api/v1/auth/admin-tokens`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newAdminToken)
+      body: JSON.stringify(newAdminToken),
     });
 
     if (!res.ok) throw new Error('API-Error');
     showSnackbarSuccess(t('admin api token created'));
     getAdminTokens();
-
   } catch (e) {
     showSnackbarError(e.message);
   } finally {
@@ -180,14 +173,13 @@ const deleteAdminToken = async (id) => {
     const res = await fetch(`/api/v1/auth/admin-tokens/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
     showSnackbarSuccess(t('admin api token deleted'));
     getAdminTokens();
-
   } catch (e) {
     showSnackbarError(e.message);
   } finally {
@@ -200,16 +192,15 @@ const changePrimaryColor = async (newColor) => {
     const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'primary_color': newColor })
-    })
+      body: JSON.stringify({ primary_color: newColor }),
+    });
 
     if (!res.ok) throw new Error('API-Error');
     color.value = newColor;
     theme.themes.value[theme.global.name.value].colors.primary = newColor;
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -220,16 +211,15 @@ const changeLanguage = async () => {
     const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'language': selectedLanguage.value })
-    })
+      body: JSON.stringify({ language: selectedLanguage.value }),
+    });
 
     if (!res.ok) throw new Error('API-Error');
     locale.value = selectedLanguage.value;
     showSnackbarSuccess(t('language changed'));
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -240,15 +230,14 @@ const changeByteUnit = async () => {
     const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'byte_format': selectedByteFormat.value })
-    })
+      body: JSON.stringify({ byte_format: selectedByteFormat.value }),
+    });
 
     if (!res.ok) throw new Error('API-Error');
     showSnackbarSuccess(t('byte unit changed'));
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -282,11 +271,8 @@ const copyAuthToken = async (token) => {
         throw new Error('execCommand copy failed');
       }
     } catch (fallbackErr) {
-      showSnackbarError(
-        t('failed to copy api token') + ': ' + (err?.message || fallbackErr?.message || '')
-      );
+      showSnackbarError(t('failed to copy api token') + ': ' + (err?.message || fallbackErr?.message || ''));
     }
   }
 };
-
 </script>
