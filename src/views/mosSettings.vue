@@ -4,66 +4,134 @@
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <h2>{{ $t('settings') }}</h2>
       </v-container>
-      <v-container fluid>
+      <v-container class="pa-0" fluid>
         <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" @click="rebootDialog = true">{{ $t('reboot') }}</v-btn>
+          <!-- Power Management Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-power</v-icon>
+                {{ $t('power management') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded @click="rebootDialog = true">
+                  <v-icon start>mdi-restart</v-icon>
+                  {{ $t('reboot') }}
+                </v-btn>
+                <v-btn color="error" variant="elevated" block rounded @click="shutdownDialog = true">
+                  <v-icon start>mdi-power</v-icon>
+                  {{ $t('shutdown') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" @click="shutdownDialog = true">{{ $t('shutdown') }}</v-btn>
+
+          <!-- System Updates Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-update</v-icon>
+                {{ $t('system updates') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded @click="openUpdateOsDialog()">
+                  <v-icon start>mdi-package-up</v-icon>
+                  {{ $t('update system') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded @click="updateAPI()">
+                  <v-icon start>mdi-api</v-icon>
+                  {{ $t('update api') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block rounded @click="updateUI()">
+                  <v-icon start>mdi-monitor</v-icon>
+                  {{ $t('update ui') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
-        </v-row>
-        <v-divider class="mb-4 mt-4"></v-divider>
-        <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" @click="openUpdateOsDialog()">
-              {{ $t('update system') }}
-            </v-btn>
+
+          <!-- System Configuration Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-cog</v-icon>
+                {{ $t('system configuration') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded to="/mosSettings/system">
+                  <v-icon start>mdi-desktop-classic</v-icon>
+                  {{ $t('system') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded to="/mosSettings/cron">
+                  <v-icon start>mdi-clock-outline</v-icon>
+                  {{ $t('cron jobs') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block rounded to="/mosSettings/logs">
+                  <v-icon start>mdi-text-box-outline</v-icon>
+                  {{ $t('logs') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/drivers">{{ $t('drivers') }}</v-btn>
+
+          <!-- Virtualization Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-server</v-icon>
+                {{ $t('virtualization') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded to="/mosSettings/docker">
+                  <v-icon start>mdi-docker</v-icon>
+                  {{ $t('docker service') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded to="/mosSettings/lxc">
+                  <v-icon start>mdi-package-variant</v-icon>
+                  {{ $t('lxc service') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block rounded to="/mosSettings/vm">
+                  <v-icon start>mdi-desktop-tower</v-icon>
+                  {{ $t('vm service') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
-        </v-row>
-        <v-divider class="mb-4 mt-4"></v-divider>
-        <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/docker">{{ $t('docker service') }}</v-btn>
+
+          <!-- Network Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-network</v-icon>
+                {{ $t('network') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block class="mb-2" rounded to="/mosSettings/networkInterfaces">
+                  <v-icon start>mdi-ethernet</v-icon>
+                  {{ $t('network interfaces') }}
+                </v-btn>
+                <v-btn color="primary" variant="elevated" block rounded to="/mosSettings/networkServices">
+                  <v-icon start>mdi-network-outline</v-icon>
+                  {{ $t('network services') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/lxc">{{ $t('lxc service') }}</v-btn>
-          </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/vm">{{ $t('vm service') }}</v-btn>
-          </v-col>
-        </v-row>
-        <v-divider class="mb-4 mt-4"></v-divider>
-        <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/system">{{ $t('system') }}</v-btn>
-          </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/networkInterfaces">{{ $t('network interfaces') }}</v-btn>
-          </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/networkServices">{{ $t('network services') }}</v-btn>
-          </v-col>          
-        </v-row>
-        <v-divider class="mb-4 mt-4"></v-divider>
-        <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/cron">{{ $t('cron jobs') }}</v-btn>
-          </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" to="/mosSettings/logs">{{ $t('logs') }}</v-btn>
-          </v-col>
-        </v-row>
-        <v-divider class="mb-4 mt-4"></v-divider>
-        <v-row>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" @click="updateAPI()">{{ $t('update api') }}</v-btn>
-          </v-col>
-          <v-col xl="2" l="2" md="3" sm="6" xs="12" class="d-flex justify-center">
-            <v-btn color="primary" width="250px" @click="updateUI()">{{ $t('update ui') }}</v-btn>
+
+          <!-- Hardware Card -->
+          <v-col cols="12" md="6" lg="4" class="pb-0">
+            <v-card class="pa-0" elevation="2">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-chip</v-icon>
+                {{ $t('hardware') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" variant="elevated" block rounded to="/mosSettings/drivers">
+                  <v-icon start>mdi-expansion-card</v-icon>
+                  {{ $t('drivers') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -312,5 +380,4 @@ const clearUpdateOsDialog = () => {
   updateOsDialog.channel = null;
   updateOsDialog.update_kernel = true;
 };
-
 </script>

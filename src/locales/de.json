@@ -653,5 +653,10 @@
   "lxc container could not be unfreezed": "LXC Container konnte nicht aufgetaut werden",
   "lxc container unfreezed successfully": "LXC Container erfolgreich aufgetaut",
   "freeze": "Einfrieren",
-  "unfreeze": "Auftauen"
+  "unfreeze": "Auftauen",
+  "power management": "Energieverwaltung",
+  "system updates": "Systemupdates",
+  "hardware": "Hardware",
+  "virtualization": "Virtualisierung",
+  "system configuration": "Systemkonfiguration"
 }

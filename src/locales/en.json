@@ -652,5 +652,10 @@
   "lxc container could not be unfreezed": "LXC container could not be unfreezed",
   "lxc container unfreezed successfully": "LXC container unfreezed successfully",
   "freeze": "Freeze",
-  "unfreeze": "Unfreeze"
+  "unfreeze": "Unfreeze",
+  "power management": "Power Management",
+  "system updates": "System Updates",
+  "hardware": "Hardware",
+  "virtualization": "Virtualization",
+  "system configuration": "System Configuration"
 }
