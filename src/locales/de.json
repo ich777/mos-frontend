@@ -658,5 +658,6 @@
   "system updates": "Systemupdates",
   "hardware": "Hardware",
   "virtualization": "Virtualisierung",
-  "system configuration": "Systemkonfiguration"
+  "system configuration": "Systemkonfiguration",
+  "vms": "VMs"
 }

@@ -1,6 +1,6 @@
 <template>
   <v-row dense>
-    <v-col cols="6" sm="6" md="4" xl="3" v-if="mem.total_human">
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.total_human">
       <div class="text-caption text-medium-emphasis">
         <strong>{{ $t('total') }}</strong>
       </div>
@@ -8,6 +8,63 @@
         {{ mem.total_human }}
       </div>
     </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.used_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('used') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.used_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.used_human }}
+      </div>
+    </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.reserved_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('reserved') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.reserved_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.reserved_human }}
+      </div>
+    </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('free') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.free_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.free_human }}
+      </div>
+    </v-col>
+    <v-divider></v-divider>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('system') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.breakdown.system.used_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.breakdown.system.bytes_human }}
+      </div>
+    </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('docker') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.breakdown.docker.used_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.breakdown.docker.bytes_human }}
+      </div>
+    </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('lxc') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.breakdown.lxc.used_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.breakdown.lxc.bytes_human }}
+      </div>
+    </v-col>
+    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
+      <div class="text-caption text-medium-emphasis">
+        <strong>{{ $t('vms') }}</strong>
+      </div>
+      <div class="text-body-2" :title="mem.breakdown.vms.used_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+        {{ mem.breakdown.vms.bytes_human }}
+      </div>
+    </v-col>    
     <v-divider class="my-2"></v-divider>
     <v-col cols="12">
     <div class="memory-bar-container">
