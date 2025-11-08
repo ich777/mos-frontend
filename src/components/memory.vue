@@ -16,14 +16,6 @@
         {{ mem.used_human }}
       </div>
     </v-col>
-    <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.reserved_human">
-      <div class="text-caption text-medium-emphasis">
-        <strong>{{ $t('reserved') }}</strong>
-      </div>
-      <div class="text-body-2" :title="mem.reserved_human" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-        {{ mem.reserved_human }}
-      </div>
-    </v-col>
     <v-col cols="3" sm="3" md="3" xl="3" v-if="mem.free_human">
       <div class="text-caption text-medium-emphasis">
         <strong>{{ $t('free') }}</strong>
