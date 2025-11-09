@@ -52,6 +52,7 @@
             ></v-select>
             <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary" density="compact"></v-switch>
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
+            <v-text-field :label="$t('post parameters')" v-model="form.post_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
             <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
             <v-divider class="my-2"></v-divider>
@@ -349,6 +350,7 @@ const form = reactive({
   default_shell: '',
   privileged: false,
   extra_parameters: '',
+  post_parameters: '',
   web_ui_url: '',
   icon: '',
   ports: [],
@@ -407,6 +409,7 @@ const getDockerTemplate = async () => {
     form.default_shell = getDocker.value.default_shell;
     form.privileged = getDocker.value.privileged;
     form.extra_parameters = getDocker.value.extra_parameters;
+    form.post_parameters = getDocker.value.post_parameters;
     form.web_ui_url = getDocker.value.web_ui_url;
     form.icon = getDocker.value.icon;
     form.paths = Array.isArray(getDocker.value.paths)
@@ -533,6 +536,7 @@ const updateDocker = async () => {
   changeDocker.default_shell = form.default_shell;
   changeDocker.privileged = form.privileged;
   changeDocker.extra_parameters = form.extra_parameters;
+  changeDocker.post_parameters = form.post_parameters;
   changeDocker.web_ui_url = form.web_ui_url;
   changeDocker.icon = form.icon;
   changeDocker.gpus = form.gpus;

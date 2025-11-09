@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card   fluid>
+        <v-card fluid>
           <v-card-text>
             <v-select :items="allTemplatesMixed || []" :label="$t('template')" v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense outlined></v-select>
             <v-row>
@@ -54,6 +54,7 @@
             <v-select :label="$t('gpu')" v-model="form.gpus" :items="gpuIds" item-title="value" item-value="key" multiple clearable chips hide-selected></v-select>
             <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary" density="compact"></v-switch>
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
+            <v-text-field :label="$t('post parameters')" v-model="form.post_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
             <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
             <v-divider class="my-2"></v-divider>
@@ -338,6 +339,7 @@ const form = ref({
   default_shell: '',
   privileged: false,
   extra_parameters: '',
+  post_parameters: '',
   web_ui_url: '',
   icon: '',
   ports: [],
@@ -523,6 +525,7 @@ const fillFormFromJson = (jsonData) => {
   form.value.default_shell = jsonData.default_shell || '';
   form.value.privileged = jsonData.privileged || false;
   form.value.extra_parameters = jsonData.extra_parameters || '';
+  form.value.post_parameters = jsonData.post_parameters || '';
   form.value.web_ui_url = jsonData.web_ui_url || '';
   form.value.icon = jsonData.icon || '';
 
@@ -572,6 +575,7 @@ const createDocker = async () => {
     default_shell: form.value.default_shell,
     privileged: form.value.privileged,
     extra_parameters: form.value.extra_parameters,
+    post_parameters: form.value.post_parameters,
     web_ui_url: form.value.web_ui_url,
     icon: form.value.icon,
     paths: form.value.paths.map((path) => ({
@@ -627,10 +631,7 @@ const createDocker = async () => {
 };
 
 const goBackSafely = () => {
-  const canGoBack =
-    window.history.length > 1 &&
-    document.referrer &&
-    new URL(document.referrer).origin === window.location.origin;
+  const canGoBack = window.history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin;
 
   if (canGoBack) {
     router.back();
@@ -700,6 +701,7 @@ const getDockerTemplate = async (docker, installed) => {
       form.value.default_shell = result.default_shell;
       form.value.privileged = result.privileged;
       form.value.extra_parameters = result.extra_parameters;
+      form.value.post_parameters = result.post_parameters;
       form.value.web_ui_url = result.web_ui_url;
       form.value.icon = result.icon;
       form.value.paths = Array.isArray(result.paths)
@@ -744,6 +746,7 @@ const getDockerTemplate = async (docker, installed) => {
       form.value.default_shell = '';
       form.value.privileged = false;
       form.value.extra_parameters = '';
+      form.value.post_parameters = '';
       form.value.web_ui_url = '';
       form.value.icon = '';
       form.value.paths = [];
