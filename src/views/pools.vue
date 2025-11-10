@@ -29,9 +29,9 @@
             <span style="font-size: 0.875rem">{{ pool.status.usedSpace_human }} / {{ pool.status.totalSpace_human }}</span>
           </div>
           <v-divider />
-          <v-card-text>
+          <v-card-text class="pa-0">
             <v-list v-if="pool.data_devices && pool.data_devices.length > 0" class="pa-0" style="background-color: transparent">
-              <v-list-item-title>{{ $t('disks') }}</v-list-item-title>
+              <v-list-item-title class="pt-2 pl-4">{{ $t('disks') }}</v-list-item-title>
               <v-list-item v-for="data_device in pool.data_devices" :key="data_device.id">
                 <template v-slot:prepend>
                   <v-icon class="cursor-pointer" :color="data_device.powerStatus === 'active' ? 'green' : data_device.powerStatus === 'standby' ? 'blue' : 'red'">
@@ -61,7 +61,7 @@
             </v-list>
             <v-divider />
             <v-list v-if="pool.parity_devices && pool.parity_devices.length > 0" class="pa-0" style="background-color: transparent">
-              <v-list-item-title>{{ $t('parities') }}</v-list-item-title>
+              <v-list-item-title class="pt-2 pl-4">{{ $t('parities') }}</v-list-item-title>
               <v-list-item v-for="parity_device in pool.parity_devices" :key="parity_device.id">
                 <template v-slot:prepend>
                   <v-icon class="cursor-pointer" :color="parity_device.powerStatus === 'active' ? 'green' : parity_device.powerStatus === 'standby' ? 'blue' : 'red'">
