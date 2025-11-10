@@ -136,6 +136,9 @@
                                 <template v-else-if="$vuetify.display.smAndUp">
                                   <p style="min-width: 160px; max-width: 160px">
                                     {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                                    <span v-if="Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
+			                              {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address || '-' }}
+                                    </span>
                                   </p>
                                   <v-divider vertical class="mx-2" />
                                 </template>
@@ -287,7 +290,10 @@
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-else-if="$vuetify.display.smAndUp">
-                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}</p>
+                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                          <span v-if="Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address"> {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address }}
+                          </span>
+                          </p>
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-if="$vuetify.display.smAndUp && !docker.HostConfig.NetworkMode.startsWith('container:')">
