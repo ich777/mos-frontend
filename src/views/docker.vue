@@ -114,7 +114,7 @@
                                         ? dockers
                                             .find((d) => d.Names && d.Names[0] === containerName)
                                             ?.Ports.filter((port) => port.PublicPort)
-                                            .map((port) => port.PublicPort)
+                                            .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
                                             .join(', ')
                                         : '-'
                                     }}
@@ -271,7 +271,7 @@
                             {{
                               docker.Ports && docker.Ports.some((port) => port.PublicPort)
                                 ? docker.Ports.filter((port) => port.PublicPort)
-                                    .map((port) => port.PublicPort)
+                                    .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
                                     .join(', ')
                                 : '-'
                             }}
