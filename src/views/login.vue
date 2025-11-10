@@ -1,5 +1,5 @@
 <template>
-  <div class="login-wrap">
+  <div :class="$vuetify.display.mdAndUp ? 'login-wrap' : 'login-wrap-mobile'">
     <v-container class="py-10 fill-height" max-width="1000">
       <v-row align="center" justify="center" no-gutters :class="$vuetify.display.mdAndUp ? 'fill-height' : ''">
         <!-- Left side -->
@@ -117,6 +117,11 @@ const login = async () => {
   min-height: 100vh;
   background: linear-gradient(180deg, color-mix(in oklab, var(--v-theme-primary) 6%, transparent) 0%, transparent 30%),
     linear-gradient(90deg, color-mix(in oklab, var(--v-theme-secondary) 5%, transparent) 0%, transparent 40%);
+}
+.login-wrap-mobile {
+  min-height: auto;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--v-theme-primary) 6%, transparent) 0%, transparent 30%),
+    linear-gradient(90deg, color-mix(in oklab, var(--v-theme-secondary) 5%, transparent) 0%, transparent 40%);  
 }
 
 /* Card with gentle elevation & soft border */
