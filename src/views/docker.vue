@@ -122,23 +122,31 @@
                                   <v-divider vertical class="mx-2" />
                                 </template>
                                 <template v-if="$vuetify.display.mdAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
-                                  <p style="min-width: 150px; max-width: 150px">
+                                  <p style="min-width: 160px; max-width: 160px">
                                     {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-' }}
                                   </p>
                                   <v-divider vertical class="mx-2" />
                                 </template>
                                 <template v-else-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
-                                  <p style="min-width: 150px; max-width: 150px">
+                                  <p style="min-width: 160px; max-width: 160px">
                                     {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-' }}
                                   </p>
                                   <v-divider vertical class="mx-2" />
                                 </template>
                                 <template v-else-if="$vuetify.display.smAndUp">
-                                  <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: -</p>
+                                  <p style="min-width: 160px; max-width: 160px">
+                                    {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                                  </p>
                                   <v-divider vertical class="mx-2" />
                                 </template>
                                 <template v-if="$vuetify.display.smAndUp && !dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
                                   <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode }}</p>
+                                  <v-divider vertical class="mx-2" />
+                                </template>
+                                <template v-else-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
+                                  <p style="min-width: 150px; max-width: 150px">
+                                    {{ $t('network') }}: {{ getContainerNameFromNetworkmode(dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode) }}
+                                  </p>
                                   <v-divider vertical class="mx-2" />
                                 </template>
                                 <template v-else-if="$vuetify.display.smAndUp">
@@ -271,19 +279,23 @@
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'bridge'">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
+                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-else-if="$vuetify.display.smAndUp && docker.HostConfig.NetworkMode === 'host'">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
+                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-else-if="$vuetify.display.smAndUp">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('ip address') }}: -</p>
+                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}</p>
                           <v-divider vertical class="mx-2" />
                         </template>
-                        <template v-if="$vuetify.display.smAndUp">
-                          <p v-if="!docker.HostConfig.NetworkMode.startsWith('container:')" style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ docker.HostConfig.NetworkMode }}</p>
+                        <template v-if="$vuetify.display.smAndUp && !docker.HostConfig.NetworkMode.startsWith('container:')">
+                          <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ docker?.HostConfig.NetworkMode }}</p>
+                          <v-divider vertical class="mx-2" />
+                        </template>
+                        <template v-else-if="$vuetify.display.smAndUp && docker?.HostConfig.NetworkMode.startsWith('container:')">
+                          <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ getContainerNameFromNetworkmode(docker?.HostConfig.NetworkMode) }}</p>
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-else-if="$vuetify.display.smAndUp">
@@ -460,7 +472,7 @@
                 <v-btn variant="text" icon color="red" @click="removeUnusedImage(image.id)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
-              </template>              
+              </template>
             </v-list-item>
             <v-divider v-if="index < unusedImages.length - 1" />
           </template>
@@ -1251,6 +1263,17 @@ const removeUnusedImage = async (imageId) => {
   } finally {
     overlay.value = false;
   }
+};
+
+const getContainerNameFromNetworkmode = (networkMode) => {
+  if (!networkMode || !networkMode.startsWith('container:')) return '-';
+
+  const ref = networkMode.split(':')[1];
+  if (!ref) return '-';
+
+  const matched = dockers.value.find((d) => (d.Id && (d.Id === ref || d.Id.startsWith(ref))) || (d.Names && d.Names[0] === ref));
+
+  return matched ? (matched.Names && matched.Names[0]) || matched.Id : ref;
 };
 
 const showWebui = (docker) => {
