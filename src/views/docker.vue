@@ -494,7 +494,7 @@
       <v-card-text class="pa-1">
         <div
           ref="wsScrollContainer"
-          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
+          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px; background-color: #fafafa; color: #111;"
         >
           <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
             <small>{{ line.output }}</small>
