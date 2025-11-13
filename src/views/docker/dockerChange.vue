@@ -313,6 +313,27 @@
     </v-container>
   </v-container>
 
+  <!-- WebSocket Operation Dialog -->
+  <v-dialog v-model="wsOperationDialog.value" max-width="800" persistent>
+    <v-card>
+      <v-card-text class="pa-1">
+        <div
+          ref="wsScrollContainer"
+          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
+        >
+          <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
+            <small>{{ line.output }}</small>
+          </div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="onPrimary" text @click="closeWsDialog(); goBackSafely();">
+          {{ $t('close') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
   <v-fab color="primary" @click="updateDocker()" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon color="onPrimary">mdi-content-save</v-icon>
@@ -328,6 +349,15 @@ import { ref, onMounted, reactive } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useDockerWebSocket } from '@/composables/useDockerWebSocket';
+const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
+  onErrorSnackbar: showSnackbarError,
+  onSuccessSnackbar: showSnackbarSuccess,
+  onCompleted: async () => {
+    await getDockers();
+    await getDockerGroups();
+  }
+});
 
 const router = useRouter();
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
@@ -563,8 +593,45 @@ const updateDocker = async () => {
     value: variable.value,
     mask: variable.mask,
   }));
+  const newDocker = { template: changeDocker };
+  sendDockerWSCommand('create', newDocker);
 
-
+  /*
+  const changeDocker = getDocker.value;
+  changeDocker.name = form.name;
+  changeDocker.repo = form.repo;
+  changeDocker.network = form.network;
+  changeDocker.custom_ip = form.custom_ip;
+  changeDocker.default_shell = form.default_shell;
+  changeDocker.privileged = form.privileged;
+  changeDocker.extra_parameters = form.extra_parameters;
+  changeDocker.post_parameters = form.post_parameters;
+  changeDocker.web_ui_url = form.web_ui_url;
+  changeDocker.icon = form.icon;
+  changeDocker.gpus = form.gpus;
+  changeDocker.paths = form.paths.map((path) => ({
+    name: path.name,
+    mode: path.mode,
+    host: path.host,
+    container: path.container,
+  }));
+  changeDocker.ports = form.ports.map((port) => ({
+    name: port.name,
+    protocol: port.protocol,
+    host: port.host,
+    container: port.container,
+  }));
+  changeDocker.devices = form.devices.map((device) => ({
+    name: device.name,
+    host: device.host,
+    container: device.container,
+  }));
+  changeDocker.variables = form.variables.map((variable) => ({
+    name: variable.name,
+    key: variable.key,
+    value: variable.value,
+    mask: variable.mask,
+  }));
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/create`, {
@@ -589,7 +656,7 @@ const updateDocker = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
-  }
+  }*/
 };
 
 const getGPUs = async () => {

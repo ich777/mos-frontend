@@ -301,6 +301,27 @@
     </v-container>
   </v-container>
 
+  <!-- WebSocket Operation Dialog -->
+  <v-dialog v-model="wsOperationDialog.value" max-width="800" persistent>
+    <v-card>
+      <v-card-text class="pa-1">
+        <div
+          ref="wsScrollContainer"
+          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
+        >
+          <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
+            <small>{{ line.output }}</small>
+          </div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="onPrimary" text @click="closeWsDialog(); goBackSafely();">
+          {{ $t('close') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
   <v-fab color="primary" @click="createDocker()" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon color="onPrimary">mdi-content-save</v-icon>
@@ -316,6 +337,7 @@ import { onMounted, ref } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useDockerWebSocket } from '@/composables/useDockerWebSocket';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
@@ -350,6 +372,14 @@ const form = ref({
 });
 const allTemplates = ref({});
 const allTemplatesMixed = ref([]);
+const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
+  onErrorSnackbar: showSnackbarError,
+  onSuccessSnackbar: showSnackbarSuccess,
+  onCompleted: async () => {
+    await getDockers();
+    await getDockerGroups();
+  }
+});
 
 onMounted(() => {
   window.scrollTo(0, 0);
@@ -566,6 +596,46 @@ const fillFormFromJson = (jsonData) => {
 };
 
 const createDocker = async () => {
+  const newDocker = { template: {
+    name: form.value.name,
+    repo: form.value.repo,
+    registry: form.value.registry,
+    network: form.value.network,
+    custom_ip: form.value.custom_ip,
+    default_shell: form.value.default_shell,
+    privileged: form.value.privileged,
+    extra_parameters: form.value.extra_parameters,
+    post_parameters: form.value.post_parameters,
+    web_ui_url: form.value.web_ui_url,
+    icon: form.value.icon,
+    paths: form.value.paths.map((path) => ({
+      name: path.name,
+      mode: path.mode,
+      host: path.host,
+      container: path.container,
+    })),
+    ports: form.value.ports.map((port) => ({
+      name: port.name,
+      protocol: port.protocol,
+      host: port.host,
+      container: port.container,
+    })),
+    variables: form.value.variables.map((variable) => ({
+      name: variable.name,
+      key: variable.key,
+      value: variable.value,
+      mask: variable.mask,
+    })),
+    devices: form.value.devices.map((device) => ({
+      name: device.name,
+      host: device.host,
+      container: device.container,
+    })),
+    gpus: form.gpus,
+  }};
+  sendDockerWSCommand('create', newDocker);
+
+  /*
   const newDocker = {
     name: form.value.name,
     repo: form.value.repo,
@@ -627,7 +697,7 @@ const createDocker = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
-  }
+  }*/
 };
 
 const goBackSafely = () => {

@@ -489,7 +489,7 @@
   </v-dialog>
 
   <!-- WebSocket Operation Dialog -->
-  <v-dialog v-model="wsOperationDialog.value" max-width="600">
+  <v-dialog v-model="wsOperationDialog.value" max-width="800" persistent>
     <v-card>
       <v-card-text class="pa-1">
         <div
@@ -556,7 +556,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, onUnmounted, watch, nextTick } from 'vue';
+import { ref, onMounted, reactive, onUnmounted } from 'vue';
 import draggable from 'vuedraggable';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
@@ -599,39 +599,19 @@ const unusedImagesDialog = reactive({
   images: [],
 });
 const dockersLoading = ref(true);
-let socket = null;
 const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
   onErrorSnackbar: showSnackbarError,
   onSuccessSnackbar: showSnackbarSuccess,
   onCompleted: async () => {
     await getDockers();
     await getDockerGroups();
-  },
-});
-
-watch(
-  () => wsOperationDialog.data.length,
-  () => {
-    nextTick(() => {
-      const el = wsScrollContainer.value;
-      if (el) {
-        el.scrollTop = el.scrollHeight;
-      }
-    });
   }
-);
+});
 
 onMounted(async () => {
   await getDockers();
   await getDockerGroups();
   dockersLoading.value = false;
-});
-
-onUnmounted(() => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
 });
 
 const getDockers = async () => {
@@ -1402,13 +1382,5 @@ const clearDeleteGroupDialog = () => {
 const openUnusedImagesDialog = async () => {
   await getUnusedImages();
   unusedImagesDialog.value = true;
-};
-const clearWsOperationDialog = () => {
-  wsOperationDialog.operationId = '';
-  wsOperationDialog.data = [];
-};
-const openWsOperationDialog = () => {
-  wsOperationDialog.value = true;
-  clearWsOperationDialog();
 };
 </script>
