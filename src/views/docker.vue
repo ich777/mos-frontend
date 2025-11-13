@@ -489,12 +489,12 @@
   </v-dialog>
 
   <!-- WebSocket Operation Dialog -->
-  <v-dialog v-model="wsOperationDialog.value" max-width="800">
+  <v-dialog v-model="wsOperationDialog.value" max-width="600">
     <v-card>
       <v-card-text class="pa-1">
         <div
           ref="wsScrollContainer"
-          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px; background-color: #fafafa; color: #111;"
+          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
         >
           <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
             <small>{{ line.output }}</small>
@@ -513,39 +513,39 @@
   <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-menu location="top">
       <template v-slot:activator="{ props }">
-      <v-icon v-bind="props" color="onPrimary">mdi-dots-vertical</v-icon>
+        <v-icon v-bind="props" color="onPrimary">mdi-dots-vertical</v-icon>
       </template>
       <v-list>
-      <v-list-item @click="$router.push('/docker/create')">
-        <template v-slot:prepend>
-        <v-icon>mdi-plus</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('add container') }}</v-list-item-title>
-      </v-list-item>
-      <v-list-item @click="openCreateGroupDialog()">
-        <template v-slot:prepend>
-        <v-icon>mdi-folder-plus</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('create docker group') }}</v-list-item-title>
-      </v-list-item>
-      <v-list-item @click="openUnusedImagesDialog()">
-        <template v-slot:prepend>
-        <v-icon>mdi-image-off</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('unused docker images') }}</v-list-item-title>
-      </v-list-item>
-      <v-list-item @click="checkForUpdates()">
-        <template v-slot:prepend>
-        <v-icon>mdi-update</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('check for updates') }}</v-list-item-title>
-      </v-list-item>
-      <v-list-item @click="updateAll()">
-        <template v-slot:prepend>
-        <v-icon>mdi-refresh</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('update all') }}</v-list-item-title>
-      </v-list-item>
+        <v-list-item @click="$router.push('/docker/create')">
+          <template v-slot:prepend>
+            <v-icon>mdi-plus</v-icon>
+          </template>
+          <v-list-item-title>{{ $t('add container') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="openCreateGroupDialog()">
+          <template v-slot:prepend>
+            <v-icon>mdi-folder-plus</v-icon>
+          </template>
+          <v-list-item-title>{{ $t('create docker group') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="openUnusedImagesDialog()">
+          <template v-slot:prepend>
+            <v-icon>mdi-image-off</v-icon>
+          </template>
+          <v-list-item-title>{{ $t('unused docker images') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="checkForUpdates()">
+          <template v-slot:prepend>
+            <v-icon>mdi-update</v-icon>
+          </template>
+          <v-list-item-title>{{ $t('check for updates') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="updateAll()">
+          <template v-slot:prepend>
+            <v-icon>mdi-refresh</v-icon>
+          </template>
+          <v-list-item-title>{{ $t('update all') }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
   </v-fab>
@@ -561,7 +561,7 @@ import draggable from 'vuedraggable';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { openTerminalPopup } from '@/composables/terminalpopup';
-import { io } from 'socket.io-client';
+import { useDockerWebSocket } from '@/composables/useDockerWebSocket';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
@@ -599,15 +599,15 @@ const unusedImagesDialog = reactive({
   images: [],
 });
 const dockersLoading = ref(true);
-const wsIsConnected = ref(false);
-const wsError = ref(null);
-const wsOperationDialog = reactive({
-  value: false,
-  operationId: '',
-  data: [{ timestamp: '', output: '' }],
-});
-const wsScrollContainer = ref(null);
 let socket = null;
+const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
+  onErrorSnackbar: showSnackbarError,
+  onSuccessSnackbar: showSnackbarSuccess,
+  onCompleted: async () => {
+    await getDockers();
+    await getDockerGroups();
+  },
+});
 
 watch(
   () => wsOperationDialog.data.length,
@@ -710,7 +710,15 @@ const getDockerGroups = async () => {
       throw new Error(`${t('docker groups could not be loaded')}|$| ${error.error || t('unknown error')}`);
     }
     const result = await res.json();
-    dockerGroups.value = result || [];
+    const newGroups = result || [];
+
+    dockerGroups.value = newGroups.map((group) => {
+      const old = dockerGroups.value.find((g) => g.id === group.id);
+      return {
+        ...group,
+        expanded: old ? old.expanded : false,
+      };
+    });
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1402,79 +1410,5 @@ const clearWsOperationDialog = () => {
 const openWsOperationDialog = () => {
   wsOperationDialog.value = true;
   clearWsOperationDialog();
-};
-const closeWsDialog = () => {
-  wsOperationDialog.value = false;
-  clearWsOperationDialog();
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-    wsIsConnected.value = false;
-  }
-};
-
-// WebSocket for Docker Commands
-const sendDockerWSCommand = (command, params = null) => {
-  const authToken = localStorage.getItem('authToken');
-  if (!authToken) {
-    wsError.value = 'No auth token found';
-    return;
-  }
-
-  if (socket && wsIsConnected.value) {
-    showSnackbarError(t('docker command is already running'));
-    return;
-  }
-
-  socket = io('/docker', { path: '/api/v1/socket.io/', transports: ['websocket'], upgrade: false });
-
-  socket.on('connect', () => {
-    console.log('WebSocket connected');
-    wsIsConnected.value = true;
-    wsError.value = null;
-    socket.emit('docker', { token: authToken, operation: command, params: params });
-  });
-
-  socket.on('connect_error', (err) => {
-    console.log('WebSocket connection error:', err);
-    wsError.value = `Connection error: ${err.message}`;
-    wsIsConnected.value = false;
-  });
-  socket.on('disconnect', () => {
-    wsIsConnected.value = false;
-  });
-
-  const apply = (data) => {
-    if (wsOperationDialog.operationId && data.operationId && data.operationId !== wsOperationDialog.operationId) {
-      return;
-    }
-
-    console.log('Docker data received:', data);
-    if (data.status === 'started') {
-      openWsOperationDialog();
-      wsOperationDialog.operationId = data.operationId;
-      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.operation + ' ' + data.status + '\n' });
-    } else if (data.status === 'running') {
-      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.output });
-    } else if (data.status === 'error') {
-      showSnackbarError(t('docker command error occurred'), data.message);
-      socket.disconnect();
-      wsIsConnected.value = false;
-    } else if (data.status === 'completed') {
-      showSnackbarSuccess(t('docker command completed successfully'));
-      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.status + '\n' });
-      socket.disconnect();
-      wsIsConnected.value = false;
-      getDockers();
-      getDockerGroups();
-    }
-  };
-
-  socket.on('docker-update', apply);
-  socket.on('error', (err) => {
-    console.log('WebSocket error:', err);
-    wsError.value = `Socket error: ${err}`;
-    wsIsConnected.value = false;
-  });
 };
 </script>
