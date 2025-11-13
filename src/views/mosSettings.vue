@@ -411,19 +411,13 @@ const updateKernel = async (kernelVersion) => {
 };
 
 const rollbackKernel = async () => {
-  const rollbackBody = { 
-    kernel_rollback: true
-  }
-
   try {
     overlay.value = true;
-    const res = await fetch('/api/v1/mos/rollbackos', {
+    const res = await fetch('/api/v1/mos/rollbackkernel', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(rollbackBody),
+      }
     });
 
     if (!res.ok) {

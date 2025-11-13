@@ -114,7 +114,7 @@
                                         ? dockers
                                             .find((d) => d.Names && d.Names[0] === containerName)
                                             ?.Ports.filter((port) => port.PublicPort)
-                                            .filter((port, index, self) => index === self.findIndex(p => p.PrivatePort === port.PrivatePort))
+                                            .filter((port, index, self) => index === self.findIndex((p) => p.PrivatePort === port.PrivatePort))
                                             .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
                                             .join(', ')
                                         : '-'
@@ -138,7 +138,7 @@
                                   <p style="min-width: 160px; max-width: 160px">
                                     {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
                                     <span v-if="Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
-			                              {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address || '-' }}
+                                      {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address || '-' }}
                                     </span>
                                   </p>
                                   <v-divider vertical class="mx-2" />
@@ -275,7 +275,7 @@
                             {{
                               docker.Ports && docker.Ports.some((port) => port.PublicPort)
                                 ? docker.Ports.filter((port) => port.PublicPort)
-                                    .filter((port, index, self) => index === self.findIndex(p => p.PrivatePort === port.PrivatePort))
+                                    .filter((port, index, self) => index === self.findIndex((p) => p.PrivatePort === port.PrivatePort))
                                     .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
                                     .join(', ')
                                 : '-'
@@ -292,9 +292,11 @@
                           <v-divider vertical class="mx-2" />
                         </template>
                         <template v-else-if="$vuetify.display.smAndUp">
-                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
-                          <span v-if="Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address"> {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address }}
-                          </span>
+                          <p style="min-width: 160px; max-width: 160px">
+                            {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                            <span v-if="Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
+                              {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address }}
+                            </span>
                           </p>
                           <v-divider vertical class="mx-2" />
                         </template>
@@ -492,6 +494,27 @@
     </v-card>
   </v-dialog>
 
+  <!-- WebSocket Operation Dialog -->
+  <v-dialog v-model="wsOperationDialog.value" max-width="600">
+    <v-card>
+      <v-card-text class="pa-1">
+        <div
+          ref="wsScrollContainer"
+          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
+        >
+          <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
+            <small>{{ line.output }}</small>
+          </div>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="onPrimary" text @click="closeWsDialog()">
+          {{ $t('close') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon color="onPrimary">mdi-dots-vertical</v-icon>
@@ -537,11 +560,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, onUnmounted, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { openTerminalPopup } from '@/composables/terminalpopup';
+import { io } from 'socket.io-client';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
@@ -579,11 +603,39 @@ const unusedImagesDialog = reactive({
   images: [],
 });
 const dockersLoading = ref(true);
+const wsIsConnected = ref(false);
+const wsError = ref(null);
+const wsOperationDialog = reactive({
+  value: false,
+  operationId: '',
+  data: [{ timestamp: '', output: '' }],
+});
+const wsScrollContainer = ref(null);
+let socket = null;
+
+watch(
+  () => wsOperationDialog.data.length,
+  () => {
+    nextTick(() => {
+      const el = wsScrollContainer.value;
+      if (el) {
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+  }
+);
 
 onMounted(async () => {
   await getDockers();
   await getDockerGroups();
   dockersLoading.value = false;
+});
+
+onUnmounted(() => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
 });
 
 const getDockers = async () => {
@@ -804,6 +856,10 @@ const removeDocker = async (name) => {
 
 const updateDocker = async (name, force_update = false) => {
   const updateBody = force_update ? { name: name, force_update: true } : { name: name };
+  sendDockerWSCommand('upgrade', updateBody);
+
+  /*
+  const updateBody = force_update ? { name: name, force_update: true } : { name: name };
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/upgrade`, {
@@ -827,11 +883,13 @@ const updateDocker = async (name, force_update = false) => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
-  }
+  }*/
 };
 
 const checkForUpdates = async () => {
-  try {
+  sendDockerWSCommand('check-updates');
+
+  /*try {
     showSnackbarSuccess(t('update check started'));
 
     const res = await fetch('/api/v1/docker/mos/update_check', {
@@ -855,7 +913,7 @@ const checkForUpdates = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
-  }
+  }*/
 };
 
 const updateAll = async () => {
@@ -1340,5 +1398,87 @@ const clearDeleteGroupDialog = () => {
 const openUnusedImagesDialog = async () => {
   await getUnusedImages();
   unusedImagesDialog.value = true;
+};
+const clearWsOperationDialog = () => {
+  wsOperationDialog.operationId = '';
+  wsOperationDialog.data = [];
+};
+const openWsOperationDialog = () => {
+  wsOperationDialog.value = true;
+  clearWsOperationDialog();
+};
+const closeWsDialog = () => {
+  wsOperationDialog.value = false;
+  clearWsOperationDialog();
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+    wsIsConnected.value = false;
+  }
+};
+
+// WebSocket for Docker Commands
+const sendDockerWSCommand = (command, params = null  ) => {
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    wsError.value = 'No auth token found';
+    return;
+  }
+
+  if (socket && wsIsConnected.value) {
+    showSnackbarError(t('docker command is already running'));
+    return;
+  }
+
+  socket = io('/docker', { path: '/api/v1/socket.io/', transports: ['websocket'], upgrade: false });
+
+  socket.on('connect', () => {
+    console.log('WebSocket connected');
+    wsIsConnected.value = true;
+    wsError.value = null;
+    socket.emit('docker', { token: authToken, operation: command, params: params  });
+  });
+
+  socket.on('connect_error', (err) => {
+    console.log('WebSocket connection error:', err);
+    wsError.value = `Connection error: ${err.message}`;
+    wsIsConnected.value = false;
+  });
+  socket.on('disconnect', () => {
+    wsIsConnected.value = false;
+  });
+
+  const apply = (data) => {
+    if (wsOperationDialog.operationId && data.operationId && data.operationId !== wsOperationDialog.operationId) {
+      return;
+    }
+
+    console.log('Docker data received:', data);
+    if (data.status === 'started') {
+      openWsOperationDialog();
+      wsOperationDialog.operationId = data.operationId;
+      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.operation + ' ' + data.status + '\n' });
+    } else if (data.status === 'running') {
+      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.output });
+    } else if (data.status === 'error') {
+      showSnackbarError(t('docker command error occurred'), data.message);
+      socket.disconnect();
+      wsIsConnected.value = false;
+    } else if (data.status === 'completed') {
+      showSnackbarSuccess(t('docker command completed successfully'));
+      wsOperationDialog.data.push({ timestamp: data.timestamp, output: data.status + '\n' });
+      socket.disconnect();
+      wsIsConnected.value = false;
+      getDockers();
+      getDockerGroups();
+    }
+  };
+
+  socket.on('docker-update', apply);
+  socket.on('error', (err) => {
+    console.log('WebSocket error:', err);
+    wsError.value = `Socket error: ${err}`;
+    wsIsConnected.value = false;
+  });
 };
 </script>

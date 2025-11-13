@@ -668,5 +668,9 @@
   "kernel rollback could not be initiated": "Kernel Rollback konnte nicht gestartet werden",
   "kernel rollback initiated successfully": "Kernel Rollback erfolgreich gestartet",
   "are you sure you want to rollback to the previous kernel version?": "Bist du sicher, dass du zur vorherigen Kernel-Version zurückkehren möchtest?",
-  "rollback kernel": "Kernel zurücksetzen"
+  "rollback kernel": "Kernel zurücksetzen",
+  "post parameters": "Post Parameter",
+  "docker command is already running": "Docker Befehl läuft bereits",
+  "docker command error occurred": "Fehler beim Docker Befehl aufgetreten",
+  "docker command completed successfully": "Docker Befehl erfolgreich abgeschlossen"
 }

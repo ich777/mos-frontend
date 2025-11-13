@@ -665,5 +665,6 @@
   "kernel update could not be initiated": "Kernel update could not be initiated",
   "kernel update initiated successfully": "Kernel update initiated successfully",
   "kernel rollback could not be initiated": "Kernel Rollback could not be initiated",
-  "kernel rollback initiated successfully": "Kernel Rollback initiated successfully"
+  "kernel rollback initiated successfully": "Kernel Rollback initiated successfully",
+  "post parameters": "Post Parameters"
 }
