@@ -901,6 +901,9 @@ const checkForUpdates = async () => {
 };
 
 const updateAll = async () => {
+  sendDockerWSCommand('upgrade');
+
+  /*
   try {
     showSnackbarSuccess(t('update started'));
 
@@ -926,7 +929,7 @@ const updateAll = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
-  }
+  }*/
 };
 
 const switchAutostart = async (docker) => {
