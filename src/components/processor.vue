@@ -46,12 +46,12 @@
     </v-col>
     <v-col cols="12" sm="12" md="12" xl="12">
       <div v-if="processor.cores && processor.cores.length">
-        <details class="mt-2">
-          <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline">{{ $t('cores') }}</summary>
+        <details>
+          <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline" class="mb-1">{{ $t('cores') }}</summary>
           <v-row v-for="(core, i) in (processor.cores || []).filter((c) => c.isPhysical)" :key="i" dense>
             <v-col>
               <div class="core-row" style="min-width: 0; display: flex; align-items: center; gap: 6px">
-                <div class="core-label text-body-2 mb-1">
+                <div class="core-label text-body-2">
                   <small>
                     <b>CPU {{ core.number }}</b>
                   </small>
@@ -74,7 +74,7 @@
             </v-col>
             <v-col v-for="(thread, ti) in (processor.cores || []).filter((c) => c.isHyperThreaded && c.physicalCoreNumber === core.number)" :key="ti">
               <div class="core-row" style="min-width: 0">
-                <div class="core-label text-body-2 mb-1">
+                <div class="core-label text-body-2">
                   <small>
                     <b>vCPU {{ thread.number }}</b>
                   </small>
