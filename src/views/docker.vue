@@ -8,212 +8,92 @@
         <v-skeleton-loader v-if="dockersLoading" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
         <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
-            <v-list class="bg-transparent">
-              <draggable v-model="dockerGroups" item-key="id" @end="onDragEndGrp" handle=".drag-handle">
-                <template #item="{ element: group, index }">
-                  <div v-if="group.name !== ''">
-                    <v-list-item :id="group.id" @click.stop="group.expanded = !group.expanded">
-                      <template v-slot:prepend>
+            <v-table class="bg-transparent">
+              <thead>
+                <tr>
+                  <th style="width:42px"></th>
+                  <th>{{ $t('name') }}</th>
+                  <th>{{ $t('state') }}</th>
+                  <th v-if="$vuetify.display.xlAndUp">{{ $t('image') }}</th>
+                  <th v-if="$vuetify.display.smAndUp">{{ $t('ports') }}</th>
+                  <th v-if="$vuetify.display.smAndUp">{{ $t('ip address') }}</th>
+                  <th v-if="$vuetify.display.smAndUp">{{ $t('network') }}</th>
+                  <th style="width:42px">{{ $t('update') }}</th>
+                  <th style="width:90px">{{ $t('autostart') }}</th>
+                  <th style="width:42px">{{ $t('info') }}</th>
+                  <th style="width:42px"></th>
+                </tr>
+              </thead>
+
+              <!-- Docker Groups -->
+              <draggable
+                tag="tbody"
+                v-model="dockerGroups"
+                item-key="id"
+                handle=".drag-handle"
+                @end="onDragEndGrp"
+              >
+                <template #item="{ element: group }">
+                  <template v-if="group.name !== ''">
+                    <tr :id="group.id" @click.stop="group.expanded = !group.expanded" style="cursor:pointer">
+                      <td>
                         <v-menu>
                           <template #activator="{ props }">
-                            <v-icon class="drag-handle" style="cursor: pointer" v-bind="props">mdi-folder</v-icon>
+                            <v-icon class="drag-handle" style="cursor:grab" v-bind="props">mdi-folder</v-icon>
                           </template>
                           <v-list>
-                            <v-list-item @click="openChangeGroupDialog(group)">
+                            <v-list-item @click.stop="openChangeGroupDialog(group)">
                               <v-list-item-title>{{ $t('edit group') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="openDeleteGroupDialog(group)">
+                            <v-list-item @click.stop="openDeleteGroupDialog(group)">
                               <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-menu>
-                      </template>
-                      <template v-slot:append>
-                        <v-icon v-if="group.update_available" tooltip="$t('update available')" color="green" @click="updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
-                        <v-divider vertical class="mx-2" />
-                        <v-btn icon small density="compact" class="ms-2" @click.stop="group.expanded = !group.expanded">
+                      </td>
+                      <td>
+                        <strong>{{ group.name }}</strong>
+                        <div class="text-caption">{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</div>
+                      </td>
+                      <td>-</td>
+                      <td v-if="$vuetify.display.xlAndUp">-</td>
+                      <td v-if="$vuetify.display.smAndUp">-</td>
+                        <td v-if="$vuetify.display.smAndUp">-</td>
+                      <td v-if="$vuetify.display.smAndUp">-</td>
+                      <td>
+                        <v-icon
+                          v-if="group.update_available"
+                          color="green"
+                          @click.stop="updateDockerGroupContainers && updateDockerGroupContainers(group)"
+                        >mdi-autorenew</v-icon>
+                      </td>
+                      <td>-</td>
+                      <td>
+                        <v-btn icon density="compact" @click.stop="group.expanded = !group.expanded">
                           <v-icon>{{ group.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                         </v-btn>
-                      </template>
-                      <v-list-item-title>{{ group.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-divider />
-                    <v-expand-transition>
-                      <div v-if="group.expanded" >
-                        <v-list class="bg-transparent pa-0">
-                          <template v-for="(containerName, idx) in group.containers" :key="containerName">
-                            <v-list-item :id="containerName">
-                              <template v-slot:prepend>
-                                <v-menu>
-                                  <template #activator="{ props }">
-                                    <v-img class="drag-handle mr-4" v-bind="props" :src="`/docker_icons/${containerName}.png`" alt="docker image" width="30" height="30" style="cursor: pointer">
-                                      <template v-slot:error>
-                                        <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
-                                          <v-icon color="grey-darken-1">mdi-image-off</v-icon>
-                                        </v-sheet>
-                                      </template>
-                                    </v-img>
-                                  </template>
-                                  <v-list>
-                                    <v-list-item
-                                      v-if="checkWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
-                                      @click="showWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
-                                    >
-                                      <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="openTerminal(containerName)">
-                                      <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'running'" @click="startDocker(containerName)">
-                                      <v-list-item-title>{{ $t('start') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="stopDocker(containerName)">
-                                      <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="restartDocker(containerName)">
-                                      <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="killDocker(containerName)">
-                                      <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item :to="`/docker/change/${containerName}`">
-                                      <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-divider />
-                                    <v-list-item @click="openTerminalLogs(containerName)">
-                                      <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName)">
-                                      <v-list-item-title>{{ $t('update') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="!mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName, true)">
-                                      <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item @click="openDeleteDialog(dockers.find((d) => d.Names && d.Names[0] === containerName))">
-                                      <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
-                                    </v-list-item>
-                                  </v-list>
-                                </v-menu>
-                              </template>
-                              <v-list-item-title>{{ containerName }}</v-list-item-title>
-                              <v-list-item-subtitle :style="{ color: dockers.find((d) => d.Names && d.Names[0] === containerName)?.State === 'running' ? 'green' : 'red' }">
-                                {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.State || '-' }}
-                              </v-list-item-subtitle>
-                              <template v-slot:append>
-                                <template v-if="$vuetify.display.xlAndUp">
-                                  <v-divider vertical class="mx-2" />
-                                  <p style="min-width: 250px; max-width: 150px">{{ $t('image') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.Image }}</p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-if="$vuetify.display.smAndUp">
-                                  <p style="min-width: 150px; max-width: 150px">
-                                    {{ $t('ports') }}:
-                                    {{
-                                      dockers.find((d) => d.Names && d.Names[0] === containerName)?.Ports &&
-                                      dockers.find((d) => d.Names && d.Names[0] === containerName)?.Ports.some((port) => port.PublicPort)
-                                        ? dockers
-                                            .find((d) => d.Names && d.Names[0] === containerName)
-                                            ?.Ports.filter((port) => port.PublicPort)
-                                            .filter((port, index, self) => index === self.findIndex((p) => p.PrivatePort === port.PrivatePort))
-                                            .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
-                                            .join(', ')
-                                        : '-'
-                                    }}
-                                  </p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
-                                  <p style="min-width: 160px; max-width: 160px">
-                                    {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-' }}
-                                  </p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-else-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
-                                  <p style="min-width: 160px; max-width: 160px">
-                                    {{ $t('ip address') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-' }}
-                                  </p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-else-if="$vuetify.display.smAndUp">
-                                  <p style="min-width: 160px; max-width: 160px">
-                                    {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
-                                    <span v-if="Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
-                                      {{ $t('ip address') }}: {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.GlobalIPv6Address || '-' }}
-                                    </span>
-                                  </p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-if="$vuetify.display.smAndUp && !dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
-                                  <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode }}</p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-else-if="$vuetify.display.smAndUp && dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
-                                  <p style="min-width: 150px; max-width: 150px">
-                                    {{ $t('network') }}: {{ getContainerNameFromNetworkmode(dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode) }}
-                                  </p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <template v-else-if="$vuetify.display.smAndUp">
-                                  <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: -</p>
-                                  <v-divider vertical class="mx-2" />
-                                </template>
-                                <v-icon
-                                  v-if="mosDockers && mosDockers.find((item) => item.name === dockers.find((d) => d.Names && d.Names[0] === containerName)?.Names[0] && item.update_available)"
-                                  tooltip="$t('update available')"
-                                  color="green"
-                                  @click="updateDocker(dockers.find((d) => d.Names && d.Names[0] === containerName)?.Names[0])"
-                                >
-                                  mdi-autorenew
-                                </v-icon>
-                                <v-icon v-else style="width: 21px; height: 21px"></v-icon>
-                                <v-divider vertical class="mx-2" />
-                                <v-switch
-                                  :model-value="dockers.find((d) => d.Names && d.Names[0] === containerName)?.autostart ?? false"
-                                  color="green"
-                                  hide-details
-                                  @update:model-value="
-                                    (val) => {
-                                      const d = dockers.find((d) => d.Names && d.Names[0] === containerName);
-                                      if (d) {
-                                        d.autostart = val;
-                                        switchAutostart(d);
-                                      }
-                                    }
-                                  "
-                                  inset
-                                  density="compact"
-                                />
-                                <v-divider vertical class="mx-2" />
-                                <v-icon class="drag-handle" @click="openInfoDialog(dockers.find((d) => d.Names && d.Names[0] === containerName))">mdi-information-outline</v-icon>
-                              </template>
-                            </v-list-item>
-                            <v-divider />
-                          </template>
-                        </v-list>
-                      </div>
-                    </v-expand-transition>
-                  </div>
-                </template>
-              </draggable>
-              <draggable v-model="dockers" item-key="Id" @end="onDragEnd" handle=".drag-handle">
-                <template #item="{ element: docker, index }">
-                  <div>
-                    <v-list-item :id="docker.Id" v-if="!dockerGroups.some((g) => g.containers && g.containers.includes(docker.Names?.[0]))">
-                      <template v-slot:prepend>
+                      </td>
+                      <td></td>
+                    </tr>
+
+                    <!-- Containers inside group -->
+                    <tr
+                      v-for="containerName in group.expanded ? group.containers : []"
+                      :key="containerName"
+                    >
+                      <td>
                         <v-menu>
                           <template #activator="{ props }">
                             <v-img
-                              v-if="docker.Names && docker.Names.length > 0"
-                              class="drag-handle mr-4"
+                              class="drag-handle"
                               v-bind="props"
-                              :src="`/docker_icons/${docker.Names[0]}.png`"
+                              :src="`/docker_icons/${containerName}.png`"
                               alt="docker image"
                               width="30"
                               height="30"
-                              style="cursor: pointer"
+                              style="cursor:pointer"
                             >
-                              <template v-slot:error>
+                              <template #error>
                                 <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
                                   <v-icon color="grey-darken-1">mdi-image-off</v-icon>
                                 </v-sheet>
@@ -221,115 +101,246 @@
                             </v-img>
                           </template>
                           <v-list>
-                            <v-list-item v-if="checkWebui(docker)" @click="showWebui(docker)">
-                              <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="docker.State === 'running'" @click="openTerminal(docker.Names[0])">
-                              <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="docker.State !== 'running'" @click="startDocker(docker.Names[0])">
-                              <v-list-item-title>{{ $t('start') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="docker.State === 'running'" @click="stopDocker(docker.Names[0])">
-                              <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="docker.State === 'running'" @click="restartDocker(docker.Names[0])">
-                              <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="docker.State === 'running'" @click="killDocker(docker.Names[0])">
-                              <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item :to="`/docker/change/${docker.Names[0]}`">
+                            <v-list-item
+                              v-if="checkWebui(dockers.find(d => d.Names && d.Names[0] === containerName))"
+                              @click="showWebui(dockers.find(d => d.Names && d.Names[0] === containerName))"
+                            ><v-list-item-title>{{ $t('web ui') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
+                              @click="openTerminal(containerName)"
+                            ><v-list-item-title>{{ $t('terminal') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State !== 'running'"
+                              @click="startDocker(containerName)"
+                            ><v-list-item-title>{{ $t('start') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
+                              @click="stopDocker(containerName)"
+                            ><v-list-item-title>{{ $t('stop') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
+                              @click="restartDocker(containerName)"
+                            ><v-list-item-title>{{ $t('restart') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="dockers.find(d => d.Names && d.Names[0] === containerName).State === 'running'"
+                              @click="killDocker(containerName)"
+                            ><v-list-item-title>{{ $t('kill') }}</v-list-item-title></v-list-item>
+                            <v-list-item :to="`/docker/change/${containerName}`">
                               <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider />
-                            <v-list-item @click="openTerminalLogs(docker.Names[0])">
+                            <v-list-item @click="openTerminalLogs(containerName)">
                               <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item v-if="mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0])">
-                              <v-list-item-title>{{ $t('update') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item v-if="!mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0], true)">
-                              <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="openDeleteDialog(docker)">
+                            <v-list-item
+                              v-if="mosDockers.find(item => item.name === containerName && item.update_available)"
+                              @click="updateDocker(containerName)"
+                            ><v-list-item-title>{{ $t('update') }}</v-list-item-title></v-list-item>
+                            <v-list-item
+                              v-if="!mosDockers.find(item => item.name === containerName && item.update_available)"
+                              @click="updateDocker(containerName, true)"
+                            ><v-list-item-title>{{ $t('force update') }}</v-list-item-title></v-list-item>
+                            <v-list-item @click="openDeleteDialog(dockers.find(d => d.Names && d.Names[0] === containerName))">
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-menu>
-                      </template>
-                      <v-list-item-title>{{ docker.Names[0] }}</v-list-item-title>
-                      <v-list-item-subtitle :style="{ color: docker.State === 'running' ? 'green' : 'red' }">
-                        {{ docker.State }}
-                      </v-list-item-subtitle>
-                      <template v-slot:append>
-                        <template v-if="$vuetify.display.xlAndUp">
-                          <v-divider vertical class="mx-2" />
-                          <p style="min-width: 250px; max-width: 150px">{{ $t('image') }}: {{ docker.Image }}</p>
-                          <v-divider vertical class="mx-2" />
+                      </td>
+                      <td>{{ containerName }}</td>
+                      <td :style="{ color: dockers.find(d => d.Names && d.Names[0] === containerName)?.State === 'running' ? 'green':'red' }">
+                        {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.State || '-' }}
+                      </td>
+                      <td v-if="$vuetify.display.xlAndUp">
+                        {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.Image }}
+                      </td>
+                      <td v-if="$vuetify.display.smAndUp">
+                        {{
+                          dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports &&
+                          dockers.find(d => d.Names && d.Names[0] === containerName)?.Ports.some(p => p.PublicPort)
+                            ? dockers
+                                .find(d => d.Names && d.Names[0] === containerName)
+                                ?.Ports.filter(p => p.PublicPort)
+                                .filter((p,i,self)=> i === self.findIndex(x => x.PrivatePort === p.PrivatePort))
+                                .map(p => `${p.PublicPort}:${p.PrivatePort}`)
+                                .join(', ')
+                            : '-'
+                        }}
+                      </td>
+                      <td v-if="$vuetify.display.smAndUp">
+                        <template v-if="dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
+                          {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-' }}
                         </template>
-                        <template v-if="$vuetify.display.mdAndUp">
-                          <p style="min-width: 150px; max-width: 150px">
-                            {{ $t('ports') }}:
-                            {{
-                              docker.Ports && docker.Ports.some((port) => port.PublicPort)
-                                ? docker.Ports.filter((port) => port.PublicPort)
-                                    .filter((port, index, self) => index === self.findIndex((p) => p.PrivatePort === port.PrivatePort))
-                                    .map((port) => `${port.PublicPort}:${port.PrivatePort}`)
-                                    .join(', ')
-                                : '-'
-                            }}
-                          </p>
-                          <v-divider vertical class="mx-2" />
+                        <template v-else-if="dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
+                          {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-' }}
                         </template>
-                        <template v-if="$vuetify.display.mdAndUp && docker.HostConfig.NetworkMode === 'bridge'">
-                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}</p>
-                          <v-divider vertical class="mx-2" />
+                        <template v-else>
+                          {{
+                            Object.values(dockers.find(d => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-'
+                          }}
                         </template>
-                        <template v-else-if="$vuetify.display.mdAndUp && docker.HostConfig.NetworkMode === 'host'">
-                          <p style="min-width: 160px; max-width: 160px">{{ $t('ip address') }}: {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}</p>
-                          <v-divider vertical class="mx-2" />
+                      </td>
+                      <td v-if="$vuetify.display.smAndUp">
+                        <template v-if="!dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode.startsWith('container:')">
+                          {{ dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode }}
                         </template>
-                        <template v-else-if="$vuetify.display.mdAndUp">
-                          <p style="min-width: 160px; max-width: 160px">
-                            {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
-                            <span v-if="Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
-                              {{ $t('ip address') }}: {{ Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address }}
-                            </span>
-                          </p>
-                          <v-divider vertical class="mx-2" />
+                        <template v-else>
+                          {{ getContainerNameFromNetworkmode(dockers.find(d => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode) }}
                         </template>
-                        <template v-if="$vuetify.display.smAndUp && !docker.HostConfig.NetworkMode.startsWith('container:')">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ docker?.HostConfig.NetworkMode }}</p>
-                          <v-divider vertical class="mx-2" />
-                        </template>
-                        <template v-else-if="$vuetify.display.smAndUp && docker?.HostConfig.NetworkMode.startsWith('container:')">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: {{ getContainerNameFromNetworkmode(docker?.HostConfig.NetworkMode) }}</p>
-                          <v-divider vertical class="mx-2" />
-                        </template>
-                        <template v-else-if="$vuetify.display.smAndUp">
-                          <p style="min-width: 150px; max-width: 150px">{{ $t('network') }}: -</p>
-                          <v-divider vertical class="mx-2" />
-                        </template>
+                      </td>
+                      <td>
                         <v-icon
-                          v-if="mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)"
-                          tooltip="$t('update available')"
+                          v-if="mosDockers && mosDockers.find(item => item.name === containerName && item.update_available)"
                           color="green"
-                          @click="updateDocker(docker.Names[0])"
-                        >
-                          mdi-autorenew
+                          @click="updateDocker(containerName)"
+                        >mdi-autorenew</v-icon>
+                      </td>
+                      <td>
+                        <v-switch
+                          :model-value="dockers.find(d => d.Names && d.Names[0] === containerName)?.autostart ?? false"
+                          color="green"
+                          hide-details
+                          density="compact"
+                          @update:model-value="val => { const d = dockers.find(x => x.Names && x.Names[0] === containerName); if(d){ d.autostart = val; switchAutostart(d); } }"
+                        />
+                      </td>
+                      <td>
+                        <v-icon class="drag-handle" @click="openInfoDialog(dockers.find(d => d.Names && d.Names[0] === containerName))">
+                          mdi-information-outline
                         </v-icon>
-                        <v-icon v-else style="width: 21px; height: 21px"></v-icon>
-                        <v-divider vertical class="mx-2" />
-                        <v-switch v-model="docker.autostart" color="green" hide-details @change="switchAutostart(docker)" inset density="compact" />
-                        <v-divider vertical class="mx-2" />
-                        <v-icon class="drag-handle" @click="openInfoDialog(docker)">mdi-information-outline</v-icon>
-                      </template>
-                    </v-list-item>
-                  </div>
+                      </td>
+                      <td></td>
+                    </tr>
+                  </template>
                 </template>
               </draggable>
-            </v-list>
+
+              <!-- Ungrouped Docker Containers -->
+              <draggable
+                tag="tbody"
+                v-model="dockers"
+                item-key="Id"
+                handle=".drag-handle"
+                @end="onDragEnd"
+              >
+                <template #item="{ element: docker }">
+                  <tr
+                    v-if="!dockerGroups.some(g => g.containers && g.containers.includes(docker.Names?.[0]))"
+                    :id="docker.Id"
+                  >
+                    <td>
+                      <v-menu>
+                        <template #activator="{ props }">
+                          <v-img
+                            v-if="docker.Names && docker.Names.length"
+                            class="drag-handle"
+                            v-bind="props"
+                            :src="`/docker_icons/${docker.Names[0]}.png`"
+                            alt="docker image"
+                            width="30"
+                            height="30"
+                            style="cursor:pointer"
+                          >
+                            <template #error>
+                              <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
+                                <v-icon color="grey-darken-1">mdi-image-off</v-icon>
+                              </v-sheet>
+                            </template>
+                          </v-img>
+                        </template>
+                        <v-list>
+                          <v-list-item v-if="checkWebui(docker)" @click="showWebui(docker)">
+                            <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="docker.State === 'running'" @click="openTerminal(docker.Names[0])">
+                            <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="docker.State !== 'running'" @click="startDocker(docker.Names[0])">
+                            <v-list-item-title>{{ $t('start') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="docker.State === 'running'" @click="stopDocker(docker.Names[0])">
+                            <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="docker.State === 'running'" @click="restartDocker(docker.Names[0])">
+                            <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="docker.State === 'running'" @click="killDocker(docker.Names[0])">
+                            <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item :to="`/docker/change/${docker.Names[0]}`">
+                            <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-divider />
+                          <v-list-item @click="openTerminalLogs(docker.Names[0])">
+                            <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0])">
+                            <v-list-item-title>{{ $t('update') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-if="!mosDockers.find(item => item.name === docker.Names[0] && item.update_available)" @click="updateDocker(docker.Names[0], true)">
+                            <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="openDeleteDialog(docker)">
+                            <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </td>
+                    <td>{{ docker.Names[0] }}</td>
+                    <td :style="{ color: docker.State === 'running' ? 'green':'red' }">{{ docker.State }}</td>
+                    <td v-if="$vuetify.display.xlAndUp">{{ docker.Image }}</td>
+                    <td v-if="$vuetify.display.smAndUp">
+                      {{
+                        docker.Ports && docker.Ports.some(p => p.PublicPort)
+                          ? docker.Ports.filter(p => p.PublicPort)
+                              .filter((p,i,self)=> i === self.findIndex(x => x.PrivatePort === p.PrivatePort))
+                              .map(p => `${p.PublicPort}:${p.PrivatePort}`)
+                              .join(', ')
+                          : '-'
+                      }}
+                    </td>
+                    <td v-if="$vuetify.display.smAndUp">
+                      <template v-if="docker.HostConfig.NetworkMode === 'bridge'">
+                        {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}
+                      </template>
+                      <template v-else-if="docker.HostConfig.NetworkMode === 'host'">
+                        {{ docker.NetworkSettings.Networks.host.IPAddress || '-' }}
+                      </template>
+                      <template v-else>
+                        {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                      </template>
+                    </td>
+                    <td v-if="$vuetify.display.smAndUp">
+                      <template v-if="!docker.HostConfig.NetworkMode.startsWith('container:')">
+                        {{ docker.HostConfig.NetworkMode }}
+                      </template>
+                      <template v-else>
+                        {{ getContainerNameFromNetworkmode(docker.HostConfig.NetworkMode) }}
+                      </template>
+                    </td>
+                    <td>
+                      <v-icon
+                        v-if="mosDockers && mosDockers.find(item => item.name === docker.Names[0] && item.update_available)"
+                        color="green"
+                        @click="updateDocker(docker.Names[0])"
+                      >mdi-autorenew</v-icon>
+                    </td>
+                    <td>
+                      <v-switch
+                        v-model="docker.autostart"
+                        color="green"
+                        hide-details
+                        density="compact"
+                        @change="switchAutostart(docker)"
+                      />
+                    </td>
+                    <td>
+                      <v-icon class="drag-handle" @click="openInfoDialog(docker)">mdi-information-outline</v-icon>
+                    </td>
+                    <td></td>
+                  </tr>
+                </template>
+              </draggable>
+            </v-table>
           </v-card-text>
         </v-card>
       </v-container>
