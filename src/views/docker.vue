@@ -38,9 +38,10 @@
                       <v-list-item-title>{{ group.name }}</v-list-item-title>
                       <v-list-item-subtitle>{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</v-list-item-subtitle>
                     </v-list-item>
+                    <v-divider />
                     <v-expand-transition>
-                      <div v-if="group.expanded">
-                        <v-list class="bg-transparent">
+                      <div v-if="group.expanded" >
+                        <v-list class="bg-transparent pa-0">
                           <template v-for="(containerName, idx) in group.containers" :key="containerName">
                             <v-list-item :id="containerName">
                               <template v-slot:prepend>
