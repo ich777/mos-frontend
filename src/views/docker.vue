@@ -13,11 +13,11 @@
                 <tr>
                   <th style="width: 42px"></th>
                   <th>{{ $t('name') }}</th>
-                  <th v-if="$vuetify.display.xlAndUp">{{ $t('image') }}</th>
-                  <th v-if="$vuetify.display.smAndUp">{{ $t('ports') }}</th>
-                  <th v-if="$vuetify.display.smAndUp">{{ $t('ip address') }}</th>
-                  <th v-if="$vuetify.display.smAndUp">{{ $t('network') }}</th>
-                  <th style="width: 42px">{{ $t('update') }}</th>
+                  <th style="width: 250px">{{ $t('image') }}</th>
+                  <th style="width: 250px">{{ $t('ports') }}</th>
+                  <th>{{ $t('ip address') }}</th>
+                  <th>{{ $t('network') }}</th>
+                  <th style="width: 42px">{{ $t('state') }}</th>
                   <th style="width: 90px">{{ $t('autostart') }}</th>
                   <th style="width: 42px">{{ $t('info') }}</th>
                   <th style="width: 42px"></th>
@@ -45,24 +45,23 @@
                         </v-menu>
                       </td>
                       <td>
-                        <span>{{ group.name }}</span>
+                        <span style="font-size: 0.9rem;">{{ group.name }}</span>
                         <div class="text-caption">{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</div>
                       </td>
-                      <td>-</td>
-                      <td v-if="$vuetify.display.xlAndUp">-</td>
-                      <td v-if="$vuetify.display.smAndUp">-</td>
-                      <td v-if="$vuetify.display.smAndUp">-</td>
-                      <td v-if="$vuetify.display.smAndUp">-</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
                       <td>
                         <v-icon v-if="group.update_available" color="green" @click.stop="updateDockerGroupContainers && updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
                       </td>
-                      <td>-</td>
+                      <td>&nbsp;</td>
                       <td>
                         <v-btn icon density="compact" @click.stop="group.expanded = !group.expanded">
                           <v-icon>{{ group.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                         </v-btn>
                       </td>
-                      <td></td>
                     </tr>
 
                     <!-- Containers inside group -->
@@ -120,8 +119,8 @@
                         </v-menu>
                       </td>
                       <td>
-                        <div class="text-caption-2">{{ containerName }}</div>
-                        <div class="text-caption" :style="{ color: dockers.find((d) => d.Names && d.Names[0] === containerName)?.State === 'running' ? 'green' : '' }">
+                        <div style="font-size: 0.9rem;">{{ containerName }}</div>
+                        <div class="text-caption" :style="{ color: dockers.find((d) => d.Names && d.Names[0] === containerName)?.State === 'running' ? 'green' : 'red' }">
                           {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.State }}
                         </div>
                       </td>
@@ -137,18 +136,18 @@
                                 .filter((p, i, self) => i === self.findIndex((x) => x.PrivatePort === p.PrivatePort))
                                 .map((p) => `${p.PublicPort}:${p.PrivatePort}`)
                                 .join(', ')
-                            : '-'
+                            : 'none'
                         }}
                       </td>
                       <td v-if="$vuetify.display.smAndUp">
                         <template v-if="dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'bridge'">
-                          {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || '-' }}
+                          {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.bridge.IPAddress || 'none' }}
                         </template>
                         <template v-else-if="dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode === 'host'">
-                          {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || '-' }}
+                          {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks.host.IPAddress || 'none' }}
                         </template>
                         <template v-else>
-                          {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                          {{ Object.values(dockers.find((d) => d.Names && d.Names[0] === containerName)?.NetworkSettings.Networks)[0]?.IPAddress || 'none' }}
                         </template>
                       </td>
                       <td v-if="$vuetify.display.smAndUp">
@@ -160,9 +159,10 @@
                         </template>
                       </td>
                       <td>
-                        <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="green" @click="updateDocker(containerName)">
+                        <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="red" @click="updateDocker(containerName)">
                           mdi-autorenew
                         </v-icon>
+                        <v-icon v-else color="green">mdi-check</v-icon>
                       </td>
                       <td>
                         <v-switch
@@ -256,18 +256,18 @@
                       <div class="text-caption-2">{{ docker.Names[0] }}</div>
                       <div class="text-caption" :style="{ color: docker.State === 'running' ? 'green' : 'red' }">{{ docker.State }}</div>
                     </td>
-                    <td v-if="$vuetify.display.xlAndUp">{{ docker.Image }}</td>
-                    <td v-if="$vuetify.display.smAndUp">
+                    <td>{{ docker.Image }}</td>
+                    <td>
                       {{
                         docker.Ports && docker.Ports.some((p) => p.PublicPort)
                           ? docker.Ports.filter((p) => p.PublicPort)
                               .filter((p, i, self) => i === self.findIndex((x) => x.PrivatePort === p.PrivatePort))
                               .map((p) => `${p.PublicPort}:${p.PrivatePort}`)
                               .join(', ')
-                          : '-'
+                          : 'none'
                       }}
                     </td>
-                    <td v-if="$vuetify.display.smAndUp">
+                    <td>
                       <template v-if="docker.HostConfig.NetworkMode === 'bridge'">
                         {{ docker.NetworkSettings.Networks.bridge.IPAddress || '-' }}
                       </template>
@@ -281,7 +281,7 @@
                        </span>
                       </template>
                     </td>
-                    <td v-if="$vuetify.display.smAndUp">
+                    <td>
                       <template v-if="!docker.HostConfig.NetworkMode.startsWith('container:')">
                         {{ docker.HostConfig.NetworkMode }}
                       </template>
@@ -290,9 +290,10 @@
                       </template>
                     </td>
                     <td>
-                      <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" color="green" @click="updateDocker(docker.Names[0])">
+                      <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" color="red" @click="updateDocker(docker.Names[0])">
                         mdi-autorenew
                       </v-icon>
+                      <v-icon v-else color="green">mdi-check</v-icon>
                     </td>
                     <td>
                       <v-switch v-model="docker.autostart" color="green" hide-details density="compact" @change="switchAutostart(docker)" />
@@ -300,7 +301,6 @@
                     <td>
                       <v-icon class="drag-handle" @click="openInfoDialog(docker)" color="grey-darken-1">mdi-information-outline</v-icon>
                     </td>
-                    <td></td>
                   </tr>
                 </template>
               </draggable>
