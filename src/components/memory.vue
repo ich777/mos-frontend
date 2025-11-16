@@ -237,7 +237,7 @@ const getMemUsedPercentage = () => {
 }
 
 .memory-segment.lxc-used {
-    background: rgb(0, 148, 255);
+    background: rgb(255, 106, 0);;
 }
 
 .memory-segment.vms-used {
@@ -283,7 +283,7 @@ const getMemUsedPercentage = () => {
 }
 
 .legend-color.lxc-used {
-    background: rgb(0, 148, 255);
+    background: rgb(255, 106, 0);
 }
 
 .legend-color.vms-used {
