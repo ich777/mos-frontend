@@ -276,6 +276,9 @@
                       </template>
                       <template v-else>
                         {{ Object.values(docker.NetworkSettings.Networks)[0]?.IPAddress || '-' }}
+                       <span v-if="Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address">
+                        <br>{{ Object.values(docker.NetworkSettings.Networks)[0]?.GlobalIPv6Address }}
+                       </span>
                       </template>
                     </td>
                     <td v-if="$vuetify.display.smAndUp">
