@@ -105,16 +105,16 @@
                 </div>
                 <v-divider class="mb-2"></v-divider>
                 <div class="memory-bar-container">
-                    <div class="memory-segment actual-used"
+                    <div class="memory-segment system-used"
                          :style="{ width: (mem.breakdown?.system?.percentage || 0) + '%' }"
                          :title="`System: ${mem.breakdown?.system?.percentage || 0}%`"></div>
-                    <div class="memory-segment actual-used"
+                    <div class="memory-segment docker-used"
                          :style="{ width: (mem.breakdown?.docker?.percentage || 0) + '%' }"
                          :title="`Docker: ${mem.breakdown?.docker?.percentage || 0}%`"></div>
-                    <div class="memory-segment actual-used"
+                    <div class="memory-segment lxc-used"
                          :style="{ width: (mem.breakdown?.lxc?.percentage || 0) + '%' }"
                          :title="`LXC: ${mem.breakdown?.lxc?.percentage || 0}%`"></div>
-                    <div class="memory-segment actual-used"
+                    <div class="memory-segment vms-used"
                          :style="{ width: (mem.breakdown?.vms?.percentage || 0) + '%' }"
                          :title="`VMs: ${mem.breakdown?.vms?.percentage || 0}%`"></div>
                     <div class="memory-segment caches"
@@ -228,6 +228,22 @@ const getMemUsedPercentage = () => {
   background: rgb(255, 165, 0);
 }
 
+.memory-segment.system-used {
+    background: rgb(255, 165, 0);
+}
+
+.memory-segment.docker-used {
+    background: rgb(182, 255, 0);
+}
+
+.memory-segment.lxc-used {
+    background: rgb(0, 148, 255);
+}
+
+.memory-segment.vms-used {
+    background: rgb(114, 0, 255);
+}
+
 .memory-segment.caches {
   background: rgb(var(--v-theme-info));
 }
@@ -252,6 +268,10 @@ const getMemUsedPercentage = () => {
   width: 12px;
   height: 12px;
   border-radius: 2px;
+}
+
+.legend-color.actual-used {
+    background: rgb(255, 165, 0);
 }
 
 .legend-color.system-used {
