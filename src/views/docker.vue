@@ -63,7 +63,7 @@
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>
-                        <v-icon v-if="group.update_available" color="green" @click.stop="updateDockerGroupContainers && updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
+                        <v-icon v-if="group.update_available" color="red" @click.stop="updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
                       </td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
@@ -1358,6 +1358,32 @@ const restartDockerGroupContainers = async (group) => {
   } finally {
     overlay.value = false;
   }
+};
+
+const updateDockerGroupContainers = async (group) => {
+  /* TODO
+  
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(group.id)}/upgrade`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('all containers in group could not be updated')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('all containers in group updated successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }*/
 };
 
 const getUnusedImages = async () => {
