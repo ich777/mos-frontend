@@ -41,6 +41,16 @@
                             <v-list-item @click.stop="openDeleteGroupDialog(group)">
                               <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
                             </v-list-item>
+                            <v-divider />
+                            <v-list-item @click.stop="startDockerGroupContainers(group)">
+                              <v-list-item-title>{{ $t('start all') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click.stop="stopDockerGroupContainers(group)">
+                              <v-list-item-title>{{ $t('stop all') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click.stop="restartDockerGroupContainers(group)">
+                              <v-list-item-title>{{ $t('restart all') }}</v-list-item-title>
+                            </v-list-item>
                           </v-list>
                         </v-menu>
                       </td>
@@ -52,10 +62,10 @@
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
-                      <td>&nbsp;</td>
                       <td>
                         <v-icon v-if="group.update_available" color="green" @click.stop="updateDockerGroupContainers && updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
                       </td>
+                      <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>
                         <v-btn icon density="compact" @click.stop="group.expanded = !group.expanded">
@@ -1270,6 +1280,78 @@ const updateDockerGroup = async () => {
     showSnackbarSuccess(t('docker group updated successfully'));
     getDockerGroups();
     clearChangeGroupDialog();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const startDockerGroupContainers = async (group) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(group.id)}/start`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('all containers in group could not be started')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('all containers in group started successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const stopDockerGroupContainers = async (group) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(group.id)}/stop`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('all containers in group could not be stopped')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('all containers in group stopped successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const restartDockerGroupContainers = async (group) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(group.id)}/restart`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('all containers in group could not be restarted')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('all containers in group restarted successfully'));
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);

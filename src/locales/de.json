@@ -549,7 +549,7 @@
   "script stopped successfully": "Skript erfolgreich gestoppt",
   "start script": "Skript starten",
   "stop script": "Skript stoppen",
-  "start wait": "Start-Wartezeit",
+  "start wait": "Start Wartezeit",
   "update check": "Update Prüfung",
   "update check interval": "Update Prüfintervall",
   "interval": "Intervall",
@@ -672,5 +672,15 @@
   "post parameters": "Post Parameter",
   "docker command is already running": "Docker Befehl läuft bereits",
   "docker command error occurred": "Fehler beim Docker Befehl aufgetreten",
-  "docker command completed successfully": "Docker Befehl erfolgreich abgeschlossen"
+  "docker command completed successfully": "Docker Befehl erfolgreich abgeschlossen",
+  "info": "Info",
+  "all containers in group could not be started": "Alle Container in der Gruppe konnten nicht gestartet werden",
+  "all containers in group started successfully": "Alle Container in der Gruppe erfolgreich gestartet",
+  "all containers in group could not be stopped": "Alle Container in der Gruppe konnten nicht gestoppt werden",
+  "all containers in group stopped successfully": "Alle Container in der Gruppe erfolgreich gestoppt",
+  "all containers in group could not be restarted": "Alle Container in der Gruppe konnten nicht neu gestartet werden",
+  "all containers in group restarted successfully": "Alle Container in der Gruppe erfolgreich neu gestartet",
+  "start all": "Alle starten",
+  "stop all": "Alle stoppen",
+  "restart all": "Alle neu starten"
 }

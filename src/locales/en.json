@@ -549,6 +549,7 @@
   "script stopped successfully": "Script stopped successfully",
   "start script": "Start script",
   "stop script": "Stop script",
+  "start wait": "Start wait",
   "update check": "Update check",
   "update check interval": "Update check interval",
   "interval": "Interval",
@@ -666,5 +667,14 @@
   "kernel update initiated successfully": "Kernel update initiated successfully",
   "kernel rollback could not be initiated": "Kernel Rollback could not be initiated",
   "kernel rollback initiated successfully": "Kernel Rollback initiated successfully",
-  "post parameters": "Post Parameters"
+  "are you sure you want to rollback to the previous kernel version?": "Are you sure you want to rollback to the previous kernel version?",  
+  "rollback kernel": "Rollback Kernel",
+  "post parameters": "Post Parameters",
+  "docker command is already running": "Docker command is already running",
+  "docker command error occurred": "Docker command error occurred",
+  "docker command completed successfully": "Docker command completed successfully",  
+  "info": "Info",
+  "start all": "Start All",
+  "stop all": "Stop All",
+  "restart all": "Restart All"
 }
