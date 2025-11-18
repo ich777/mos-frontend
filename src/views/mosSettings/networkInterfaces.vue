@@ -269,7 +269,7 @@ const changeEthernetIPv6Enabled = (enabled) => {
       });
     }
   } else {
-    bridge.ipv6 = [];
+    eth0.ipv6 = [];
   }
 };
 
