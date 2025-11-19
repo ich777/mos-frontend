@@ -375,10 +375,7 @@ const allTemplatesMixed = ref([]);
 const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
   onErrorSnackbar: showSnackbarError,
   onSuccessSnackbar: showSnackbarSuccess,
-  onCompleted: async () => {
-    await getDockers();
-    await getDockerGroups();
-  }
+  onCompleted: async () => {}
 });
 
 onMounted(() => {

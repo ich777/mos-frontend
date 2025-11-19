@@ -353,10 +353,7 @@ import { useDockerWebSocket } from '@/composables/useDockerWebSocket';
 const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
   onErrorSnackbar: showSnackbarError,
   onSuccessSnackbar: showSnackbarSuccess,
-  onCompleted: async () => {
-    await getDockers();
-    await getDockerGroups();
-  }
+  onCompleted: async () => {}
 });
 
 const router = useRouter();

@@ -13,8 +13,12 @@
                 <tr>
                   <th style="width: 42px"></th>
                   <th>{{ $t('name') }}</th>
-                  <th style="width: 250px">{{ $t('image') }}</th>
-                  <th style="width: 250px">{{ $t('ports') }}</th>
+                  <th style="width:250px; max-width:250px;">
+                    <div style="max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                      {{ $t('image') }}
+                    </div>
+                  </th>
+                  <th style="width: 250px;">{{ $t('ports') }}</th>
                   <th>{{ $t('ip address') }}</th>
                   <th>{{ $t('network') }}</th>
                   <th style="width: 42px">{{ $t('state') }}</th>
@@ -84,7 +88,7 @@
                             </div>
                             <div class="text-caption">{{ group.runningCount }}/{{ group.count }} {{ $t('started') }}</div>
                           </div>
-                          <v-chip v-if="group.compose" size="small">{{ $t('composed') }}</v-chip>
+                          <v-chip v-if="group.compose" size="small">{{ $t('compose') }}</v-chip>
                         </div>
                       </td>
                       <td>&nbsp;</td>
@@ -1527,6 +1531,7 @@ const stopComposeStack = async (name) => {
 };
 
 const removeComposeStack = async (name) => {
+  closeRemoveComposeStackDialog();
   sendDockerWSCommand('compose-delete', { name: name });
 };
 

@@ -715,5 +715,6 @@
   "edit stack": "Edit Stack",
   "docker compose could not be updated": "Docker Compose could not be updated",
   "docker compose updated successfully": "Docker Compose updated successfully",
-  "edit docker compose stack": "Edit Docker Compose Stack"
+  "edit docker compose stack": "Edit Docker Compose Stack",
+  "compose": "Compose"
 }
