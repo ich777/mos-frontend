@@ -12,11 +12,9 @@
         </div>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-row>
-          <v-col>
-            <v-card v-if="notifications.length > 0"   fluid>
+            <v-card v-if="notifications.length > 0" style="margin-bottom: 80px" class="pa-0">
               <v-card-text class="pa-0">
-                <v-list>
+                <v-list class="pa-0" style="background-color: transparent;">
                     <v-list-item v-for="(notification, index) in notifications" :key="notification.id"
                     @click="openNotificationDialog(notification)">
                     <template v-slot:prepend>
@@ -50,8 +48,6 @@
                 </v-list>
               </v-card-text>
             </v-card>
-          </v-col>
-        </v-row>
       </v-container>
     </v-container>
   </v-container>
