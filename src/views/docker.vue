@@ -36,15 +36,24 @@
                             <v-icon v-else class="drag-handle" style="cursor: grab" v-bind="props" color="grey-darken-1">mdi-folder</v-icon>
                           </template>
                           <v-list v-if="group.compose">
-                            <v-list-item @click="startStack(group.name)">
+                            <v-list-item @click="startComposeStack(group.name)">
                               <v-list-item-title>{{ $t('start stack') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item @click="stopStack(group.name)">
+                            <v-list-item @click="stopComposeStack(group.name)">
                               <v-list-item-title>{{ $t('stop stack') }}</v-list-item-title>
                             </v-list-item>
+                            <v-list-item @click="restartComposeStack(group.name)">
+                              <v-list-item-title>{{ $t('restart stack') }}</v-list-item-title>
+                            </v-list-item>
                             <v-divider />
-                            <v-list-item @click="openDockerComposeRemoveDialog(group.name)">
+                            <v-list-item @click="openEditComposeStackDialog(group.name)">
+                              <v-list-item-title>{{ $t('edit stack') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="openRemoveComposeStackDialog(group.name)">
                               <v-list-item-title>{{ $t('remove stack') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="pullImagesForComposeStack(group.name)">
+                              <v-list-item-title>{{ $t('pull stack images') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                           <v-list v-else>
@@ -568,35 +577,54 @@
   </v-dialog>
 
   <!-- Docker Compose Dialog -->
-  <v-dialog v-model="dockerComposeDialog.value" max-width="800">
+  <v-dialog v-model="createComposeStackDialog.value" max-width="800">
     <v-card>
       <v-card-title class="text-h6">{{ $t('docker compose') }}</v-card-title>
       <v-card-text>
-        <v-text-field v-model="dockerComposeDialog.name" :label="$t('stack name')" required></v-text-field>
-        <v-textarea v-model="dockerComposeDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
-        <v-textarea v-model="dockerComposeDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
-        <v-text-field v-model="dockerComposeDialog.icon" :label="$t('icon url')"></v-text-field>
+        <v-text-field v-model="createComposeStackDialog.name" :label="$t('stack name')" required></v-text-field>
+        <v-textarea v-model="createComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
+        <v-textarea v-model="createComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
+        <v-text-field v-model="createComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="onPrimary" @click="dockerComposeDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn color="onPrimary" @click="createDockerCompose()">
+        <v-btn color="onPrimary" @click="createComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="createComposeStack()">
           {{ $t('create') }}
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <!--Docker Compose Remove Dialog -->
-  <v-dialog v-model="dockerComposeRemoveDialog.value" max-width="500" persistent>
+  <!--Docker Compose Edit Dialog -->
+  <v-dialog v-model="editComposeStackDialog.value" max-width="800">
     <v-card>
-      <v-card-title class="text-h6">{{ $t('remove docker compose stack') }} - {{ dockerComposeRemoveDialog.name }}</v-card-title>
+      <v-card-title class="text-h6">{{ $t('edit docker compose stack') }} - {{ editComposeStackDialog.name }}</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="editComposeStackDialog.name" :label="$t('stack name')" readonly></v-text-field>
+        <v-textarea v-model="editComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
+        <v-textarea v-model="editComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
+        <v-text-field v-model="editComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="onPrimary" @click="editComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="editComposeStack()">
+          {{ $t('save') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!--Docker Compose Remove Dialog -->
+  <v-dialog v-model="removeComposeStackDialog.value" max-width="500" persistent>
+    <v-card>
+      <v-card-title class="text-h6">{{ $t('remove docker compose stack') }} - {{ removeComposeStackDialog.name }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to remove this docker compose stack? all containers in this stack will be removed.') }}
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="onPrimary" @click="dockerComposeRemoveDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn color="red" @click="removeStack(dockerComposeRemoveDialog.name)">
+        <v-btn color="onPrimary" @click="removeComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="red" @click="removeComposeStack(removeComposeStackDialog.name)">
           {{ $t('remove') }}
         </v-btn>
       </v-card-actions>
@@ -617,7 +645,7 @@
         </template>
         <v-list-item-title>{{ $t('add container') }}</v-list-item-title>
       </v-list-item>
-      <v-list-item @click="openDockerComposeDialog()">
+      <v-list-item @click="openCreateComposeStackDialog()">
         <template v-slot:prepend>
           <v-icon>mdi-toy-brick-plus</v-icon>
         </template>
@@ -707,14 +735,21 @@ const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDocker
     await getDockerGroups();
   },
 });
-const dockerComposeDialog = reactive({
+const createComposeStackDialog = reactive({
   value: false,
   name: '',
   yaml: '',
   env: '',
   icon: '',
 });
-const dockerComposeRemoveDialog = reactive({
+const editComposeStackDialog = reactive({
+  value: false,
+  name: '',
+  yaml: '',
+  env: '',
+  icon: '',
+});
+const removeComposeStackDialog = reactive({
   value: false,
   name: '',
 });
@@ -952,95 +987,14 @@ const removeDocker = async (name) => {
 const updateDocker = async (name, force_update = false) => {
   const updateBody = force_update ? { name: name, force_update: true } : { name: name };
   sendDockerWSCommand('upgrade', updateBody);
-
-  /*
-  const updateBody = force_update ? { name: name, force_update: true } : { name: name };
-  try {
-    overlay.value = true;
-    const res = await fetch(`/api/v1/docker/mos/upgrade`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateBody),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('docker container could not be updated')}|$| ${error.error || t('unknown error')}`);
-    }
-    showSnackbarSuccess(t('docker container updated successfully'));
-    getDockers();
-    getDockerGroups();
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  } finally {
-    overlay.value = false;
-  }*/
 };
 
 const checkForUpdates = async () => {
   sendDockerWSCommand('check-updates');
-
-  /*try {
-    showSnackbarSuccess(t('update check started'));
-
-    const res = await fetch('/api/v1/docker/mos/update_check', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('update check could not be performed')}|$| ${error.error || t('unknown error')}`);
-    }
-
-    showSnackbarSuccess(t('update check finished'));
-    getDockers();
-    getDockerGroups();
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  } finally {
-    overlay.value = false;
-  }*/
 };
 
 const updateAll = async () => {
   sendDockerWSCommand('upgrade');
-
-  /*
-  try {
-    showSnackbarSuccess(t('update started'));
-
-    overlay.value = true;
-    const res = await fetch(`/api/v1/docker/mos/upgrade`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('docker containers could not be updated')}|$| ${error.error || t('unknown error')}`);
-    }
-
-    showSnackbarSuccess(t('docker containers updated successfully'));
-    getDockers();
-    getDockerGroups();
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  } finally {
-    overlay.value = false;
-  }*/
 };
 
 const switchAutostart = async (docker) => {
@@ -1458,28 +1412,6 @@ const restartDockerGroupContainers = async (group) => {
 const updateDockerGroupContainers = async (group, force_update = false) => {
   const updateBody = { groupId: group.id, force_update: force_update };
   sendDockerWSCommand('upgrade-group', updateBody);
-  /*
-  try {
-    overlay.value = true;
-    const res = await fetch(`/api/v1/docker/mos/groups/${encodeURIComponent(group.id)}/upgrade`, {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      },
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('all containers in group could not be updated')}|$| ${error.error || t('unknown error')}`);
-    }
-    getDockers();
-    getDockerGroups();
-    showSnackbarSuccess(t('all containers in group updated successfully'));
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  } finally {
-    overlay.value = false;
-  }*/
 };
 
 const getUnusedImages = async () => {
@@ -1535,12 +1467,12 @@ const removeUnusedImage = async (imageId) => {
   }
 };
 
-const createDockerCompose = async () => {
+const createComposeStack = async () => {
   const newCompose = {
-    name: dockerComposeDialog.name.trim(),
-    yaml: dockerComposeDialog.yaml,
-    env: dockerComposeDialog.env,
-    icon: dockerComposeDialog.icon,
+    name: createComposeStackDialog.name.trim(),
+    yaml: createComposeStackDialog.yaml,
+    env: createComposeStackDialog.env,
+    icon: createComposeStackDialog.icon,
   };
 
   try {
@@ -1562,7 +1494,7 @@ const createDockerCompose = async () => {
     showSnackbarSuccess(t('docker compose created successfully'));
     getDockers();
     getDockerGroups();
-    dockerComposeDialog.value = false;
+    createComposeStackDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -1571,7 +1503,7 @@ const createDockerCompose = async () => {
   }
 };
 
-const startStack = async (name) => {
+const startComposeStack = async (name) => {
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}/start`, {
@@ -1595,7 +1527,7 @@ const startStack = async (name) => {
   }
 };
 
-const stopStack = async (name) => {
+const stopComposeStack = async (name) => {
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}/stop`, {
@@ -1619,7 +1551,7 @@ const stopStack = async (name) => {
   }
 };
 
-const removeStack = async (name) => {
+const removeComposeStack = async (name) => {
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}`, {
@@ -1632,7 +1564,7 @@ const removeStack = async (name) => {
       const error = await res.json();
       throw new Error(`${t('docker compose stack could not be removed')}|$| ${error.error || t('unknown error')}`);
     }
-    closeDockerComposeRemoveDialog();
+    closeRemoveComposeStackDialog();
     getDockers();
     getDockerGroups();
     showSnackbarSuccess(t('docker compose stack removed successfully'));
@@ -1641,6 +1573,115 @@ const removeStack = async (name) => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
+  }
+};
+
+const restartComposeStack = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}/restart`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('docker compose stack could not be restarted')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('docker compose stack restarted successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const pullImagesForComposeStack = async (name) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}/pull`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('docker compose stack images could not be pulled')}|$| ${error.error || t('unknown error')}`);
+    }
+    getDockers();
+    getDockerGroups();
+    showSnackbarSuccess(t('docker compose stack images pulled successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const editComposeStack = async () => {
+  if (!editComposeStackDialog.name || editComposeStackDialog.name.trim() === '') {
+    showSnackbarError(t('compose name is required'));
+    return;
+  }
+
+  const updatedCompose = {
+    yaml: editComposeStackDialog.yaml,
+    env: editComposeStackDialog.env,
+    icon: editComposeStackDialog.icon,
+  };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(editComposeStackDialog.name)}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedCompose),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('docker compose could not be updated')}|$| ${error.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('docker compose updated successfully'));
+    getDockers();
+    getDockerGroups();
+    editComposeStackDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const getComposeStack = async (name) => {
+  try {
+    const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(name)}`, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('docker compose stack could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+    const result = await res.json();
+    return result;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+    return null;
   }
 };
 
@@ -1705,19 +1746,27 @@ const openUnusedImagesDialog = async () => {
   await getUnusedImages();
   unusedImagesDialog.value = true;
 };
-const openDockerComposeDialog = () => {
-  dockerComposeDialog.value = true;
-  dockerComposeDialog.name = '';
-  dockerComposeDialog.yaml = '';
-  dockerComposeDialog.env = '';
-  dockerComposeDialog.icon = '';
+const openCreateComposeStackDialog = () => {
+  createComposeStackDialog.value = true;
+  createComposeStackDialog.name = '';
+  createComposeStackDialog.yaml = '';
+  createComposeStackDialog.env = '';
+  createComposeStackDialog.icon = '';
 };
-const openDockerComposeRemoveDialog = (name) => {
-  dockerComposeRemoveDialog.value = true;
-  dockerComposeRemoveDialog.name = name;
+const openRemoveComposeStackDialog = (name) => {
+  removeComposeStackDialog.value = true;
+  removeComposeStackDialog.name = name;
 };
-const closeDockerComposeRemoveDialog = () => {
-  dockerComposeRemoveDialog.value = false;
-  dockerComposeRemoveDialog.name = '';
+const closeRemoveComposeStackDialog = () => {
+  removeComposeStackDialog.value = false;
+  removeComposeStackDialog.name = '';
+};
+const openEditComposeStackDialog = async (name) => {
+  let stack = await getComposeStack(name);
+  editComposeStackDialog.value = true;
+  editComposeStackDialog.name = stack.name;
+  editComposeStackDialog.yaml = stack.yaml;
+  editComposeStackDialog.env = stack.env;
+  editComposeStackDialog.icon = stack.icon;
 };
 </script>

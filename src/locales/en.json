@@ -704,6 +704,16 @@
   "start stack": "Stack starten",
   "stop stack": "Stack stoppen",
   "remove stack": "Stack entfernen",
+  "restart stack": "Restart Stack",
   "are you sure you want to remove this docker compose stack? all containers in this stack will be removed.": "Are you sure you want to remove this Docker Compose stack? All containers in this stack will be removed.",
-  "remove docker compose stack": "Remove Docker Compose Stack"
+  "remove docker compose stack": "Remove Docker Compose Stack",
+  "docker compose stack could not be restarted": "Docker Compose Stack could not be restarted",
+  "docker compose stack restarted successfully": "Docker Compose Stack restarted successfully",
+  "docker compose stack images could not be pulled": "Docker Compose Stack images could not be pulled",
+  "docker compose stack images pulled successfully": "Docker Compose Stack images pulled successfully",
+  "pull stack images": "Pull Stack Images",
+  "edit stack": "Edit Stack",
+  "docker compose could not be updated": "Docker Compose could not be updated",
+  "docker compose updated successfully": "Docker Compose updated successfully",
+  "edit docker compose stack": "Edit Docker Compose Stack"
 }
