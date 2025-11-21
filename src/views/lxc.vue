@@ -5,7 +5,8 @@
         <h2>{{ $t('lxc containers') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid style="margin-bottom: 80px" class="pa-0">
+        <v-skeleton-loader v-if="lxcsLoading" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
+        <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list>
               <draggable v-model="lxcs" item-key="Id" @end="onDragEnd" handle=".drag-handle">
@@ -140,6 +141,7 @@ const deleteDialog = reactive({
   value: false,
   lxc: null,
 });
+const lxcsLoading = ref(true);
 
 onMounted(() => {
   getLXCs();
@@ -194,6 +196,8 @@ const getLXCs = async () => {
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    lxcsLoading.value = false;
   }
 };
 

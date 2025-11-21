@@ -95,6 +95,7 @@
                       <td>&nbsp;</td>
                       <td>
                         <v-icon v-if="group.update_available" color="red" @click.stop="updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
+                        <v-icon v-else color="green">mdi-check</v-icon>
                       </td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
@@ -130,13 +131,13 @@
                             <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'running'" @click="startDocker(containerName)">
                               <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="stopDocker(containerName)">
+                            <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'restarting'" @click="stopDocker(containerName)">
                               <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="restartDocker(containerName)">
                               <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="killDocker(containerName)">
+                            <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'restarting'" @click="killDocker(containerName)">
                               <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item :to="`/docker/change/${containerName}`">

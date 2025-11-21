@@ -235,7 +235,7 @@
       <v-card-title>{{ $t('create pool') }}</v-card-title>
       <v-card-text>
         <v-form>
-          <v-select v-model="createPoolDialog.type" :items="['single', 'mergerfs', 'multi']" :label="$t('type')" dense @update:model-value="switchPoolType()" />
+          <v-select v-model="createPoolDialog.type" :items="poolTypes" :label="$t('type')" dense @update:model-value="switchPoolType()" />
           <v-text-field v-model="createPoolDialog.name" :label="$t('name')" />
           <v-select
             v-model="createPoolDialog.devices"
@@ -252,7 +252,8 @@
             dense
             multiple="true"
           />
-          <v-select v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel" :items="['raid0', 'raid1', 'raid5']" :label="$t('raid level')" dense />
+          <v-select v-if="createPoolDialog.type === 'nonraid'" v-model="createPoolDialog.parity" :items="parityOptions" :label="$t('parity')" dense />
+          <v-select v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel" :items="raidLevels" :label="$t('raid level')" dense />
           <v-select v-model="createPoolDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.comment" :label="$t('comment')" />
           <div v-if="createPoolDialog.type === 'mergerfs'">
@@ -307,7 +308,13 @@
       <v-card-text>
         <p class="mb-4">{{ $t('select devices to add to pool') }}</p>
         <v-form>
-          <v-select v-model="addMergerfsDevicesDialog.devices" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('devices')" :multiple="true" dense />
+          <v-select
+            v-model="addMergerfsDevicesDialog.devices"
+            :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []"
+            :label="$t('devices')"
+            :multiple="true"
+            dense
+          />
           <v-switch v-model="addMergerfsDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="onPrimary" inset />
         </v-form>
       </v-card-text>
@@ -501,6 +508,8 @@ const unassignedDisksLoading = ref(true);
 const overlay = ref(false);
 const { t } = useI18n();
 const filesystems = ref([]);
+const poolTypes = ['single', 'mergerfs', 'multi', 'nonraid'];
+const raidLevels = ['raid0', 'raid1', 'raid5'];
 const formatDialog = reactive({
   value: false,
   disk: null,
@@ -525,6 +534,13 @@ const createPoolDialog = reactive({
   create_keyfile: false,
   passphrase: '',
   showAdvanced: false,
+  parity: [],
+  parity_valid: false,
+  policies: {
+    create: 'epmfs',
+    read: 'ff',
+    search: 'ff',
+  },
 });
 const deletePoolDialog = reactive({
   value: false,
@@ -767,6 +783,8 @@ const createPool = async () => {
     createPoolMergerfs();
   } else if (createPoolDialog.type === 'multi') {
     createPoolMulti();
+  } else if (createPoolDialog.type === 'nonraid') {
+    createPoolNonRaid();
   }
 };
 
@@ -792,6 +810,53 @@ const createPoolMergerfs = async () => {
 
   try {
     const res = await fetch(`/api/v1/pools/mergerfs`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(createPoolData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('pool could not be created')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('pool created successfully'));
+
+    clearCreatePoolDialog();
+    getPools();
+    getUnassignedDisks();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const createPoolNonRaid = async () => {
+  const createPoolData = {
+    name: createPoolDialog.name,
+    devices: createPoolDialog.devices,
+    filesystem: createPoolDialog.filesystem,
+    format: createPoolDialog.format,
+    parity: createPoolDialog.parity,
+    options: {
+      automount: createPoolDialog.automount,
+      comment: createPoolDialog.comment,
+      policies: createPoolDialog.policies,
+    },
+    config: {
+      encrypted: createPoolDialog.encrypted,
+      create_keyfile: createPoolDialog.encrypted ? createPoolDialog.create_keyfile : false,
+    },
+    passphrase: createPoolDialog.encrypted ? createPoolDialog.passphrase : null,
+  };
+  overlay.value = true;
+
+  try {
+    const res = await fetch(`/api/v1/pools/nonraid`, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
@@ -1115,6 +1180,15 @@ const switchPoolType = () => {
     createPoolDialog.filesystem = 'xfs';
   } else {
     createPoolDialog.filesystem = 'btrfs';
+  }
+  if (createPoolDialog.type === 'nonraid') {
+    createPoolDialog.filesystem = 'xfs';
+    if (pools.value.some((p) => p.type === 'nonraid')) {
+      showSnackbarError(t('only one nonraid pool allowed'), t('you can only create one nonraid pool per system'));
+      createPoolDialog.type = 'single';
+      createPoolDialog.filesystem = 'xfs';
+      return;
+    }
   }
 };
 

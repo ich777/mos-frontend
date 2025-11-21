@@ -716,5 +716,8 @@
   "docker compose could not be updated": "Docker Compose could not be updated",
   "docker compose updated successfully": "Docker Compose updated successfully",
   "edit docker compose stack": "Edit Docker Compose Stack",
-  "compose": "Compose"
+  "compose": "Compose",
+  "only one nonraid pool allowed": "Only one non-raid pool allowed",
+  "you can only create one nonraid pool per system": "You can only create one non-raid pool per system",
+  "parity": "Parity"
 }

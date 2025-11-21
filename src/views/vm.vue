@@ -5,7 +5,8 @@
         <h2>{{ $t('vm') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid style="margin-bottom: 80px" class="pa-0">
+        <v-skeleton-loader v-if="vmsloading" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
+        <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list class="bg-transparent">
             <draggable v-model="vms" item-key="Id">
@@ -63,19 +64,20 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
+import draggable from 'vuedraggable';
+import { useI18n } from 'vue-i18n';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const vms = ref([]);
 const overlay = ref(false);
-import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
-import draggable from 'vuedraggable';
+const vmsloading = ref(true);
 
 onMounted(() => {
-  fetchVMs();
+  getVMs();
 });
 
-const fetchVMs = async () => {
+const getVMs = async () => {
   try {
     const res = await fetch('/api/v1/vm/machines', {
       headers: {
@@ -87,6 +89,8 @@ const fetchVMs = async () => {
     vms.value = await res.json();
   } catch (e) {
     showSnackbarError(t('Could not fetch VMs'));
+  } finally {
+    vmsloading.value = false;
   }
 };
 
@@ -106,7 +110,7 @@ const stopVM = async (name) => {
     }
 
     showSnackbarSuccess(t('VM shutdown initiated'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -131,7 +135,7 @@ const startVM = async (name) => {
     }
 
     showSnackbarSuccess(t('VM started successfully'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -156,7 +160,7 @@ const killVM = async (name) => {
     }
 
     showSnackbarSuccess(t('VM killed successfully'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -181,7 +185,7 @@ const resetVM = async (name) => {
     }
 
     showSnackbarSuccess(t('VM reset successfully'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -206,7 +210,7 @@ const restartVM = async (name) => {
     }
 
     showSnackbarSuccess(t('VM restarted successfully'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -235,7 +239,7 @@ const switchAutostart = async (vm) => {
     }
 
     showSnackbarSuccess(t('autostart setting updated'));
-    fetchVMs();
+    getVMs();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
