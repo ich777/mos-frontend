@@ -252,7 +252,7 @@
             dense
             multiple="true"
           />
-          <v-select v-if="createPoolDialog.type === 'nonraid'" v-model="createPoolDialog.parity" :items="parityOptions" :label="$t('parity')" dense />
+          <v-select v-if="createPoolDialog.type === 'nonraid'" v-model="createPoolDialog.parity" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('parity')" dense />
           <v-select v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel" :items="raidLevels" :label="$t('raid level')" dense />
           <v-select v-model="createPoolDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.comment" :label="$t('comment')" />
@@ -527,7 +527,7 @@ const createPoolDialog = reactive({
   format: false,
   automount: true,
   comment: '',
-  mergerfsOptions: 'defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs',
+  mergerfsOptions: '',
   snapraidDevice: [],
   raidLevel: '',
   encrypted: false,
@@ -650,7 +650,7 @@ const openCreatePoolDialog = (disk) => {
   createPoolDialog.format = false;
   createPoolDialog.automount = true;
   createPoolDialog.comment = '';
-  createPoolDialog.mergerfsOptions = 'defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs';
+  createPoolDialog.mergerfsOptions = '';
   createPoolDialog.snapraidDevice = [];
   createPoolDialog.encrypted = false;
   createPoolDialog.passphrase = '';
@@ -1382,7 +1382,7 @@ const clearCreatePoolDialog = () => {
   createPoolDialog.automount = true;
   createPoolDialog.raidLevel = '';
   createPoolDialog.comment = '';
-  createPoolDialog.mergerfsOptions = 'defaults,allow_other,use_ino,cache.files=partial,dropcacheonclose=true,category.create=mfs';
+  createPoolDialog.mergerfsOptions = '';
   createPoolDialog.snapraidDevice = [];
   createPoolDialog.format = false;
   createPoolDialog.encrypted = false;
