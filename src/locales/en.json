@@ -719,5 +719,11 @@
   "compose": "Compose",
   "only one nonraid pool allowed": "Only one non-raid pool allowed",
   "you can only create one nonraid pool per system": "You can only create one non-raid pool per system",
-  "parity": "Parity"
+  "parity": "Parity",
+  "boot settings": "Boot Settings",
+  "disk": "Disk",
+  "install to disk": "Install to Disk",
+  "boot": "Boot",
+  "transfer usb data to disk device": "Transfer USB data to disk device",
+  "installation successfully, please make sure to reboot the system from the installed disk": "Installation successful, please make sure to reboot the system from the installed disk"
 }

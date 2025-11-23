@@ -7,7 +7,7 @@
       <v-container class="pa-0" fluid>
         <v-row>
           <!-- Power Management Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-power</v-icon>
@@ -27,7 +27,7 @@
           </v-col>
 
           <!-- System Updates Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-update</v-icon>
@@ -51,7 +51,7 @@
           </v-col>
 
           <!-- System Configuration Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-cog</v-icon>
@@ -66,16 +66,20 @@
                   <v-icon start>mdi-clock-outline</v-icon>
                   {{ $t('cron jobs') }}
                 </v-btn>
-                <v-btn color="primary" block rounded to="/mosSettings/logs">
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/logs">
                   <v-icon start>mdi-text-box-outline</v-icon>
                   {{ $t('logs') }}
+                </v-btn>
+                <v-btn color="primary" block rounded to="/mosSettings/boot">
+                  <v-icon start>mdi-usb-flash-drive</v-icon>
+                  {{ $t('boot') }}
                 </v-btn>
               </v-card-text>
             </v-card>
           </v-col>
 
           <!-- Virtualization Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-server</v-icon>
@@ -99,7 +103,7 @@
           </v-col>
 
           <!-- Network Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-network</v-icon>
@@ -119,7 +123,7 @@
           </v-col>
 
           <!-- Hardware Card -->
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-chip</v-icon>
@@ -134,7 +138,7 @@
             </v-card>
           </v-col>
 
-          <v-col cols="12" md="6" lg="4" class="pb-0">
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
                 <v-icon color="primary" class="mr-2">mdi-star-face</v-icon>

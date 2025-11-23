@@ -13,13 +13,13 @@
                 <tr>
                   <th style="width: 42px"></th>
                   <th style="min-width: 250px">{{ $t('name') }}</th>
+                  <th style="width: 42px">{{ $t('state') }}</th>
                   <th style="min-width: 150px">
                     {{ $t('image') }}
                   </th>
                   <th style="width: 250px">{{ $t('ports') }}</th>
                   <th>{{ $t('ip address') }}</th>
                   <th>{{ $t('network') }}</th>
-                  <th style="width: 42px">{{ $t('state') }}</th>
                   <th style="width: 90px">{{ $t('autostart') }}</th>
                   <th style="width: 42px">{{ $t('info') }}</th>
                   <th style="width: 42px"></th>
@@ -90,14 +90,14 @@
                           <v-chip v-if="group.compose" size="small">{{ $t('compose') }}</v-chip>
                         </div>
                       </td>
-                      <td>&nbsp;</td>
-                      <td>&nbsp;</td>
-                      <td>&nbsp;</td>
-                      <td>&nbsp;</td>
                       <td>
                         <v-icon v-if="group.update_available" color="red" @click.stop="updateDockerGroupContainers(group)">mdi-autorenew</v-icon>
                         <v-icon v-else color="green">mdi-check</v-icon>
                       </td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>
@@ -166,6 +166,12 @@
                           {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.State }}
                         </div>
                       </td>
+                      <td>
+                        <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="red" @click="updateDocker(containerName)">
+                          mdi-autorenew
+                        </v-icon>
+                        <v-icon v-else color="green">mdi-check</v-icon>
+                      </td>
                       <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
                         {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.Image }}
                       </td>
@@ -214,12 +220,6 @@
                         <template v-else>
                           {{ getContainerNameFromNetworkmode(dockers.find((d) => d.Names && d.Names[0] === containerName)?.HostConfig.NetworkMode) }}
                         </template>
-                      </td>
-                      <td>
-                        <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="red" @click="updateDocker(containerName)">
-                          mdi-autorenew
-                        </v-icon>
-                        <v-icon v-else color="green">mdi-check</v-icon>
                       </td>
                       <td>
                         <v-switch
@@ -334,6 +334,12 @@
                       <div class="text-caption-2">{{ docker.Names[0] }}</div>
                       <div class="text-caption" :style="{ color: docker.State === 'running' ? 'green' : 'red' }">{{ docker.State }}</div>
                     </td>
+                    <td>
+                      <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" color="red" @click="updateDocker(docker.Names[0])">
+                        mdi-autorenew
+                      </v-icon>
+                      <v-icon v-else color="green">mdi-check</v-icon>
+                    </td>
                     <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ docker.Image }}</td>
                     <td>
                       {{
@@ -367,12 +373,6 @@
                       <template v-else>
                         {{ getContainerNameFromNetworkmode(docker.HostConfig.NetworkMode) }}
                       </template>
-                    </td>
-                    <td>
-                      <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === docker.Names[0] && item.update_available)" color="red" @click="updateDocker(docker.Names[0])">
-                        mdi-autorenew
-                      </v-icon>
-                      <v-icon v-else color="green">mdi-check</v-icon>
                     </td>
                     <td>
                       <v-switch v-model="docker.autostart" color="green" hide-details density="compact" @change="switchAutostart(docker)" />

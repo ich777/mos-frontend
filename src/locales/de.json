@@ -719,5 +719,11 @@
   "compose": "Compose",
   "only one nonraid pool allowed": "Nur ein Non-Raid Pool erlaubt",
   "you can only create one nonraid pool per system": "Du kannst nur einen Non-Raid Pool pro System erstellen",
-  "parity": "Parität"
+  "parity": "Parität",
+  "boot settings": "Boot Einstellungen",
+  "disk": "Festplatte",
+  "install to disk": "Auf Festplatte installieren",
+  "boot": "Boot",
+  "transfer usb data to disk device": "USB-Daten auf Festplatte übertragen",
+  "installation successfully, please make sure to reboot the system from the installed disk": "Installation erfolgreich, bitte stelle sicher, dass du das System von der installierten Festplatte neu startest"
 }
