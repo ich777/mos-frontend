@@ -726,5 +726,6 @@
   "boot": "Boot",
   "transfer usb data to disk device": "Transfer USB data to disk device",
   "installation successfully, please make sure to reboot the system from the installed disk": "Installation successful, please make sure to reboot the system from the installed disk",
-  "search online templates": "Search online templates"
+  "search online templates": "Search online templates",
+  "could not fetch online templates": "Could not fetch online templates"
 }

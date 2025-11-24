@@ -16,15 +16,17 @@
           <v-card-text>
             <v-select :items="allTemplatesMixed || []" :label="$t('template')" v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense outlined></v-select>
             <v-autocomplete
-              v-model="selectOnlineTemplate"
+              :items="selectOnlineTemplate.length > 0 ? selectOnlineTemplate.map(item => item.name) : []"
               v-model:search="searchOnlineTemplate"
               :label="$t('search online templates')"
               clear-icon="mdi-close-circle"
+              append-icon="mdi-download"
               type="url"
               class="mb-0"
               style="margin-bottom: 0"
               clearable
               @click:clear="searchTemplate = ''"
+              @click:append="fetchOnlineTemplate()"
             />
             <v-text-field
               v-model="dockerUrl"
@@ -378,7 +380,7 @@ const dockerUrl = ref('');
 const gpus = ref([]);
 const gpuIds = ref([]);
 const searchOnlineTemplate = ref('');
-const selectOnlineTemplate = ref('');
+const selectOnlineTemplate = ref([]);
 const form = ref({
   selectedTemplate: '',
   name: '',
@@ -411,6 +413,7 @@ onMounted(() => {
   getDockerNetworks();
   getDockerContainers();
   getGPUs();
+  getOnlineTemplates();
 });
 
 const getDockerNetworks = async () => {
@@ -556,6 +559,34 @@ const fetchDockerTemplateUrl = async () => {
   }
 };
 
+const fetchOnlineTemplate = async () => {
+  const url = selectOnlineTemplate.value.find((item) => item.name === searchOnlineTemplate.value)?.link;
+  if (!url) {
+    showSnackbarError(t('please select a valid online template'));;
+    return;
+  }
+
+  try {
+    overlay.value = true;
+    const res = await fetch(url, {
+      method: 'GET'
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('online template could not be fetched')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const jsonData = await res.json();
+    fillFormFromJson(jsonData);
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
 const fillFormFromJson = (jsonData) => {
   if (!jsonData) {
     return;
@@ -660,70 +691,6 @@ const createDocker = async () => {
     },
   };
   sendDockerWSCommand('create', newDocker);
-
-  /*
-  const newDocker = {
-    name: form.value.name,
-    repo: form.value.repo,
-    registry: form.value.registry,
-    network: form.value.network,
-    custom_ip: form.value.custom_ip,
-    default_shell: form.value.default_shell,
-    privileged: form.value.privileged,
-    extra_parameters: form.value.extra_parameters,
-    post_parameters: form.value.post_parameters,
-    web_ui_url: form.value.web_ui_url,
-    icon: form.value.icon,
-    paths: form.value.paths.map((path) => ({
-      name: path.name,
-      mode: path.mode,
-      host: path.host,
-      container: path.container,
-    })),
-    ports: form.value.ports.map((port) => ({
-      name: port.name,
-      protocol: port.protocol,
-      host: port.host,
-      container: port.container,
-    })),
-    variables: form.value.variables.map((variable) => ({
-      name: variable.name,
-      key: variable.key,
-      value: variable.value,
-      mask: variable.mask,
-    })),
-    devices: form.value.devices.map((device) => ({
-      name: device.name,
-      host: device.host,
-      container: device.container,
-    })),
-    gpus: form.gpus,
-  };
-
-  try {
-    overlay.value = true;
-
-    const res = await fetch('/api/v1/docker/mos/create', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newDocker),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('docker container could not be created')}|$| ${error.error || t('unknown error')}`);
-    }
-    goBackSafely();
-    showSnackbarSuccess(t('docker container created successfully'));
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  } finally {
-    overlay.value = false;
-  }*/
 };
 
 const goBackSafely = () => {
@@ -752,6 +719,23 @@ const getAllTemplates = async () => {
     const result = await res.json();
     allTemplates.value = result;
     allTemplatesMixed.value = [...result.installed, ...result.removed];
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const getOnlineTemplates = async () => {
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/s3ppo/docker_json_templates/refs/heads/main/index.json', {
+      method: 'GET'
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not fetch online templates')}|$| ${error.error || t('unknown error')}`);
+    }
+    selectOnlineTemplate.value = await res.json();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
