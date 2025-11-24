@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card   fluid>
+        <v-card class="px-0" style="margin-bottom: 80px">
           <v-card-text>
             <v-text-field :label="$t('name')" v-model="form.name" readonly></v-text-field>
             <v-text-field :label="$t('repository')" v-model="form.repo" required></v-text-field>
@@ -39,23 +39,15 @@
             ></v-select>
             <v-text-field :label="$t('custom ip')" v-model="form.custom_ip"></v-text-field>
             <v-text-field :label="$t('default shell')" v-model="form.default_shell"></v-text-field>
-            <v-select
-                :label="$t('gpu')"
-                v-model="form.gpus"
-                :items="gpuIds"
-                item-title="value"
-                item-value="key"
-                multiple
-                clearable
-                chips
-                hide-selected
-            ></v-select>
+            <v-select :label="$t('gpu')" v-model="form.gpus" :items="gpuIds" item-title="value" item-value="key" multiple clearable chips hide-selected></v-select>
             <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary" density="compact"></v-switch>
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
             <v-text-field :label="$t('post parameters')" v-model="form.post_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
-            <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
-            <v-divider class="my-2"></v-divider>
+            <v-text-field :label="$t('icon')" v-model="form.icon" hide-details="auto"></v-text-field>
+          </v-card-text>
+          <v-divider :color="$vuetify.theme.name === 'dark' ? 'white' : 'black'"></v-divider>
+          <v-card-text>
             <v-card-subtitle class="mb-2">
               <v-btn
                 icon
@@ -162,23 +154,23 @@
                   </v-row>
                   <v-row class="mt-n8">
                     <v-col cols="6">
-                      <v-text-field 
-                        :label="$t('host')" 
-                        type="text" 
-                        v-model="port.host" 
-                        density="compact" 
+                      <v-text-field
+                        :label="$t('host')"
+                        type="text"
+                        v-model="port.host"
+                        density="compact"
                         hide-details="auto"
-                        :rules="[v => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
+                        :rules="[(v) => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field 
-                        :label="$t('container')" 
-                        type="text" 
-                        v-model="port.container" 
-                        density="compact" 
+                      <v-text-field
+                        :label="$t('container')"
+                        type="text"
+                        v-model="port.container"
+                        density="compact"
                         hide-details="auto"
-                        :rules="[v => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
+                        :rules="[(v) => /^[0-9-]+$/.test(v) || 'Only a single port or a port range allowed']"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -256,7 +248,7 @@
               </v-btn>
               {{ $t('variables') }}
             </v-card-subtitle>
-            <div v-for="(variable, i) in form.variables" :key="i" class="mb-2">
+            <div v-for="(variable, i) in form.variables" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -327,7 +319,14 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="onPrimary" text @click="closeWsDialog(); goBackSafely();">
+        <v-btn
+          color="onPrimary"
+          text
+          @click="
+            closeWsDialog();
+            goBackSafely();
+          "
+        >
           {{ $t('close') }}
         </v-btn>
       </v-card-actions>
@@ -353,7 +352,7 @@ import { useDockerWebSocket } from '@/composables/useDockerWebSocket';
 const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
   onErrorSnackbar: showSnackbarError,
   onSuccessSnackbar: showSnackbarSuccess,
-  onCompleted: async () => {}
+  onCompleted: async () => {},
 });
 
 const router = useRouter();
@@ -685,7 +684,6 @@ const getGPUs = async () => {
         gpuIds.value.push({ key: pci, value: pci + ' | ' + name });
       });
     });
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -693,10 +691,7 @@ const getGPUs = async () => {
 };
 
 const goBackSafely = () => {
-  const canGoBack =
-    window.history.length > 1 &&
-    document.referrer &&
-    new URL(document.referrer).origin === window.location.origin;
+  const canGoBack = window.history.length > 1 && document.referrer && new URL(document.referrer).origin === window.location.origin;
 
   if (canGoBack) {
     router.back();

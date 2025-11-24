@@ -12,20 +12,36 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid>
+        <v-card class="px-0" style="margin-bottom: 80px">
           <v-card-text>
             <v-select :items="allTemplatesMixed || []" :label="$t('template')" v-model="form.selectedTemplate" @update:model-value="selectTemplate" dense outlined></v-select>
-            <v-row>
-              <v-col cols="9" class="d-flex align-center">
-                <v-text-field v-model="dockerUrl" :label="$t('load from url')" hide-details type="url" class="mb-0" style="margin-bottom: 0" />
-              </v-col>
-              <v-col cols="3" class="d-flex align-center justify-center">
-                <v-btn color="onPrimary" @click="fetchDockerTemplateUrl()" :disabled="!dockerUrl" style="margin-bottom: 20px" hide-details>
-                  {{ $t('fetch') }}
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-divider class="my-4"></v-divider>
+            <v-autocomplete
+              v-model="selectOnlineTemplate"
+              v-model:search="searchOnlineTemplate"
+              :label="$t('search online templates')"
+              clear-icon="mdi-close-circle"
+              type="url"
+              class="mb-0"
+              style="margin-bottom: 0"
+              clearable
+              @click:clear="searchTemplate = ''"
+            />
+            <v-text-field
+              v-model="dockerUrl"
+              :label="$t('load from url')"
+              clear-icon="mdi-close-circle"
+              append-icon="mdi-download"
+              hide-details
+              type="url"
+              class="mb-0"
+              style="margin-bottom: 0"
+              clearable
+              @click:append="fetchDockerTemplateUrl()"
+              @click:clear="dockerUrl = ''"
+            />
+          </v-card-text>
+          <v-divider :color="$vuetify.theme.name === 'dark' ? 'white' : 'black'"></v-divider>
+          <v-card-text>
             <v-text-field :label="$t('name')" v-model="form.name" required></v-text-field>
             <v-text-field :label="$t('repository')" v-model="form.repo" required></v-text-field>
             <v-select
@@ -56,8 +72,10 @@
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
             <v-text-field :label="$t('post parameters')" v-model="form.post_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
-            <v-text-field :label="$t('icon')" v-model="form.icon"></v-text-field>
-            <v-divider class="my-2"></v-divider>
+            <v-text-field :label="$t('icon')" v-model="form.icon" hide-details="auto"></v-text-field>
+          </v-card-text>
+          <v-divider :color="$vuetify.theme.name === 'dark' ? 'white' : 'black'"></v-divider>
+          <v-card-text>
             <v-card-subtitle class="mb-2">
               <v-btn
                 icon
@@ -244,7 +262,7 @@
               </v-btn>
               {{ $t('variables') }}
             </v-card-subtitle>
-            <div v-for="(variable, i) in form.variables" :key="i" class="mb-2">
+            <div v-for="(variable, i) in form.variables" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -315,7 +333,14 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="onPrimary" text @click="closeWsDialog(); goBackSafely();">
+        <v-btn
+          color="onPrimary"
+          text
+          @click="
+            closeWsDialog();
+            goBackSafely();
+          "
+        >
           {{ $t('close') }}
         </v-btn>
       </v-card-actions>
@@ -352,6 +377,8 @@ const networkMode = ref('');
 const dockerUrl = ref('');
 const gpus = ref([]);
 const gpuIds = ref([]);
+const searchOnlineTemplate = ref('');
+const selectOnlineTemplate = ref('');
 const form = ref({
   selectedTemplate: '',
   name: '',
@@ -375,7 +402,7 @@ const allTemplatesMixed = ref([]);
 const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDockerWSCommand, closeWsDialog } = useDockerWebSocket({
   onErrorSnackbar: showSnackbarError,
   onSuccessSnackbar: showSnackbarSuccess,
-  onCompleted: async () => {}
+  onCompleted: async () => {},
 });
 
 onMounted(() => {
@@ -593,43 +620,45 @@ const fillFormFromJson = (jsonData) => {
 };
 
 const createDocker = async () => {
-  const newDocker = { template: {
-    name: form.value.name,
-    repo: form.value.repo,
-    registry: form.value.registry,
-    network: form.value.network,
-    custom_ip: form.value.custom_ip,
-    default_shell: form.value.default_shell,
-    privileged: form.value.privileged,
-    extra_parameters: form.value.extra_parameters,
-    post_parameters: form.value.post_parameters,
-    web_ui_url: form.value.web_ui_url,
-    icon: form.value.icon,
-    paths: form.value.paths.map((path) => ({
-      name: path.name,
-      mode: path.mode,
-      host: path.host,
-      container: path.container,
-    })),
-    ports: form.value.ports.map((port) => ({
-      name: port.name,
-      protocol: port.protocol,
-      host: port.host,
-      container: port.container,
-    })),
-    variables: form.value.variables.map((variable) => ({
-      name: variable.name,
-      key: variable.key,
-      value: variable.value,
-      mask: variable.mask,
-    })),
-    devices: form.value.devices.map((device) => ({
-      name: device.name,
-      host: device.host,
-      container: device.container,
-    })),
-    gpus: form.gpus,
-  }};
+  const newDocker = {
+    template: {
+      name: form.value.name,
+      repo: form.value.repo,
+      registry: form.value.registry,
+      network: form.value.network,
+      custom_ip: form.value.custom_ip,
+      default_shell: form.value.default_shell,
+      privileged: form.value.privileged,
+      extra_parameters: form.value.extra_parameters,
+      post_parameters: form.value.post_parameters,
+      web_ui_url: form.value.web_ui_url,
+      icon: form.value.icon,
+      paths: form.value.paths.map((path) => ({
+        name: path.name,
+        mode: path.mode,
+        host: path.host,
+        container: path.container,
+      })),
+      ports: form.value.ports.map((port) => ({
+        name: port.name,
+        protocol: port.protocol,
+        host: port.host,
+        container: port.container,
+      })),
+      variables: form.value.variables.map((variable) => ({
+        name: variable.name,
+        key: variable.key,
+        value: variable.value,
+        mask: variable.mask,
+      })),
+      devices: form.value.devices.map((device) => ({
+        name: device.name,
+        host: device.host,
+        container: device.container,
+      })),
+      gpus: form.gpus,
+    },
+  };
   sendDockerWSCommand('create', newDocker);
 
   /*

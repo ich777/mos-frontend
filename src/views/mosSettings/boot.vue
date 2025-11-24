@@ -5,9 +5,13 @@
         <h2>{{ $t('boot') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-btn color="primary" rounded @click="installToDiskDialog.value = true">
-            {{ $t('install to disk') }}
-        </v-btn>
+        <v-card class="px-0" style="margin-bottom: 80px">
+          <v-card-text>
+            <v-btn color="primary" rounded @click="installToDiskDialog.value = true">
+              {{ $t('install to disk') }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
       </v-container>
     </v-container>
   </v-container>
@@ -19,19 +23,8 @@
       <v-card-text>
         <p class="mb-4">{{ $t('transfer usb data to disk device') }}</p>
         <v-form>
-          <v-select
-            v-model="installToDiskDialog.disk"
-            :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []"
-            :label="$t('device')"
-            dense
-          />
-        <v-select
-            v-model="installToDiskDialog.filesystem"
-            :items="['ext4', 'btrfs', 'xfs', 'vfat']"
-            :label="$t('filesystem')"
-            required
-            outlined
-        ></v-select>
+          <v-select v-model="installToDiskDialog.disk" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('device')" dense />
+          <v-select v-model="installToDiskDialog.filesystem" :items="['ext4', 'btrfs', 'xfs', 'vfat']" :label="$t('filesystem')" required outlined></v-select>
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -51,30 +44,29 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const unassignedDisks = ref([]);
 const installToDiskDialog = reactive({
-    value: false,
-    disk: '',
-    filesystem: ''
+  value: false,
+  disk: '',
+  filesystem: '',
 });
 
 onMounted(() => {
-    getUnassignedDisks();
+  getUnassignedDisks();
 });
 
 const installToDisk = async () => {
   const installToDiskBody = {
     disk: installToDiskDialog.disk,
-    filesystem: installToDiskDialog.filesystem
-  }
+    filesystem: installToDiskDialog.filesystem,
+  };
 
   try {
     overlay.value = true;
     const res = await fetch('/api/v1/mos/installtodisk', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
-      body: JSON.stringify(installToDiskBody)
+      body: JSON.stringify(installToDiskBody),
     });
 
     if (!res.ok) {
@@ -110,5 +102,4 @@ const getUnassignedDisks = async () => {
     unassignedDisksLoading.value = false;
   }
 };
-
 </script>

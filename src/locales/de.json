@@ -725,5 +725,6 @@
   "install to disk": "Auf Festplatte installieren",
   "boot": "Boot",
   "transfer usb data to disk device": "USB-Daten auf Festplatte übertragen",
-  "installation successfully, please make sure to reboot the system from the installed disk": "Installation erfolgreich, bitte stelle sicher, dass du das System von der installierten Festplatte neu startest"
+  "installation successfully, please make sure to reboot the system from the installed disk": "Installation erfolgreich, bitte stelle sicher, dass du das System von der installierten Festplatte neu startest",
+  "search online templates": "Online Vorlagen durchsuchen"
 }
