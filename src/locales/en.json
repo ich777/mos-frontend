@@ -745,5 +745,7 @@
   "no templates found matching your search": "No templates found matching your search",
   "view": "View",
   "webpage": "Webpage",
-  "search templates": "Search templates"
+  "search templates": "Search templates",
+  "unknown": "Unknown",
+  "install": "Install"
 }

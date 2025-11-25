@@ -745,5 +745,7 @@
   "no templates found matching your search": "Keine Vorlagen gefunden, die deiner Suche entsprechen",
   "view": "Ansicht",
   "webpage": "Webseite",
-  "search templates": "Vorlagen durchsuchen"
+  "search templates": "Vorlagen durchsuchen",
+  "unknown": "Unbekannt",
+  "install": "Installieren"
 }

@@ -7,14 +7,15 @@
       <v-container fluid class="pa-0">
         <v-skeleton-loader v-if="poolsLoading" type="card" />
         <v-card v-for="pool in pools" :key="pool.id" fluid class="mb-4 pa-0">
-          <v-card-title class="d-flex align-center">
+          <v-card-title class="d-flex align-center pb-0">
             <span>{{ pool.name }}</span>
             <v-spacer />
+            <v-chip v-if="pool.type" size="small" class="mr-2">{{ pool.type }}</v-chip>
             <v-chip v-if="pool.status.mounted" size="small">{{ $t('mounted') }}</v-chip>
             <v-chip v-else size="small">{{ $t('unmounted') }}</v-chip>
             <v-icon v-if="pool.config.encrypted" class="ml-2" color="grey darken-1" aria-label="locked">mdi-lock</v-icon>
           </v-card-title>
-          <v-card-subtitle v-if="pool.status">{{ $t('type') }}: {{ pool.type }}</v-card-subtitle>
+          <v-card-subtitle v-if="pool.mountPoint">{{ pool.mountPoint }}</v-card-subtitle>
           <div v-if="pool.status" class="mt-2 mr-4 ml-4">
             <v-progress-linear
               :model-value="pool.status.usagePercent"
