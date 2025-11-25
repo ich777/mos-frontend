@@ -76,7 +76,7 @@
               <div class="core-row" style="min-width: 0">
                 <div class="core-label text-body-2">
                   <small>
-                    <b>Ht-{{ thread.number }}</b>
+                    <b>Ht-{{ thread.physicalCoreNumber }}</b>
                   </small>
                 </div>
                 <div class="core-bar">
