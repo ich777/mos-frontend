@@ -750,5 +750,9 @@
   "install": "Install",
   "pool types could not be loaded": "Pool types could not be loaded",
   "user settings": "User Settings",
-  "template loaded successfully": "Template loaded successfully"
+  "template loaded successfully": "Template loaded successfully",
+  "action": "Action",
+  "selected": "Selected",
+  "select directory": "Selected Directory",
+  "no entries": "No entries"
 }

@@ -750,5 +750,9 @@
   "install": "Installieren",
   "pool types could not be loaded": "Pool-Typen konnten nicht geladen werden",
   "user settings": "Benutzereinstellungen",
-  "template loaded successfully": "Vorlage erfolgreich geladen"
+  "template loaded successfully": "Vorlage erfolgreich geladen",
+  "action": "Aktion",
+  "selected": "Ausgewählt",
+  "select directory": "Ausgewähltes Verzeichnis",
+  "no entries": "Keine Einträge"
 }

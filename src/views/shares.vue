@@ -50,7 +50,7 @@
       <v-card-text>
         <v-form>
           <v-text-field v-model="createDialog.shareName" :label="$t('share name')" required autofocus />
-          <v-text-field v-model="createDialog.subPath" :label="$t('sub path')" required />
+          <v-text-field v-model="createDialog.subPath" :label="$t('select directory')" append-inner-icon="mdi-folder" required @click:append-inner="openFsDialog((item) => { createDialog.subPath = item.path })" />
           <v-select v-model="createDialog.poolName" :items="pools" item-title="name" item-value="name" :label="$t('pool')" required />
           <v-select v-model="createDialog.selectedUser" :items="smbUsers" item-title="username" item-value="username" :label="$t('smb user')" required multiple />
           <v-text-field v-model="createDialog.comment" :label="$t('comment')" clearable />
@@ -139,6 +139,9 @@
     </v-card>
   </v-dialog>
 
+  <!-- File System Navigator Dialog -->
+  <fsNavigatorDialog v-model="fsDialog" :initial-path="'/'" select-type="directory" :title="$t('select directory')" @selected="handleFsSelected" />
+
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
@@ -153,6 +156,22 @@
 import { ref, onMounted, reactive } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
+import fsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
+
+const selectedPath = ref(null);
+const fsDialog = ref(false);
+const fsDialogCallback = ref(null);
+const openFsDialog = (cb) => {
+  fsDialogCallback.value = cb;
+  fsDialog.value = true;
+};
+const handleFsSelected = (item) => {
+  if (typeof fsDialogCallback.value === 'function') {
+    fsDialogCallback.value(item);
+  }
+  fsDialogCallback.value = null;
+  fsDialog.value = false;
+};
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
