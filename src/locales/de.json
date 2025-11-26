@@ -727,7 +727,7 @@
   "transfer usb data to disk device": "USB-Daten auf Festplatte übertragen",
   "installation successfully, please make sure to reboot the system from the installed disk": "Installation erfolgreich, bitte stelle sicher, dass du das System von der installierten Festplatte neu startest",
   "search online templates": "Online Vorlagen durchsuchen",
-  "could not fetch online templates": "Online Vorlagen konnten nicht abgerufen werden",
+  "could not fetch mos hub templates": "MOS Hub Vorlagen konnten nicht abgerufen werden",
   "ui session expiry time (days)": "UI Sitzungsablaufzeit (Tage)",
   "ui session expiry changed": "UI Sitzungsablauf geändert",
   "ui session expiry could not be changed": "UI Sitzungsablauf konnte nicht geändert werden",
@@ -739,9 +739,9 @@
   "admin api token could not be created": "Admin API Token konnte nicht erstellt werden",
   "admin api tokens could not be loaded": "Admin API Tokens konnten nicht geladen werden",
   "profile could not be loaded": "Profil konnte nicht geladen werden",
-  "community templates": "Community Vorlagen",
+  "mos hub": "MOS Hub",
   "no description": "Keine Beschreibung",
-  "failed to load community templates": "Fehler beim Laden der Community Vorlagen",
+  "failed to load mos hub": "Fehler beim Laden des MOS Hubs",
   "no templates found matching your search": "Keine Vorlagen gefunden, die deiner Suche entsprechen",
   "view": "Ansicht",
   "webpage": "Webseite",
@@ -754,5 +754,6 @@
   "action": "Aktion",
   "selected": "Ausgewählt",
   "select directory": "Ausgewähltes Verzeichnis",
-  "no entries": "Keine Einträge"
+  "no entries": "Keine Einträge",
+  "path template could not be fetched": "Pfadvorlage konnte nicht abgerufen werden"
 }

@@ -2,7 +2,7 @@
   <v-container fluid class="d-flex justify-center">
     <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
-        <h2>{{ $t('community templates') }}</h2>
+        <h2>{{ $t('mos hub') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
         <v-card fluid style="margin-bottom: 80px" class="pa-0">
@@ -16,23 +16,25 @@
               dense
               hide-details
               class="ma-4"
-              @click:append-inner="searchStringInTemplates()"
+              @click:append-inner="getMosHub(searchOnlineTemplate)"
               @click:clear="
                 searchOnlineTemplate = '';
-                searchStringInTemplates();
+                getMosHub(searchOnlineTemplate);
               "
-              @keyup.enter="searchStringInTemplates()"
+              @keyup.enter="getMosHub(searchOnlineTemplate)"
             ></v-text-field>
             <v-divider class="mt-2" />
-            <v-container fluid class="pa-4">
+            <v-container fluid class="pa-4" v-if="!hubLoading">
               <v-row class="ma-n2">
-                <v-col v-if="onlineTemplates.length > 0" cols="12" sm="6" md="4" lg="3" xl="2" v-for="(tpl, i) in onlineTemplates" :key="tpl.name || i" class="pa-2">
+                <v-col v-if="mosHub.length > 0" cols="12" sm="6" md="4" lg="3" xl="2" v-for="(tpl, i) in mosHub" :key="tpl.name || i" class="pa-2">
                   <v-card style="height: 250px; display: flex; flex-direction: column" class="pa-0">
                     <v-card-text class="pa-0 pt-4">
-                      <v-img v-if="tpl.logo" :src="tpl.logo" height="60" contain style="max-width: 100%"></v-img>
-                      <v-icon v-else size="60" color="grey" style="opacity: 0.5">mdi-package-variant</v-icon>
-                      <v-chip v-if="tpl.version" size="small" style="position: absolute; top: 12px; right: 12px; background: var(--v-theme-primary); color: var(--v-theme-on-primary)">
-                        {{ tpl.version }}
+                      <div class="d-flex justify-center">
+                        <v-img v-if="tpl.icon" :src="tpl.icon" height="60" contain style="max-width: 100%"></v-img>
+                        <v-icon v-else size="60" color="grey" style="opacity: 0.5">mdi-package-variant</v-icon>
+                      </div>
+                      <v-chip v-if="tpl.type" size="small" style="position: absolute; top: 12px; right: 12px; background: var(--v-theme-primary); color: var(--v-theme-on-primary)">
+                        {{ $t(tpl.type) }}
                       </v-chip>
                     </v-card-text>
                     <v-card-title class="pb-1">
@@ -45,10 +47,16 @@
                     </v-card-text>
                     <v-divider />
                     <v-card-actions style="flex: 0 0 auto; gap: 4px; padding: 8px">
-                      <v-btn color="secondary" :href="tpl.url" target="_blank" v-if="tpl.url" prepend-icon="mdi-web" size="small">
+                      <v-btn color="secondary" :href="tpl.website" target="_blank" v-if="tpl.website" prepend-icon="mdi-web" size="small">
                         {{ $t('webpage') }}
                       </v-btn>
-                      <v-btn color="secondary" v-if="tpl.link" prepend-icon="mdi-docker" size="small" @click="$router.push({ path: '/docker/create', query: { urlTemplate: tpl.link } })">
+                      <v-btn
+                        v-if="tpl.type == 'docker'"
+                        color="secondary"
+                        prepend-icon="mdi-docker"
+                        size="small"
+                        @click="$router.push({ path: '/docker/create', query: { path: tpl.files.template } })"
+                      >
                         {{ $t('install') }}
                       </v-btn>
                     </v-card-actions>
@@ -60,6 +68,9 @@
                   </div>
                 </v-col>
               </v-row>
+            </v-container>
+            <v-container v-else fluid class="pa-4 d-flex justify-center">
+              <v-progress-circular indeterminate color="primary" size="48"></v-progress-circular>
             </v-container>
           </v-card-text>
         </v-card>
@@ -75,62 +86,51 @@ import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
 const { t } = useI18n();
 const searchOnlineTemplate = ref('');
-const onlineTemplates = ref([
+const hubLoading = ref(true);
+const mosHub = ref([
   {
-    type: '',
     name: '',
-    version: '',
+    maintainer: '',
+    maintainer_donate: '',
+    donate: null,
+    type: '',
+    category: ['network'],
     description: '',
-    url: '',
-    logo: '',
-    documentation: '',
-    languages: [],
-    license: '',
-    repository: '',
-    link: '',
+    website: null,
+    icon: '',
+    repository: 'a',
+    created_at: 0,
+    updated_at: 0,
+    stack_images: [],
+    files: {
+      template: '',
+      yaml: null,
+      env: null,
+    },
   },
 ]);
 
 onMounted(() => {
-  getOnlineTemplates();
+  getMosHub();
 });
 
-const getOnlineTemplates = async () => {
+const getMosHub = async (search) => {
+  hubLoading.value = true;
   try {
-    const res = await fetch('https://raw.githubusercontent.com/s3ppo/docker_json_templates/refs/heads/main/index.json', {
+    const res = await fetch(`/api/v1/mos/hub/index?search=${encodeURIComponent(search || '')}&order=asc`, {
       method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
     });
 
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(`${t('could not fetch online templates')}|$| ${error.error || t('unknown error')}`);
-    }
-    onlineTemplates.value = await res.json();
+    mosHub.value = await res.json();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
-  }
-};
-
-const searchStringInTemplates = () => {
-  if (!searchOnlineTemplate.value || searchOnlineTemplate.value.trim() === '') {
-    getOnlineTemplates();
-    return;
-  }
-
-  const searchString = searchOnlineTemplate.value.toLowerCase().trim();
-  onlineTemplates.value = onlineTemplates.value.filter((tpl) => {
-    return (
-      (tpl.name && tpl.name.toLowerCase().includes(searchString)) ||
-      (tpl.description && tpl.description.toLowerCase().includes(searchString)) ||
-      (tpl.type && tpl.type.toLowerCase().includes(searchString)) ||
-      (tpl.languages && tpl.languages.some((lang) => lang.toLowerCase().includes(searchString))) ||
-      (tpl.license && tpl.license.toLowerCase().includes(searchString))
-    );
-  });
-
-  if (onlineTemplates.value.length === 0) {
-    showSnackbarSuccess(t('no templates found matching your search'));
+  } finally {
+    hubLoading.value = false;
   }
 };
 </script>

@@ -727,7 +727,7 @@
   "transfer usb data to disk device": "Transfer USB data to disk device",
   "installation successfully, please make sure to reboot the system from the installed disk": "Installation successful, please make sure to reboot the system from the installed disk",
   "search online templates": "Search online templates",
-  "could not fetch online templates": "Could not fetch online templates",
+  "could not fetch mos hub templates": "Could not fetch MOS Hub templates",
   "ui session expiry time (days)": "UI session expiry time (days)",
   "ui session expiry changed": "UI session expiry changed",
   "ui session expiry could not be changed": "UI session expiry could not be changed",
@@ -739,9 +739,9 @@
   "admin api token could not be created": "Admin API token could not be created",
   "admin api tokens could not be loaded": "Admin API tokens could not be loaded",
   "profile could not be loaded": "Profile could not be loaded",
-  "community templates": "Community Templates",
+  "mos hub": "MOS Hub",
   "no description": "No description",
-  "failed to load community templates": "Failed to load community templates",
+  "failed to load mos hub": "Failed to load MOS Hub",
   "no templates found matching your search": "No templates found matching your search",
   "view": "View",
   "webpage": "Webpage",
@@ -754,5 +754,6 @@
   "action": "Action",
   "selected": "Selected",
   "select directory": "Selected Directory",
-  "no entries": "No entries"
+  "no entries": "No entries",
+  "path template could not be fetched": "Path template could not be fetched"
 }

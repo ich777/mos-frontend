@@ -393,7 +393,7 @@ const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDocker
 });
 
 const props = defineProps({
-  urlTemplate: String,
+  path: String,
 });
 
 onMounted(() => {
@@ -402,8 +402,8 @@ onMounted(() => {
   getDockerNetworks();
   getDockerContainers();
   getGPUs();
-  if (props.urlTemplate) {
-    fetchOnlineTemplate(props.urlTemplate);
+  if (props.path) {
+    fetchPathTemplate(props.path);
   }
 });
 
@@ -550,16 +550,22 @@ const fetchDocke1rTemplateUrl = async () => {
   }
 };
 
-const fetchOnlineTemplate = async (url) => {
+const fetchPathTemplate = async (path) => {
+  const newPathBody = { template: path }
   try {
     overlay.value = true;
-    const res = await fetch(url, {
-      method: 'GET'
+    const res = await fetch('/api/v1/mos/hub/docker', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newPathBody),
     });
 
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(`${t('online template could not be fetched')}|$| ${error.error || t('unknown error')}`);
+      throw new Error(`${t('path template could not be fetched')}|$| ${error.error || t('unknown error')}`);
     }
 
     const jsonData = await res.json();
