@@ -158,21 +158,8 @@ import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import fsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
 
-const selectedPath = ref(null);
 const fsDialog = ref(false);
 const fsDialogCallback = ref(null);
-const openFsDialog = (cb) => {
-  fsDialogCallback.value = cb;
-  fsDialog.value = true;
-};
-const handleFsSelected = (item) => {
-  if (typeof fsDialogCallback.value === 'function') {
-    fsDialogCallback.value(item);
-  }
-  fsDialogCallback.value = null;
-  fsDialog.value = false;
-};
-
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
 const overlay = ref(false);
@@ -223,6 +210,17 @@ const deleteDialog = reactive({
   deleteDirectory: false,
 });
 const sharesLoading = ref(true);
+const openFsDialog = (cb) => {
+  fsDialogCallback.value = cb;
+  fsDialog.value = true;
+};
+const handleFsSelected = (item) => {
+  if (typeof fsDialogCallback.value === 'function') {
+    fsDialogCallback.value(item);
+  }
+  fsDialogCallback.value = null;
+  fsDialog.value = false;
+};
 
 onMounted(async () => {
   await getShares();

@@ -11,8 +11,8 @@
             <v-form>
               <v-switch :label="$t('enabled')" color="onPrimary" inset density="compact" v-model="vmSettings.enabled">
               </v-switch>
-              <v-text-field :label="$t('directory')" v-model="vmSettings.directory"></v-text-field>
-              <v-text-field :label="$t('vdisk directory')" v-model="vmSettings.vdisk_directory"></v-text-field>
+              <v-text-field :label="$t('directory')" v-model="vmSettings.directory" append-inner-icon="mdi-folder" @click:append-inner="openFsDialog((item) => { vmSettings.directory = item.path })"></v-text-field>
+              <v-text-field :label="$t('vdisk directory')" v-model="vmSettings.vdisk_directory" append-inner-icon="mdi-folder" @click:append-inner="openFsDialog((item) => { vmSettings.vdisk_directory = item.path })"></v-text-field>
             </v-form>
           </v-card-text>
         </v-card>
@@ -20,6 +20,9 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <!-- File System Navigator Dialog -->
+  <fsNavigatorDialog v-model="fsDialog" :initial-path="'/'" select-type="directory" :title="$t('select directory')" @selected="handleFsSelected" />
 
   <!-- Floating Action Button -->
   <v-fab @click="setVMService()" color="primary"
@@ -36,7 +39,10 @@
 import { onMounted, ref } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
+import fsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
 
+const fsDialog = ref(false);
+const fsDialogCallback = ref(null);
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const vmSettings = ref({
   enabled: false,
@@ -50,6 +56,18 @@ const vmServiceLoading = ref(true);
 onMounted(() => {
   getVMService();
 });
+
+const openFsDialog = (cb) => {
+  fsDialogCallback.value = cb;
+  fsDialog.value = true;
+};
+const handleFsSelected = (item) => {
+  if (typeof fsDialogCallback.value === 'function') {
+    fsDialogCallback.value(item);
+  }
+  fsDialogCallback.value = null;
+  fsDialog.value = false;
+};
 
 const getVMService = async () => {
   try {

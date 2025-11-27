@@ -10,8 +10,8 @@
             <v-card-text>
               <v-form>
                 <v-switch :label="$t('docker service')" inset density="compact" v-model="settingsDocker.enabled" color="green"></v-switch>
-                <v-text-field v-model="settingsDocker.directory" :label="$t('directory')" required></v-text-field>
-                <v-text-field v-model="settingsDocker.appdata" :label="$t('appdata')" required></v-text-field>
+                <v-text-field v-model="settingsDocker.directory" :label="$t('directory')" append-inner-icon="mdi-folder" @click:append-inner="openFsDialog((item) => { settingsDocker.directory = item.path })" required></v-text-field>
+                <v-text-field v-model="settingsDocker.appdata" :label="$t('appdata')" append-inner-icon="mdi-folder" @click:append-inner="openFsDialog((item) => { settingsDocker.appdata = item.path })" required></v-text-field>
                 <v-text-field v-model="settingsDocker.filesystem" :label="$t('filesystem')" required></v-text-field>
                 <v-row>
                   <v-col cols="12" md="6">
@@ -65,6 +65,9 @@
     </v-container>
   </v-container>
 
+  <!-- File System Navigator Dialog -->
+  <fsNavigatorDialog v-model="fsDialog" :initial-path="'/'" select-type="directory" :title="$t('select directory')" @selected="handleFsSelected" />
+
   <!-- Floating Action Button -->
   <v-fab @click="setDockerService()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-content-save</v-icon>
@@ -79,7 +82,10 @@
 import { onMounted, ref } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
+import fsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
 
+const fsDialog = ref(false);
+const fsDialogCallback = ref(null);
 const settingsDocker = ref({
   enabled: false,
   directory: '',
@@ -107,6 +113,18 @@ const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 onMounted(() => {
   getDockerService();
 });
+
+const openFsDialog = (cb) => {
+  fsDialogCallback.value = cb;
+  fsDialog.value = true;
+};
+const handleFsSelected = (item) => {
+  if (typeof fsDialogCallback.value === 'function') {
+    fsDialogCallback.value(item);
+  }
+  fsDialogCallback.value = null;
+  fsDialog.value = false;
+};
 
 const getDockerService = async () => {
   try {
