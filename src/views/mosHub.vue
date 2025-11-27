@@ -81,14 +81,80 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <!-- Repositories Dialog -->
+  <v-dialog v-model="mosHubRepositoriesDialog.value" max-width="600px">
+    <v-card>
+      <v-card-title>{{ $t('repositories') }}</v-card-title>
+      <v-card-text class="pa-0">
+        <v-container fluid>
+          <v-row class="pa-0">
+            <v-col cols="12" v-for="(repo, index) in mosHubRepositoriesDialog.repositories" :key="index" class="d-flex align-center">
+              <v-text-field
+                v-model="mosHubRepositoriesDialog.repositories[index]"
+                :label="$t('repository') + ' ' + (index + 1)"
+                outlined
+                dense
+                class="flex-grow-1 mr-2"
+                append-icon="mdi-delete"
+                @click:append="mosHubRepositoriesDialog.repositories.splice(index, 1)"
+                hide-details="auto"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" class="d-flex justify-end mt-2">
+              <v-btn color="primary" variant="text" prepend-icon="mdi-plus" @click="mosHubRepositoriesDialog.repositories.push('')">
+                {{ $t('add repository') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="mosHubRepositoriesDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="setHubRepositories(mosHubRepositoriesDialog.repositories)">{{ $t('save') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Floating Action Button with Menu -->
+  <v-menu location="top">
+    <template v-slot:activator="{ props }">
+      <v-fab v-bind="props" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
+        <v-icon color="onPrimary">mdi-dots-vertical</v-icon>
+      </v-fab>
+    </template>
+    <v-list>
+      <v-list-item @click="openHubRepositoriesDialog()">
+        <template v-slot:prepend>
+          <v-icon>mdi-plus</v-icon>
+        </template>
+        <v-list-item-title>{{ $t('repositories') }}</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="refreshRepositories()">
+        <template v-slot:prepend>
+          <v-icon>mdi-refresh</v-icon>
+        </template>
+        <v-list-item-title>{{ $t('refresh repositories') }}</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-menu>
+
+  <v-overlay :model-value="overlay" class="align-center justify-center">
+    <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
+  </v-overlay>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
+const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
+const overlay = ref(false);
 const searchOnlineTemplate = ref('');
 const hubLoading = ref(true);
 const mosHub = ref([
@@ -113,6 +179,10 @@ const mosHub = ref([
     },
   },
 ]);
+const mosHubRepositoriesDialog = reactive({
+  value: false,
+  repositories: [''],
+});
 
 onMounted(() => {
   getMosHub();
@@ -129,12 +199,90 @@ const getMosHub = async (search) => {
       },
     });
 
-    mosHub.value = await res.json();
+    mosHub.value = (await res.json()) || [];
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     hubLoading.value = false;
   }
+};
+
+const refreshRepositories = async () => {
+  hubLoading.value = true;
+  try {
+    const res = await fetch('/api/v1/mos/hub/update', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) throw new Error(t('repositories could not be refreshed'));
+
+    showSnackbarSuccess(t('repositories refreshed successfully'));
+    getMosHub(searchOnlineTemplate.value);
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    hubLoading.value = false;
+  }
+};
+
+const getHubRepositories = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/hub/repositories', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('repositories could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const repositories = await res.json();
+    return repositories;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const setHubRepositories = async (repositories) => {
+  overlay.value = true;
+  mosHubRepositoriesDialog.value = false;
+  try {
+    const res = await fetch('/api/v1/mos/hub/repositories', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(repositories),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('repositories could not be changed')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('repositories changed successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const openHubRepositoriesDialog = async () => {
+  mosHubRepositoriesDialog.value = true;
+  mosHubRepositoriesDialog.repositories = await getHubRepositories();
 };
 </script>

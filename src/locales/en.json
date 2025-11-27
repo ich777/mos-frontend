@@ -755,5 +755,13 @@
   "selected": "Selected",
   "select directory": "Selected Directory",
   "no entries": "No entries",
-  "path template could not be fetched": "Path template could not be fetched"
+  "path template could not be fetched": "Path template could not be fetched",
+  "repositories": "Repositories",
+  "refresh repositories": "Refresh Repositories",
+  "repositories refreshed successfully": "Repositories refreshed successfully",
+  "repositories could not be refreshed": "Repositories could not be refreshed",
+  "repositories could not be loaded": "Repositories could not be loaded",
+  "repositories could not be changed": "Repositories could not be changed",
+  "repositories changed successfully": "Repositories changed successfully",
+  "add repository": "Add Repository"
 }

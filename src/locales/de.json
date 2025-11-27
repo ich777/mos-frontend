@@ -755,5 +755,13 @@
   "selected": "Ausgewählt",
   "select directory": "Ausgewähltes Verzeichnis",
   "no entries": "Keine Einträge",
-  "path template could not be fetched": "Pfadvorlage konnte nicht abgerufen werden"
+  "path template could not be fetched": "Pfadvorlage konnte nicht abgerufen werden",
+  "repositories": "Repositories",
+  "refresh repositories": "Repositories aktualisieren",
+  "repositories refreshed successfully": "Repositories erfolgreich aktualisiert",
+  "repositories could not be refreshed": "Repositories konnten nicht aktualisiert werden",
+  "repositories could not be loaded": "Repositories konnten nicht geladen werden",
+  "repositories could not be changed": "Repositories konnten nicht geändert werden",
+  "repositories changed successfully": "Repositories erfolgreich geändert",
+  "add repository": "Repository hinzufügen"
 }
