@@ -1,5 +1,5 @@
 <template>
-  <div v-for="(pool, index) in pools" :key="index" class="py-2">
+  <div v-for="(pool, index) in pools" :key="index" class="py-1">
     <div class="d-flex justify-space-between align-center w-100 mb-1">
       <div class="text-body-2 font-weight-medium">{{ pool.name }}</div>
       <div class="text-caption">{{ pool.status?.usedSpace_human || '-' }} / {{ pool.status?.totalSpace_human || '-' }}</div>
