@@ -63,6 +63,15 @@
                     </v-card-actions>
                   </v-card>
                 </v-col>
+                <!-- Pagination -->
+                <v-col v-if="mosHubCount > 0" cols="12" class="pt-4 d-flex justify-center">
+                  <v-pagination
+                    v-model="currentPage"
+                    :length="Math.ceil(mosHubCount / pageLimit)"
+                    :total-visible="7"
+                    @update:model-value="(page) => { currentPage = page; getMosHub(searchOnlineTemplate, pageLimit, (page - 1) * pageLimit); }"
+                  />
+                </v-col>
                 <v-col v-else cols="12">
                   <div class="text-center grey--text text--darken-1">
                     {{ $t('no templates found matching your search') }}
@@ -159,6 +168,7 @@ const overlay = ref(false);
 const mosServices = ref({});
 const searchOnlineTemplate = ref('');
 const hubLoading = ref(true);
+
 const mosHub = ref([
   {
     name: '',
@@ -170,7 +180,7 @@ const mosHub = ref([
     description: '',
     website: null,
     icon: '',
-    repository: 'a',
+    repository: '',
     created_at: 0,
     updated_at: 0,
     stack_images: [],
@@ -182,20 +192,22 @@ const mosHub = ref([
   },
 ]);
 const mosHubCount = ref(0);
+
 const mosHubRepositoriesDialog = reactive({
   value: false,
   repositories: [''],
 });
-
+const currentPage = ref(1);
+const pageLimit = 24;
 onMounted(() => {
   getMosHub();
   getMosServices();
 });
 
-const getMosHub = async (search) => {
+const getMosHub = async (search, limit = 24, skip = 0) => {
   hubLoading.value = true;
   try {
-    const res = await fetch(`/api/v1/mos/hub/index?search=${encodeURIComponent(search || '')}&order=asc`, {
+    const res = await fetch(`/api/v1/mos/hub/index?search=${encodeURIComponent(search || '')}&order=asc&limit=${limit}&skip=${skip}`, {
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
