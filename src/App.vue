@@ -80,21 +80,21 @@
     <!-- Top Toaster -->
     <Toaster id="top-toaster"
       position="top-center"
-      richColors="true"
+      :richColors="true"
       :theme="theme.global.name.value === 'dark' ? 'dark' : 'light'"
-      expand="true"
-      visibleToasts="3"
-      offset="16"
+      :expand="true"
+      :visibleToasts="3"
+      :offset="16"
     />
 
     <!-- Bottom Toaster -->
     <Toaster id="bottom-toaster"
       position="bottom-center"
-      richColors="true"
+      :richColors="true"
       :theme="theme.global.name.value === 'dark' ? 'dark' : 'light'"
-      expand="true"
-      visibleToasts="3"
-      offset="16"
+      :expand="true"
+      :visibleToasts="3"
+      :offset="16"
     />
   </v-app>
 
