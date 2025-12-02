@@ -48,21 +48,24 @@
           </v-card-text>
           <v-divider :color="$vuetify.theme.name === 'dark' ? 'white' : 'black'"></v-divider>
           <v-card-text>
-            <v-card-subtitle class="mb-2">
-              <v-btn
-                icon
-                size="x-small"
-                color="green"
-                class="ma-1 pa-0"
-                style="width: 24px; height: 24px; min-width: 24px"
-                @click="form.paths.push({ name: '', mode: '', host: '', container: '' })"
-                title="Add path"
-                aria-label="add path"
-              >
-                <v-icon size="18">mdi-plus</v-icon>
-              </v-btn>
-              {{ $t('paths') }}
-            </v-card-subtitle>
+            <v-row>
+              <v-col cols="12" class="d-flex align-center justify-space-between">
+                <span class="text-subtitle-1 font-weight-medium">{{ $t('paths') }}</span>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="green"
+                  class="ma-1 pa-0 float-right"
+                  style="min-width: 0"
+                  @click="form.paths.push({ name: '', mode: '', host: '', container: '' })"
+                  title="Add path"
+                  aria-label="add path"
+                >
+                  <v-icon size="18" class="mr-1">mdi-plus</v-icon>
+                  {{ $t('add') }}
+                </v-btn>
+              </v-col>
+            </v-row>
             <div v-for="(path, i) in form.paths" :key="i" class="mb-2">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
@@ -106,21 +109,24 @@
               </v-row>
             </div>
             <v-divider class="my-2"></v-divider>
-            <v-card-subtitle class="mb-2">
-              <v-btn
-                icon
-                size="x-small"
-                color="green"
-                class="ma-1 pa-0"
-                style="width: 24px; height: 24px; min-width: 24px"
-                @click="form.ports.push({ name: '', protocol: '', host: '', container: '' })"
-                title="Add port"
-                aria-label="add port"
-              >
-                <v-icon size="18">mdi-plus</v-icon>
-              </v-btn>
-              {{ $t('ports') }}
-            </v-card-subtitle>
+            <v-row>
+              <v-col cols="12" class="d-flex align-center justify-space-between">
+                <span class="text-subtitle-1 font-weight-medium">{{ $t('ports') }}</span>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="green"
+                  class="ma-1 pa-0 float-right"
+                  style="min-width: 0"
+                  @click="form.ports.push({ name: '', protocol: '', host: '', container: '' })"
+                  title="Add port"
+                  aria-label="add port"
+                >
+                  <v-icon size="18" class="mr-1">mdi-plus</v-icon>
+                  {{ $t('add') }}
+                </v-btn>
+              </v-col>
+            </v-row>
             <div v-for="(port, i) in form.ports" :key="i" class="mb-2">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
@@ -178,21 +184,24 @@
               </v-row>
             </div>
             <v-divider class="my-2"></v-divider>
-            <v-card-subtitle class="mb-2">
-              <v-btn
-                icon
-                size="x-small"
-                color="green"
-                class="ma-1 pa-0"
-                style="width: 24px; height: 24px; min-width: 24px"
-                @click="form.devices.push({ name: '', host: '', container: '' })"
-                title="Add device"
-                aria-label="add device"
-              >
-                <v-icon size="18">mdi-plus</v-icon>
-              </v-btn>
-              {{ $t('devices') }}
-            </v-card-subtitle>
+            <v-row>
+              <v-col cols="12" class="d-flex align-center justify-space-between">
+                <span class="text-subtitle-1 font-weight-medium">{{ $t('devices') }}</span>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="green"
+                  class="ma-1 pa-0 float-right"
+                  style="min-width: 0"
+                  @click="form.devices.push({ name: '', host: '', container: '' })"
+                  title="Add device"
+                  aria-label="add device"
+                >
+                  <v-icon size="18" class="mr-1">mdi-plus</v-icon>
+                  {{ $t('add') }}
+                </v-btn>
+              </v-col>
+            </v-row>
             <div v-for="(device, i) in form.devices" :key="i" class="mb-2">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
@@ -233,21 +242,24 @@
               </v-row>
             </div>
             <v-divider class="my-2"></v-divider>
-            <v-card-subtitle class="mb-2">
-              <v-btn
-                icon
-                size="x-small"
-                color="green"
-                class="ma-1 pa-0"
-                style="width: 24px; height: 24px; min-width: 24px"
-                @click="form.variables.push({ name: '', key: '', value: '', mask: false })"
-                title="Add variable"
-                aria-label="add variable"
-              >
-                <v-icon size="18">mdi-plus</v-icon>
-              </v-btn>
-              {{ $t('variables') }}
-            </v-card-subtitle>
+            <v-row>
+              <v-col cols="12" class="d-flex align-center justify-space-between">
+                <span class="text-subtitle-1 font-weight-medium">{{ $t('variables') }}</span>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="green"
+                  class="ma-1 pa-0 float-right"
+                  style="min-width: 0"
+                  @click="form.variables.push({ name: '', key: '', value: '', mask: false })"
+                  title="Add variable"
+                  aria-label="add variable"
+                >
+                  <v-icon size="18" class="mr-1">mdi-plus</v-icon>
+                  {{ $t('add') }}
+                </v-btn>
+              </v-col>
+            </v-row>
             <div v-for="(variable, i) in form.variables" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>

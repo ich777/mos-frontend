@@ -688,13 +688,13 @@
       </v-fab>
     </template>
     <v-list>
-      <v-list-item @click="$router.push('/docker/create')">
+      <v-list-item to="/docker/create">
         <template v-slot:prepend>
           <v-icon>mdi-plus</v-icon>
         </template>
         <v-list-item-title>{{ $t('add container') }}</v-list-item-title>
       </v-list-item>
-      <v-list-item @click="openCreateComposeStackDialog()">
+      <v-list-item to="/docker/compose">
         <template v-slot:prepend>
           <v-icon>mdi-toy-brick-plus</v-icon>
         </template>
