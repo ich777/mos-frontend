@@ -112,6 +112,12 @@
                 <v-list-item @click="openDeletePoolDialog(pool)">
                   <v-list-item-title>{{ $t('delete pool') }}</v-list-item-title>
                 </v-list-item>
+                <v-list-item @click="wakePool(pool)">
+                  <v-list-item-title>{{ $t('spin up pool') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="sleepPool(pool)">
+                  <v-list-item-title>{{ $t('spin down pool') }}</v-list-item-title>
+                </v-list-item>
                 <v-divider v-if="pool.type === 'mergerfs'"></v-divider>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openAddMergerfsDevicesDialog(pool)">
                   <v-list-item-title>{{ $t('add devices') }}</v-list-item-title>
@@ -1468,6 +1474,74 @@ const replaceMergerfsDevice = async (poolId, oldDevice, newDevice, format) => {
     getPools();
     getUnassignedDisks();
     replaceMergerfsDeviceDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const wakePool = async (pool) => {
+  overlay.value = true;
+    const wakePoolData = {
+    devices: [
+      ...(pool.data_devices ? pool.data_devices.map((d) => d.device) : []),
+      ...(pool.parity_devices ? pool.parity_devices.map((d) => d.device) : []),
+    ],
+  };
+
+  try {
+    const res = await fetch(`/api/v1/disks/wake`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(wakePoolData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('pool could not be woken up')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('pool woken up successfully'));
+    getPools();
+    getUnassignedDisks();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const sleepPool = async (pool) => {
+  overlay.value = true;
+  const sleepPoolData = {
+    devices: [
+      ...(pool.data_devices ? pool.data_devices.map((d) => d.device) : []),
+      ...(pool.parity_devices ? pool.parity_devices.map((d) => d.device) : []),
+    ],
+  };
+
+  try {
+    const res = await fetch(`/api/v1/disks/sleep`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sleepPoolData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('pool could not be put to sleep')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('pool put to sleep successfully'));
+    getPools();
+    getUnassignedDisks();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);

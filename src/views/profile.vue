@@ -16,7 +16,15 @@
               required
               @update:modelValue="changeLanguage()"
             />
-            <v-select v-model="selectedByteFormat" :items="byte_format"  item-title="name" item-value="name" :label="$t('byte unit')" required @update:modelValue="changeByteUnit()" />
+            <v-select
+              v-model="selectedByteFormat"
+              :items="byte_format"
+              :item-title="(option) => $t(option)"
+              :item-value="(option) => option"
+              :label="$t('byte unit')"
+              required
+              @update:modelValue="changeByteUnit()"
+            />
             <v-text-field v-model="expiryDays" :label="$t('ui session expiry time (days)')" append-icon="mdi-content-save" type="number" min="1" max="365" @click:append="changeUiSessionExpiry()" />
             <h3>{{ $t('uicolor') }}</h3>
             <v-color-picker v-model="color" show-swatches hide-canvas hide-sliders hide-inputs @update:modelValue="changePrimaryColor" />
@@ -96,7 +104,7 @@ const selectedLanguage = ref(locale.value);
 const languages = ref(availableLocales);
 const selectedByteFormat = ref('');
 const expiryDays = ref(1);
-const byte_format = ref(['binary', 'decimal']);
+const byte_format = ref([t('binary'), t('decimal')]);
 const theme = useTheme();
 const color = ref(theme.themes.value[theme.global.name.value].colors.primary || '#1976D2');
 const adminTokens = ref([]);

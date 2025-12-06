@@ -10,7 +10,7 @@
           <v-card-text class="pa-0">
             <v-table class="bg-transparent">
               <thead>
-                <tr>
+                <tr style="cursor: pointer; background-color: rgba(0,0,0,0.04);">
                   <th style="width: 42px"></th>
                   <th style="min-width: 250px">{{ $t('name') }}</th>
                   <th style="width: 42px">{{ $t('state') }}</th>

@@ -778,5 +778,14 @@
   "scrub schedule (cron)": "Scrub Schedule (Cron)",
   "check schedule (cron)": "Check Schedule (Cron)",
   "snapraid schedules could not be saved": "SnapRAID schedules could not be saved",
-  "snapraid schedules saved successfully": "SnapRAID schedules saved successfully"  
+  "snapraid schedules saved successfully": "SnapRAID schedules saved successfully",
+  "binary": "Binary",
+  "decimal": "Decimal",
+  "pool could not be woken up": "Pool konnte nicht aufgeweckt werden",
+  "pool wakeup successfully": "Pool erfolgreich aufgeweckt",
+  "spin up pool": "Spin Up Pool",
+  "spin down pool": "Spin Down Pool",
+  "pool could not be put to sleep": "Pool could not be put to sleep",
+  "pool put to sleep successfully": "Pool successfully put to sleep",
+  "boot": "Boot"
 }
