@@ -11,7 +11,7 @@
               <template v-for="(disk, index) in disks" :key="disk.device">
                 <v-list-item>
                   <template v-slot:prepend>
-                    <v-icon class="cursor-pointer" :color="disk.powerStatus === 'active' ? 'green' : disk.powerStatus === 'standby' ? 'blue' : 'red'">
+                    <v-icon class="cursor-pointer" :color="disk.powerStatus === 'active' ? 'green' : disk.powerStatus === 'standby' ? 'blue' : 'red'" @dblclick="disk.powerStatus === 'active' ? sleepDisk(disk) : wakeDisk(disk)">
                       {{ getDiskIcon(disk.type) }}
                     </v-icon>
                   </template>
@@ -31,13 +31,13 @@
                       </template>
                       <v-list>
                         <v-list-item>
-                          <v-list-item-title @click="spinDownDisk(disk)">
-                            {{ $t('spindown') }}
+                          <v-list-item-title @click="sleepDisk(disk)">
+                            {{ $t('sleep disk') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>
-                          <v-list-item-title @click="spinUpDisk(disk)">
-                            {{ $t('spinup') }}
+                          <v-list-item-title @click="wakeDisk(disk)">
+                            {{ $t('wake disk') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>
@@ -150,7 +150,7 @@ const getDiskIcon = (type) => {
   }
 };
 
-const spinUpDisk = async (disk) => {
+const wakeDisk = async (disk) => {
   overlay.value = true;
   try {
     const res = await fetch(`/api/v1/disks/${disk.name}/wake`, {
@@ -170,7 +170,7 @@ const spinUpDisk = async (disk) => {
   }
 };
 
-const spinDownDisk = async (disk) => {
+const sleepDisk = async (disk) => {
   overlay.value = true;
   try {
     const res = await fetch(`/api/v1/disks/${disk.name}/sleep`, {

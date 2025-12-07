@@ -787,5 +787,11 @@
   "spin down pool": "Pool Spindown",
   "pool could not be put to sleep": "Pool konnte nicht in den Ruhezustand versetzt werden",
   "pool put to sleep successfully": "Pool erfolgreich in den Ruhezustand versetzt",
-  "extra partition": "Extra Partition"
+  "extra partition": "Extra Partition",
+  "disk could not be woken up": "Festplatte konnte nicht aufgeweckt werden",
+  "disk woken up successfully": "Festplatte erfolgreich aufgeweckt",
+  "disk could not be put to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden",
+  "disk put to sleep successfully": "Festplatte erfolgreich in den Ruhezustand versetzt",
+  "wake disk": "Festplatte aufwecken",
+  "sleep disk": "Festplatte Ruhezustand"
 }

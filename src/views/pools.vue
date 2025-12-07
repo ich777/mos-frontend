@@ -35,7 +35,7 @@
               <v-list-item-title class="pt-2 pl-4">{{ $t('disks') }}</v-list-item-title>
               <v-list-item v-for="data_device in pool.data_devices" :key="data_device.id">
                 <template v-slot:prepend>
-                  <v-icon class="cursor-pointer" :color="data_device.powerStatus === 'active' ? 'green' : data_device.powerStatus === 'standby' ? 'blue' : 'red'">
+                  <v-icon class="cursor-pointer" :color="data_device.powerStatus === 'active' ? 'green' : data_device.powerStatus === 'standby' ? 'blue' : 'red'" @dblclick="data_device.powerStatus === 'active' ? sleepDisk(data_device) : wakeDisk(data_device)">
                     {{ getDiskIcon(data_device.diskType.type) }}
                   </v-icon>
                 </template>
@@ -65,7 +65,7 @@
               <v-list-item-title class="pt-2 pl-4">{{ $t('parities') }}</v-list-item-title>
               <v-list-item v-for="parity_device in pool.parity_devices" :key="parity_device.id">
                 <template v-slot:prepend>
-                  <v-icon class="cursor-pointer" :color="parity_device.powerStatus === 'active' ? 'green' : parity_device.powerStatus === 'standby' ? 'blue' : 'red'">
+                  <v-icon class="cursor-pointer" :color="parity_device.powerStatus === 'active' ? 'green' : parity_device.powerStatus === 'standby' ? 'blue' : 'red'" @dblclick="parity_device.powerStatus === 'active' ? sleepDisk(parity_device) : wakeDisk(parity_device)">
                     {{ getDiskIcon(parity_device.diskType.type) }}
                   </v-icon>
                 </template>
@@ -1540,6 +1540,68 @@ const sleepPool = async (pool) => {
       throw new Error(`${t('pool could not be put to sleep')}|$| ${errorDetails.error || t('unknown error')}`);
     }
     showSnackbarSuccess(t('pool put to sleep successfully'));
+    getPools();
+    getUnassignedDisks();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const wakeDisk = async (disk) => {
+  overlay.value = true;
+  const wakeDiskData = {
+    devices: [disk.device],
+  };
+
+  try {
+    const res = await fetch(`/api/v1/disks/wake`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(wakeDiskData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('disk could not be woken up')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('disk woken up successfully'));
+    getPools();
+    getUnassignedDisks();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const sleepDisk = async (disk) => {
+  overlay.value = true;
+  const sleepDiskData = {
+    devices: [disk.device],
+  };
+
+  try {
+    const res = await fetch(`/api/v1/disks/sleep`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sleepDiskData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('disk could not be put to sleep')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('disk put to sleep successfully'));
     getPools();
     getUnassignedDisks();
   } catch (e) {

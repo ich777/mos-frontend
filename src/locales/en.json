@@ -787,5 +787,11 @@
   "spin down pool": "Spin Down Pool",
   "pool could not be put to sleep": "Pool could not be put to sleep",
   "pool put to sleep successfully": "Pool successfully put to sleep",
-  "extra partition": "Extra Partition"
+  "extra partition": "Extra Partition",
+  "disk could not be woken up": "Disk could not be woken up",
+  "disk woken up successfully": "Disk woken up successfully",
+  "disk could not be put to sleep": "Disk could not be put to sleep",
+  "disk put to sleep successfully": "Disk put to sleep successfully",
+  "wake disk": "Wake Disk",
+  "sleep disk": "Sleep Disk"  
 }
