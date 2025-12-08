@@ -11,6 +11,11 @@
               {{ $t('install to disk') }}
             </v-btn>
           </v-card-text>
+          <v-card-text>
+            <v-btn color="primary" rounded @click="openFileEditor('/boot/grub/grub.cfg')">
+              {{ $t('edit grub.cfg') }}
+            </v-btn>
+          </v-card-text>
         </v-card>
       </v-container>
     </v-container>
@@ -35,31 +40,49 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <FileEditDialog v-model="editFileDialogVisible" :path="selectedFilePath" :createBackup="true" :title="$t('Config bearbeiten')" @saved="onFileSaved" />
+
+  <v-overlay :model-value="overlay" class="align-center justify-center">
+    <v-progress-circular indeterminate size="64" color="primary" />
+  </v-overlay>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, onUnmounted } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
+import FileEditDialog from '@/components/FileEditDialog.vue';
 
+const editFileDialogVisible = ref(false);
+const selectedFilePath = ref('');
+const onFileSaved = (file) => {
+  console.log('File saved:', file);
+};
+const overlay = ref(false);
 const { t } = useI18n();
 const unassignedDisks = ref([]);
 const installToDiskDialog = reactive({
   value: false,
   disk: '',
   filesystem: '',
-  extra_partition: false
+  extra_partition: false,
 });
 
 onMounted(() => {
   getUnassignedDisks();
 });
 
+const openFileEditor = (path) => {
+  selectedFilePath.value = path;
+  editFileDialogVisible.value = true;
+};
+
 const installToDisk = async () => {
   const installToDiskBody = {
     disk: installToDiskDialog.disk,
     filesystem: installToDiskDialog.filesystem,
-    extra_partition: installToDiskDialog.extra_partition
+    extra_partition: installToDiskDialog.extra_partition,
   };
 
   try {

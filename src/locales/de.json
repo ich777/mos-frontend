@@ -793,5 +793,6 @@
   "disk could not be put to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden",
   "disk put to sleep successfully": "Festplatte erfolgreich in den Ruhezustand versetzt",
   "wake disk": "Festplatte aufwecken",
-  "sleep disk": "Festplatte Ruhezustand"
+  "sleep disk": "Festplatte Ruhezustand",
+  "edit grub.cfg": "grub.cfg bearbeiten"
 }

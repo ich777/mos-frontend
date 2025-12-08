@@ -793,5 +793,6 @@
   "disk could not be put to sleep": "Disk could not be put to sleep",
   "disk put to sleep successfully": "Disk put to sleep successfully",
   "wake disk": "Wake Disk",
-  "sleep disk": "Sleep Disk"  
+  "sleep disk": "Sleep Disk",
+  "edit grub.cfg": "Edit grub.cfg"
 }

@@ -11,47 +11,16 @@
 
       <v-card-subtitle class="pb-0">
         <div class="d-flex align-center ga-2">
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-home"
-            @click="goRoot"
-            color="secondary"
-            :disabled="loading"
-          />
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-arrow-up"
-            @click="goUp"
-            color="secondary"
-            :disabled="!canGoUp || loading"
-          />
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-refresh"
-            @click="reload"
-            color="secondary"
-            :disabled="loading"
-          />
+          <v-btn size="small" variant="text" icon="mdi-home" @click="goRoot" color="secondary" :disabled="loading" />
+          <v-btn size="small" variant="text" icon="mdi-arrow-up" @click="goUp" color="secondary" :disabled="!canGoUp || loading" />
+          <v-btn size="small" variant="text" icon="mdi-refresh" @click="reload" color="secondary" :disabled="loading" />
           <v-spacer />
-          <v-progress-circular
-            v-if="loading"
-            indeterminate
-            size="20"
-            color="secondary"
-          />
+          <v-progress-circular v-if="loading" indeterminate size="20" color="secondary" />
         </div>
       </v-card-subtitle>
 
       <v-card-text class="pt-2" style="min-height: 300px; max-height: 60vh; overflow-y: auto">
-        <v-alert
-          v-if="errorMessage"
-          type="error"
-          density="compact"
-          class="mb-2"
-        >
+        <v-alert v-if="errorMessage" type="error" density="compact" class="mb-2">
           {{ errorMessage }}
         </v-alert>
 
@@ -73,10 +42,7 @@
             <tr
               v-for="item in items"
               :key="item.path"
-              :class="[
-                'cursor-pointer',
-                activeItem && activeItem.path === item.path ? 'bg-primary bg-opacity-10' : '',
-              ]"
+              :class="['cursor-pointer', activeItem && activeItem.path === item.path ? 'bg-primary bg-opacity-10' : '']"
               @click="setActiveItem(item)"
               @dblclick.stop.prevent="handleRowDblClick(item)"
             >
@@ -92,22 +58,8 @@
                 <span class="text-caption">{{ item.displayPath || item.path }}</span>
               </td>
               <td class="text-center">
-                <v-btn
-                  v-if="item.type === 'directory'"
-                  size="small"
-                  icon="mdi-folder-open"
-                  variant="text"
-                  @click.stop="navigateInto(item)"
-                  :disabled="loading"
-                />
-                <v-btn
-                  v-else-if="isSelectable(item)"
-                  size="small"
-                  icon="mdi-check"
-                  variant="text"
-                  @click.stop="confirmSelect(item)"
-                  :disabled="loading"
-                />
+                <v-btn v-if="item.type === 'directory'" size="small" icon="mdi-folder-open" variant="text" @click.stop="navigateInto(item)" :disabled="loading" />
+                <v-btn v-else-if="isSelectable(item)" size="small" icon="mdi-check" variant="text" @click.stop="confirmSelect(item)" :disabled="loading" />
               </td>
             </tr>
           </tbody>
@@ -128,12 +80,7 @@
         <v-btn variant="text" color="onPrimary" @click="onCancel">
           {{ t('cancel') }}
         </v-btn>
-        <v-btn
-          v-if="showSelectButton"
-          color="onPrimary"
-          :disabled="!activeItem || !isSelectable(activeItem) || loading"
-          @click="confirmSelect()"
-        >
+        <v-btn v-if="showSelectButton" color="onPrimary" :disabled="!activeItem || !isSelectable(activeItem) || loading" @click="confirmSelect()">
           {{ t('select') }}
         </v-btn>
       </v-card-actions>
