@@ -56,9 +56,7 @@ import FileEditDialog from '@/components/fileEditDialog.vue';
 
 const editFileDialogVisible = ref(false);
 const selectedFilePath = ref('');
-const onFileSaved = (file) => {
-  console.log('File saved:', file);
-};
+
 const overlay = ref(false);
 const { t } = useI18n();
 const unassignedDisks = ref([]);
@@ -77,6 +75,7 @@ const openFileEditor = (path) => {
   selectedFilePath.value = path;
   editFileDialogVisible.value = true;
 };
+const onFileSaved = (file) => {};
 
 const installToDisk = async () => {
   const installToDiskBody = {

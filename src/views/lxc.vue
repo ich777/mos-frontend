@@ -25,6 +25,10 @@
                             </v-img>
                           </template>
                           <v-list>
+                            <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)">
+                              <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
+                            </v-list-item>
+                            <v-divider />
                             <v-list-item v-if="lxc.state !== 'running'" @click="startLXC(lxc.name)">
                               <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                             </v-list-item>
@@ -46,8 +50,8 @@
                             <v-list-item @click="openDeleteDialog(lxc)">
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                             </v-list-item>
-                            <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)">
-                              <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
+                            <v-list-item v-if="lxc.config && lxc.config != ''" @click="openFileEditor(lxc.config)">
+                              <v-list-item-title>{{ $t('edit config') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-menu>
@@ -108,6 +112,8 @@
     </v-card>
   </v-dialog>
 
+  <FileEditDialog v-model="editFileDialogVisible" :path="selectedFilePath" :createBackup="true" :title="$t('Config bearbeiten')" @saved="onFileSaved" />
+
   <!-- Floating Action Button -->
   <v-fab @click="openCreateDialog()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-plus</v-icon>
@@ -124,7 +130,10 @@ import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import draggable from 'vuedraggable';
 import { useI18n } from 'vue-i18n';
 import { openTerminalPopup } from '@/composables/terminalpopup';
+import FileEditDialog from '@/components/fileEditDialog.vue';
 
+const editFileDialogVisible = ref(false);
+const selectedFilePath = ref('');
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const lxcs = ref([]);
 const images = ref([]);
@@ -147,6 +156,13 @@ onMounted(() => {
   getLXCs();
   getImages();
 });
+
+const openFileEditor = (path) => {
+  selectedFilePath.value = path;
+  editFileDialogVisible.value = true;
+};
+const onFileSaved = (file) => {};
+
 
 const getLXCs = async () => {
   try {

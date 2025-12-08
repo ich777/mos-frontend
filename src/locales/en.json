@@ -794,5 +794,6 @@
   "disk put to sleep successfully": "Disk put to sleep successfully",
   "wake disk": "Wake Disk",
   "sleep disk": "Sleep Disk",
-  "edit grub.cfg": "Edit grub.cfg"
+  "edit grub.cfg": "Edit grub.cfg",
+  "edit config": "Edit config"
 }

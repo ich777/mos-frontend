@@ -794,5 +794,6 @@
   "disk put to sleep successfully": "Festplatte erfolgreich in den Ruhezustand versetzt",
   "wake disk": "Festplatte aufwecken",
   "sleep disk": "Festplatte Ruhezustand",
-  "edit grub.cfg": "grub.cfg bearbeiten"
+  "edit grub.cfg": "grub.cfg bearbeiten",
+  "edit config": "Konfiguration bearbeiten"
 }
