@@ -35,7 +35,7 @@
                         <v-menu v-model="group.menu">
                           <template #activator="{ props }">
                             <v-img
-                              v-if="group.icon != '' && !group.icon.toLowerCase().includes('mdi')"
+                              v-if="group.icon && group.icon != '' && !group.icon.toLowerCase().includes('mdi')"
                               class="drag-handle"
                               v-bind="props"
                               :src="`/docker_icons/compose/${group.icon}.png`"
