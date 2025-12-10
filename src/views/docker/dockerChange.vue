@@ -99,7 +99,18 @@
                   </v-row>
                   <v-row class="mt-n8">
                     <v-col cols="6">
-                      <v-text-field :label="$t('host')" v-model="path.host" density="compact" hide-details append-inner-icon="mdi-folder" @click:append-inner="openFsDialog((item) => { path.host = item.path })" ></v-text-field>                      
+                      <v-text-field
+                        :label="$t('host')"
+                        v-model="path.host"
+                        density="compact"
+                        hide-details
+                        append-inner-icon="mdi-folder"
+                        @click:append-inner="
+                          openFsDialog((item) => {
+                            path.host = item.path;
+                          })
+                        "
+                      ></v-text-field>
                     </v-col>
                     <v-col cols="6">
                       <v-text-field :label="$t('container')" v-model="path.container" density="compact" hide-details></v-text-field>
@@ -323,9 +334,29 @@
       <v-card-text class="pa-1">
         <div
           ref="wsScrollContainer"
-          style="flex-grow: 1; height: calc(100vh - 340px); overflow: auto; white-space: pre; font-family: monospace; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 4px"
+          :style="{
+            flexGrow: 1,
+            height: 'calc(100vh - 340px)',
+            overflow: 'auto',
+            whiteSpace: 'pre',
+            fontFamily: 'monospace',
+            border: '1px solid ' + ($vuetify.theme && $vuetify.theme.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)'),
+            borderRadius: '4px',
+            backgroundColor: $vuetify.theme && $vuetify.theme.name == 'dark' ? '#121212' : '#fafafa',
+            color: $vuetify.theme && $vuetify.theme.name == 'dark' ? '#e0e0e0' : '#111',
+          }"
         >
-          <div v-for="(line, index) in wsOperationDialog.data" :key="index" style="padding-left: 4px; padding-right: 4px; background-color: #fafafa; color: #111; white-space: pre-wrap">
+          <div
+            v-for="(line, index) in wsOperationDialog.data"
+            :key="index"
+            :style="{
+              paddingLeft: '4px',
+              paddingRight: '4px',
+              whiteSpace: 'pre-wrap',
+              backgroundColor: $vuetify.theme && $vuetify.theme.name == 'dark' ? 'transparent' : '#fafafa',
+              color: $vuetify.theme && $vuetify.theme.name == 'dark' ? '#e0e0e0' : '#111',
+            }"
+          >
             <small>{{ line.output }}</small>
           </div>
         </div>
