@@ -119,7 +119,7 @@ const sendDockerWSCommand = (command: string, params?: DockerWsParams) => {
         wsOperationDialog.operationId = data.operationId;
         wsOperationDialog.data.push({
           timestamp: data.timestamp,
-          output: `${command} ${data.status}\n----------------------------------------------\n`,
+          output: `${command} ${data.status}\n--------------------------------------\n`,
         });
       } else if (data.status === 'running') {
         wsOperationDialog.data.push({
@@ -133,7 +133,7 @@ const sendDockerWSCommand = (command: string, params?: DockerWsParams) => {
         onSuccessSnackbar(t('docker command completed successfully'));
         wsOperationDialog.data.push({
           timestamp: data.timestamp,
-          output: `----------------------------------------------\n${command} ${data.status}`,
+          output: `--------------------------------------\n${command} ${data.status}`,
         });
         cleanupSocket();
 

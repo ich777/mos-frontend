@@ -78,9 +78,7 @@ function formatBytesPerSec(bytesPerSec) {
   return `${v.toFixed(v >= 100 ? 0 : v >= 10 ? 1 : 2)} ${units[i]}`
 }
 
-/* ===== Theme-Integration ===== */
 function themeHost() {
-  // Vuetify hängt die Klassen oft an <html>; zur Sicherheit suchen
   return document.querySelector('.v-theme--dark, .v-theme--light') || document.documentElement
 }
 function cssRgb(varName) {
@@ -95,7 +93,6 @@ function applyChartTheme() {
   const onSurface = cssRgb('--v-theme-on-surface')
   const surface   = cssRgb('--v-theme-surface')
 
-  // gut sichtbare, aber nicht dominante Linien/Farben
   const gridColor   = rgba(onSurface, 0.16)
   const tickColor   = rgba(onSurface, 0.85)
   const legendColor = rgba(onSurface, 0.9)
@@ -122,7 +119,6 @@ function observeThemeChanges() {
   themeObserver.observe(host, { attributes: true, attributeFilter: ['class'] })
 }
 
-/* ===== Chart Setup ===== */
 function initChart() {
   if (!chartEl.value) return
   chart = markRaw(new Chart(chartEl.value.getContext('2d'), {
@@ -167,7 +163,6 @@ function syncAndUpdateChart() {
   chart.update('none')
 }
 
-/* ===== Daten-Feed ===== */
 watch(
   () => network.value?.interfaces?.[0],
   (newVal) => {
@@ -201,7 +196,6 @@ watch(
   { immediate: true, deep: true }
 )
 
-/* ===== Lifecycle ===== */
 onMounted(() => initChart())
 onBeforeUnmount(() => {
   if (themeObserver) { themeObserver.disconnect(); themeObserver = null }

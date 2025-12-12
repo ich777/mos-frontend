@@ -795,5 +795,10 @@
   "wake disk": "Festplatte aufwecken",
   "sleep disk": "Festplatte Ruhezustand",
   "edit grub.cfg": "grub.cfg bearbeiten",
-  "edit config": "Konfiguration bearbeiten"
+  "edit config": "Konfiguration bearbeiten",
+  "read": "Lesen",
+  "write": "Schreiben",
+  "r/s": "R/s",
+  "w/s": "W/s",
+  "widget settings": "Widget Einstellungen"
 }

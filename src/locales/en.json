@@ -795,5 +795,10 @@
   "wake disk": "Wake Disk",
   "sleep disk": "Sleep Disk",
   "edit grub.cfg": "Edit grub.cfg",
-  "edit config": "Edit config"
+  "edit config": "Edit config",
+  "read": "Read",
+  "write": "Write",
+  "r/s": "R/s",
+  "w/s": "W/s",
+  "widget settings": "Widget Settings"  
 }
