@@ -102,7 +102,6 @@ const composeStack = reactive({
 });
 
 onMounted(() => {
-  console.log(props);
   if (props.template || props.yaml || props.env) {
     const template = props.template ? decodeURIComponent(props.template) : props.template;
     const yaml = props.yaml ? decodeURIComponent(props.yaml) : props.yaml;

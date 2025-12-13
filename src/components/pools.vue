@@ -1,5 +1,6 @@
 <template>
-  <div v-for="(pool, index) in pools" :key="index" class="py-1">
+  <div v-if="props.pools && props.pools.length" style="overflow: hidden">
+  <div v-for="(pool, index) in props.pools" :key="index" class="py-1">
     <div class="d-flex justify-space-between align-center w-100 mb-1">
       <div class="text-body-2 font-weight-medium">{{ pool.name }}</div>
       <div class="text-caption">{{ pool.status?.usedSpace_human || '-' }} / {{ pool.status?.totalSpace_human || '-' }}</div>
@@ -16,21 +17,19 @@
       </template>
     </v-progress-linear>
   </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
-const pools = ref([]);
-const poolsLoading = ref(true);
-
-onMounted(() => {
-  getPools();
+const props = defineProps({
+  pools: {
+    type: Array,
+    default: () => [],
+  }
 });
 
-const getPools = async () => {
+/*const getPools = async () => {
   try {
     const res = await fetch('/api/v1/pools', {
       headers: {
@@ -49,5 +48,5 @@ const getPools = async () => {
   } finally {
     poolsLoading.value = false;
   }
-};
+};*/
 </script>

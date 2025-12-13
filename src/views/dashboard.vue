@@ -72,7 +72,6 @@ import OS from '../components/os.vue';
 import Network from '../components/network.vue';
 import Pools from '../components/pools.vue';
 import Disks from '../components/disks.vue';
-import { vi } from 'vuetify/locale';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
@@ -84,10 +83,12 @@ const components = {
   Memory,
   Disks,
 };
+
 const cpu = ref(null);
 const network = ref(null);
 const memory = ref(null);
 const pools = ref([]);
+const disks = ref([]);
 const temperature = ref(null);
 const isConnected = ref(false);
 const error = ref(null);
@@ -129,8 +130,6 @@ const visibility = ref({
   Memory: true,
   Disks: true,
 });
-
-
 let socket = null;
 
 onMounted(() => {
@@ -154,17 +153,47 @@ const labelFor = (kind) => {
 const loadLayout = () => {
   try {
     const saved = JSON.parse(localStorage.getItem('dashLayout'));
-    if (saved?.left && saved?.right) {
-      left.value = saved.left.map(({ id, kind }) => ({ id, kind }));
-      right.value = saved.right.map(({ id, kind }) => ({ id, kind }));
+    if (saved?.left && saved?.right && saved?.visibility) {
+      const savedLeft = Array.isArray(saved.left) ? saved.left.map(({ id, kind }) => ({ id, kind })) : [];
+      const savedRight = Array.isArray(saved.right) ? saved.right.map(({ id, kind }) => ({ id, kind })) : [];
+      const kindsSeen = new Set();
+      const filterUnique = (arr) => arr.filter(({ kind }) => {
+        if (!kind || kindsSeen.has(kind)) return false;
+        kindsSeen.add(kind);
+        return true;
+      });
+
+      const normLeft = filterUnique(savedLeft);
+      const normRight = filterUnique(savedRight);
+
+      const missing = ALL_WIDGETS.filter(k => !kindsSeen.has(k));
+      missing.forEach((kind, i) => {
+        const baseId = kindKeyMap[kind] || kind.toLowerCase();
+        const newId = `${baseId}-added-${i}`;
+        if (normLeft.length <= normRight.length) normLeft.push({ id: newId, kind });
+        else normRight.push({ id: newId, kind });
+      });
+
+      left.value = normLeft;
+      right.value = normRight;
       visibility.value = { ...DEFAULT_VISIBILITY, ...(saved.visibility || {}) };
+      ALL_WIDGETS.forEach(k => {
+        if (visibility.value[k] === undefined) visibility.value[k] = !!DEFAULT_VISIBILITY[k];
+      });
+      return;
+    } else {
+      localStorage.removeItem('dashLayout');
+      left.value = DEFAULT_LEFT;
+      right.value = DEFAULT_RIGHT;
+      visibility.value = { ...DEFAULT_VISIBILITY };
       return;
     }
-  } catch (_) {}
-
-  left.value = DEFAULT_LEFT;
-  right.value = DEFAULT_RIGHT;
-  visibility.value = { ...DEFAULT_VISIBILITY };
+  } catch (_) {
+      left.value = DEFAULT_LEFT;
+      right.value = DEFAULT_RIGHT;
+      visibility.value = { ...DEFAULT_VISIBILITY };
+      return;
+  }
 };
 
 const saveLayout = () => {
@@ -189,6 +218,8 @@ const widgetProps = (kind) => {
     case 'Memory':
       return { memory: memory.value };
     case 'Disks':
+      return { disks: disks.value };
+    case 'Pools':
       return { pools: pools.value };
     default:
       return {};
@@ -201,7 +232,7 @@ const widgetVisible = (kind) => {
   if (kind === 'Processor') return !!visibility.value?.Processor && !!cpu.value;
   if (kind === 'Network') return !!visibility.value?.Network && !!network.value;
   if (kind === 'Memory') return !!visibility.value?.Memory && !!memory.value;
-  if (kind === 'Pools') return !!visibility.value?.Pools;
+  if (kind === 'Pools') return !!visibility.value?.Pools && !!pools.value;
   if (kind === 'Disks') return !!visibility.value?.Disks && !!pools.value;
   return !!visibility.value?.[kind];
 }
@@ -211,12 +242,20 @@ const getLoad = async () => {
     const res = await fetch('/api/v1/system/load', {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
     });
+    const resPools = await fetch('/api/v1/pools', {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+    });
+
     if (!res.ok) throw new Error('API-Error');
     const result = await res.json();
     network.value = result.network;
     cpu.value = result.cpu;
     memory.value = result.memory;
     temperature.value = result.temperature;
+
+    if (!resPools.ok) throw new Error('API-Error');
+    pools.value = await resPools.json();
+
   } catch (e) {
     error.value = e.message;
   }
@@ -250,7 +289,7 @@ const getLoadWS = () => {
     if (data.memory) memory.value = data.memory;
     if (data.network) network.value = data.network;
     if (data.temperature) temperature.value = data.temperature;
-    if (data.pools) pools.value = data.pools;
+    if (data.pools) disks.value = data.pools; //Für disks werden hier pools verwendet
   };
   socket.on('get-load', apply);
   socket.on('load-update', apply);
