@@ -32,12 +32,12 @@
                       <v-list>
                         <v-list-item>
                           <v-list-item-title @click="sleepDisk(disk)">
-                            {{ $t('sleep disk') }}
+                            {{ $t('sleep') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>
                           <v-list-item-title @click="wakeDisk(disk)">
-                            {{ $t('wake disk') }}
+                            {{ $t('wake up') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>

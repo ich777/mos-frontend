@@ -792,8 +792,8 @@
   "disk woken up successfully": "Disk woken up successfully",
   "disk could not be put to sleep": "Disk could not be put to sleep",
   "disk put to sleep successfully": "Disk put to sleep successfully",
-  "wake disk": "Wake Disk",
-  "sleep disk": "Sleep Disk",
+  "wake up": "Wake Up",
+  "sleep": "Sleep",
   "edit grub.cfg": "Edit grub.cfg",
   "edit config": "Edit config",
   "read": "Read",
@@ -802,5 +802,7 @@
   "r/s": "R/s",
   "w/s": "W/s",
   "widget settings": "Widget Settings",
-  "device(s)": "Device(s)"
+  "device(s)": "Device(s)",
+  "disk successfully woken up": "Disk successfully woken up",
+  "failed to wake up disk": "Failed to wake up disk"  
 }

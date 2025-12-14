@@ -792,8 +792,8 @@
   "disk woken up successfully": "Festplatte erfolgreich aufgeweckt",
   "disk could not be put to sleep": "Festplatte konnte nicht in den Ruhezustand versetzt werden",
   "disk put to sleep successfully": "Festplatte erfolgreich in den Ruhezustand versetzt",
-  "wake disk": "Festplatte aufwecken",
-  "sleep disk": "Festplatte Ruhezustand",
+  "wake up": "Aufwecken",
+  "sleep": "Ruhezustand",
   "edit grub.cfg": "grub.cfg bearbeiten",
   "edit config": "Konfiguration bearbeiten",
   "read": "Gelesen",
@@ -802,5 +802,7 @@
   "r/s": "R/s",
   "w/s": "W/s",
   "widget settings": "Widget Einstellungen",
-  "device(s)": "Gerät(e)"
+  "device(s)": "Gerät(e)",
+  "disk successfully woken up": "Festplatte erfolgreich aufgeweckt",
+  "failed to wake up disk": "Festplatte konnte nicht aufgeweckt werden"
 }
