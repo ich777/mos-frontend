@@ -18,7 +18,7 @@
             <v-textarea v-model="composeStack.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
             <v-textarea v-model="composeStack.env" :label="$t('environment variables')" rows="5"></v-textarea>
             <v-text-field v-model="composeStack.icon" :label="$t('icon url')"></v-text-field>
-            <v-text-field v-model="composeStack.webui" :label="$t('web ui url')"></v-text-field>
+            <v-text-field v-model="composeStack.web_ui_url" :label="$t('web ui url')"></v-text-field>
           </v-card-text>
         </v-card>
       </v-container>
@@ -94,21 +94,23 @@ const props = defineProps({
   template: String,
   yaml: String,
   env: String,
+  web_ui_url: String,
 });
 const composeStack = reactive({
   name: '',
   yaml: '',
   env: '',
   icon: '',
-  webui: '',
+  web_ui_url: '',
 });
 
 onMounted(() => {
-  if (props.template || props.yaml || props.env) {
+  if (props.template || props.yaml || props.env || props.web_ui_url) {
     const template = props.template ? decodeURIComponent(props.template) : props.template;
     const yaml = props.yaml ? decodeURIComponent(props.yaml) : props.yaml;
     const env = props.env ? decodeURIComponent(props.env) : props.env;
-    getComposeHubTemplate(template, yaml, env);
+    const web_ui_url = props.web_ui_url ? decodeURIComponent(props.web_ui_url) : props.web_ui_url;
+    getComposeHubTemplate(template, yaml, env, web_ui_url);
   }
 });
 
@@ -122,8 +124,8 @@ const createComposeStack = async () => {
   sendDockerWSCommand('compose-create', composeStack);
 };
 
-const getComposeHubTemplate = async (template, yaml, env) => {
-  const newFilesBody = { template: template, yaml: yaml, env: env };
+const getComposeHubTemplate = async (template, yaml, env, web_ui_url) => {
+  const newFilesBody = { template: template, yaml: yaml, env: env, web_ui_url: web_ui_url };
   try {
     overlay.value = true;
     const res = await fetch('/api/v1/mos/hub/compose/template', {
@@ -145,7 +147,7 @@ const getComposeHubTemplate = async (template, yaml, env) => {
     composeStack.yaml = jsonData.yaml || '';
     composeStack.env = jsonData.env || '';
     composeStack.icon = jsonData.icon || '';
-    composeStack.webui = jsonData.webui || '';
+    composeStack.web_ui_url = jsonData.web_ui_url || '';
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
