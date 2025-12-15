@@ -1772,7 +1772,30 @@ const showWebui = (docker) => {
 };
 
 const showComposeWebui = (group) => {
-  window.open(`${group.webui}`, '_blank');
+  if (!group.webui) return;
+  let webui = group.webui;
+  const portMatch = webui.match(/PORT:(\d+)/);
+  if (portMatch) {
+    for (const containerName of group.containers || []) {
+      const container = dockers.value.find((d) => d.Names && d.Names[0] === containerName);
+      if (container && Array.isArray(container.Ports)) {
+        const portObj = container.Ports.find((port) => port.PrivatePort === Number(portMatch[1]));
+        if (portObj) {
+          const port = portObj.PublicPort ? portObj.PublicPort : portObj.PrivatePort;
+          webui = webui.replace(/\[PORT:\d+\]/g, port);
+          break;
+        }
+      }
+    }
+    if (webui.includes('[PORT:')) {
+      webui = webui.replace(/\[PORT:\d+\]/g, portMatch[1]);
+    }
+  }
+  const addressMatch = webui.match(/\[ADDRESS\]/g);
+  if (addressMatch) {
+    webui = webui.replace(/\[ADDRESS\]/g, window.location.hostname);
+  }
+  window.open(webui, '_blank');
 };
 
 const openInfoDialog = (docker) => {
