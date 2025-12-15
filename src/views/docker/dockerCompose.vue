@@ -18,6 +18,7 @@
             <v-textarea v-model="composeStack.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
             <v-textarea v-model="composeStack.env" :label="$t('environment variables')" rows="5"></v-textarea>
             <v-text-field v-model="composeStack.icon" :label="$t('icon url')"></v-text-field>
+            <v-text-field v-model="composeStack.webui" :label="$t('web ui url')"></v-text-field>
           </v-card-text>
         </v-card>
       </v-container>
@@ -99,6 +100,7 @@ const composeStack = reactive({
   yaml: '',
   env: '',
   icon: '',
+  webui: '',
 });
 
 onMounted(() => {
@@ -143,6 +145,7 @@ const getComposeHubTemplate = async (template, yaml, env) => {
     composeStack.yaml = jsonData.yaml || '';
     composeStack.env = jsonData.env || '';
     composeStack.icon = jsonData.icon || '';
+    composeStack.webui = jsonData.webui || '';
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);

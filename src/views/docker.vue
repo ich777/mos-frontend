@@ -73,6 +73,9 @@
                             <v-icon v-else class="drag-handle" style="cursor: grab" v-bind="props" color="grey-darken-1">mdi-folder</v-icon>
                           </template>
                           <v-list v-if="group.compose">
+                            <v-list-item v-if="group.webui" @click="showComposeWebui(group)">
+                              <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
+                            </v-list-item>
                             <v-list-item @click="startComposeStack(group.name)">
                               <v-list-item-title>{{ $t('start stack') }}</v-list-item-title>
                             </v-list-item>
@@ -132,7 +135,17 @@
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
                       <td>&nbsp;</td>
-                      <td>&nbsp;</td>
+                      <td>
+                        <v-switch
+                          v-if="group.compose"
+                          v-model="group.autostart"
+                          color="green"
+                          hide-details
+                          density="compact"
+                          @click.stop
+                          @change="switchComposeAutostart(group)"
+                        />
+                      </td>
                       <td>&nbsp;</td>
                       <td>
                         <v-btn icon density="compact" @click.stop="group.expanded = !group.expanded">
@@ -148,7 +161,7 @@
                             <v-img class="drag-handle" v-bind="props" :src="`/docker_icons/${containerName}.png`" alt="docker image" width="24" height="24" style="cursor: pointer">
                               <template #error>
                                 <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
-                                  <v-icon color="grey-darken-1">mdi-image-off</v-icon>
+                                  <v-icon color="grey-darken-1">{{ group.compose ? 'mdi-cube-outline' : 'mdi-image-off' }}</v-icon>
                                 </v-sheet>
                               </template>
                             </v-img>
@@ -211,10 +224,12 @@
                         </div>
                       </td>
                       <td>
-                        <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="red" @click="updateDocker(containerName)">
-                          mdi-autorenew
-                        </v-icon>
-                        <v-icon v-else color="green">mdi-check</v-icon>
+                        <template v-if="!group.compose">
+                          <v-icon v-if="mosDockers && mosDockers.find((item) => item.name === containerName && item.update_available)" color="red" @click="updateDocker(containerName)">
+                            mdi-autorenew
+                          </v-icon>
+                          <v-icon v-else color="green">mdi-check</v-icon>
+                        </template>
                       </td>
                       <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
                         {{ dockers.find((d) => d.Names && d.Names[0] === containerName)?.Image }}
@@ -267,6 +282,7 @@
                       </td>
                       <td>
                         <v-switch
+                          v-if="!group.compose"
                           :model-value="dockers.find((d) => d.Names && d.Names[0] === containerName)?.autostart ?? false"
                           color="green"
                           hide-details
@@ -650,6 +666,7 @@
         <v-textarea v-model="createComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
         <v-textarea v-model="createComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
         <v-text-field v-model="createComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
+        <v-text-field v-model="createComposeStackDialog.webui" :label="$t('web ui url')"></v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" @click="createComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -669,6 +686,7 @@
         <v-textarea v-model="editComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
         <v-textarea v-model="editComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
         <v-text-field v-model="editComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
+        <v-text-field v-model="editComposeStackDialog.webui" :label="$t('web ui url')"></v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" @click="editComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -761,6 +779,7 @@ const { t } = useI18n();
 const dockers = ref([]);
 const dockerGroups = ref([]);
 const mosDockers = ref([]);
+const composeStacks = ref([]);
 const overlay = ref(false);
 const menu = ref(false);
 const unusedImages = ref([]);
@@ -799,6 +818,7 @@ const { wsIsConnected, wsError, wsOperationDialog, wsScrollContainer, sendDocker
   onSuccessSnackbar: showSnackbarSuccess,
   onCompleted: async () => {
     await getDockers();
+    await getComposeStacks();
     await getDockerGroups();
   },
 });
@@ -808,6 +828,7 @@ const createComposeStackDialog = reactive({
   yaml: '',
   env: '',
   icon: '',
+  webui: '',
 });
 const editComposeStackDialog = reactive({
   value: false,
@@ -815,6 +836,7 @@ const editComposeStackDialog = reactive({
   yaml: '',
   env: '',
   icon: '',
+  webui: '',
 });
 const removeComposeStackDialog = reactive({
   value: false,
@@ -823,6 +845,7 @@ const removeComposeStackDialog = reactive({
 
 onMounted(async () => {
   await getDockers();
+  await getComposeStacks();
   await getDockerGroups();
   dockersLoading.value = false;
 });
@@ -890,6 +913,26 @@ const getDockers = async () => {
   }
 };
 
+const getComposeStacks = async () => {
+  try {
+    const res = await fetch('/api/v1/docker/mos/compose/stacks', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('compose stacks could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+    const result = await res.json();
+    composeStacks.value = result || [];
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
 const getDockerGroups = async () => {
   try {
     const res = await fetch('/api/v1/docker/mos/groups', {
@@ -907,9 +950,13 @@ const getDockerGroups = async () => {
 
     dockerGroups.value = newGroups.map((group) => {
       const old = dockerGroups.value.find((g) => g.id === group.id);
+      // Für Compose-Gruppen: webui und autostart aus composeStacks übernehmen
+      const composeStack = group.compose ? composeStacks.value.find((s) => s.name === group.name) : null;
       return {
         ...group,
         expanded: old ? old.expanded : false,
+        webui: composeStack?.webui || null,
+        autostart: composeStack?.autostart ?? false,
       };
     });
   } catch (e) {
@@ -1076,6 +1123,31 @@ const switchAutostart = async (docker) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(autostart),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('autostart setting could not be saved')}|$| ${error.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('autostart setting saved successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const switchComposeAutostart = async (group) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/docker/mos/compose/stacks/${encodeURIComponent(group.name)}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ autostart: group.autostart }),
     });
 
     if (!res.ok) {
@@ -1543,6 +1615,7 @@ const createComposeStack = async () => {
     yaml: createComposeStackDialog.yaml,
     env: createComposeStackDialog.env,
     icon: createComposeStackDialog.icon,
+    webui: createComposeStackDialog.webui,
   };
   sendDockerWSCommand('compose-create', newCompose);
 };
@@ -1635,6 +1708,7 @@ const editComposeStack = async () => {
     yaml: editComposeStackDialog.yaml,
     env: editComposeStackDialog.env,
     icon: editComposeStackDialog.icon,
+    webui: editComposeStackDialog.webui,
   };
   sendDockerWSCommand('compose-update', updatedCompose);
 };
@@ -1697,6 +1771,10 @@ const showWebui = (docker) => {
   window.open(`${docker.webui}`, '_blank');
 };
 
+const showComposeWebui = (group) => {
+  window.open(`${group.webui}`, '_blank');
+};
+
 const openInfoDialog = (docker) => {
   infoDialog.value = true;
   infoDialog.docker = docker;
@@ -1753,6 +1831,7 @@ const openCreateComposeStackDialog = () => {
   createComposeStackDialog.yaml = '';
   createComposeStackDialog.env = '';
   createComposeStackDialog.icon = '';
+  createComposeStackDialog.webui = '';
 };
 const openRemoveComposeStackDialog = (name) => {
   removeComposeStackDialog.value = true;
@@ -1769,5 +1848,6 @@ const openEditComposeStackDialog = async (name) => {
   editComposeStackDialog.yaml = stack.yaml;
   editComposeStackDialog.env = stack.env;
   editComposeStackDialog.icon = stack.icon;
+  editComposeStackDialog.webui = stack.webui || '';
 };
 </script>
