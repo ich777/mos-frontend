@@ -20,18 +20,33 @@
                         </template>
                         <v-list>
                           <v-list-item v-if="vm.state !== 'running'" @click="startVM(vm.name)">
+                            <template #prepend>
+                              <v-icon>mdi-play-circle</v-icon>
+                            </template>
                             <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                           </v-list-item>
                           <v-list-item v-if="vm.state === 'running'" @click="stopVM(vm.name)">
+                            <template #prepend>
+                              <v-icon>mdi-stop-circle</v-icon>
+                            </template>
                             <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                           </v-list-item>
                           <v-list-item v-if="vm.state === 'running'" @click="killVM(vm.name)">
+                            <template #prepend>
+                              <v-icon>mdi-close-octagon</v-icon>
+                            </template>
                             <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                           </v-list-item>
                           <v-list-item v-if="vm.state === 'running'" @click="restartVM(vm.name)">
+                            <template #prepend>
+                              <v-icon>mdi-restart</v-icon>
+                            </template>
                             <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                           </v-list-item>
                           <v-list-item v-if="vm.state === 'running'" @click="resetVM(vm.name)">
+                            <template #prepend>
+                              <v-icon>mdi-cached</v-icon>
+                            </template>
                             <v-list-item-title>{{ $t('reset') }}</v-list-item-title>
                           </v-list-item>
                         </v-list>

@@ -74,43 +74,79 @@
                           </template>
                           <v-list v-if="group.compose">
                             <v-list-item v-if="group.webui" @click="showComposeWebui(group)">
+                              <template #prepend>
+                                <v-icon>mdi-web</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="startComposeStack(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-play-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('start stack') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="stopComposeStack(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-stop-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('stop stack') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="restartComposeStack(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-restart</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('restart stack') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider />
                             <v-list-item @click="openEditComposeStackDialog(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-text-box-edit</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('edit stack') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="openRemoveComposeStackDialog(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-delete</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('remove stack') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="pullImagesForComposeStack(group.name)">
+                              <template #prepend>
+                                <v-icon>mdi-download-multiple</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('pull stack images') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                           <v-list v-else>
                             <v-list-item @click="openChangeGroupDialog(group)">
+                              <template #prepend>
+                                <v-icon>mdi-folder-edit</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('edit group') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="openDeleteGroupDialog(group)">
+                              <template #prepend>
+                                <v-icon>mdi-folder-remove</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('delete group') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider />
                             <v-list-item @click="startDockerGroupContainers(group)">
+                              <template #prepend>
+                                <v-icon>mdi-play-box-multiple</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('start all') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="stopDockerGroupContainers(group)">
+                              <template #prepend>
+                                <v-icon>mdi-stop</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('stop all') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="restartDockerGroupContainers(group)">
+                              <template #prepend>
+                                <v-icon>mdi-restart</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('restart all') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
@@ -171,12 +207,21 @@
                               v-if="checkWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
                               @click="showWebui(dockers.find((d) => d.Names && d.Names[0] === containerName))"
                             >
+                              <template #prepend>
+                                <v-icon>mdi-web</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="openTerminal(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-console</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'running'" @click="startDocker(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-play-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item
@@ -185,9 +230,15 @@
                               "
                               @click="stopDocker(containerName)"
                             >
+                              <template #prepend>
+                                <v-icon>mdi-stop-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running'" @click="restartDocker(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-restart</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item
@@ -196,23 +247,49 @@
                               "
                               @click="killDocker(containerName)"
                             >
+                              <template #prepend>
+                                <v-icon>mdi-close-octagon</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item :to="`/docker/change/${containerName}`">
+                              <template #prepend>
+                                <v-icon>mdi-text-box-edit</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider />
                             <v-list-item @click="openTerminalLogs(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-math-log</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-update</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('update') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="!mosDockers.find((item) => item.name === containerName && item.update_available)" @click="updateDocker(containerName, true)">
+                              <template #prepend>
+                                <v-icon>mdi-chevron-up-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('force update') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="openDeleteDialog(dockers.find((d) => d.Names && d.Names[0] === containerName))">
+                              <template #prepend>
+                                <v-icon>mdi-delete</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                            </v-list-item>
+                          </v-list>
+                          <v-list v-else>
+                            <v-list-item @click="openTerminalLogs(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-math-log</v-icon>
+                              </template>
+                              <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
                         </v-menu>

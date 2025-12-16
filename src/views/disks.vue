@@ -31,16 +31,25 @@
                       </template>
                       <v-list>
                         <v-list-item>
+                          <template #prepend>
+                            <v-icon>mdi-motion-pause</v-icon>
+                          </template>
                           <v-list-item-title @click="sleepDisk(disk)">
                             {{ $t('sleep') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>
+                          <template #prepend>
+                            <v-icon>mdi-motion-play</v-icon>
+                          </template>
                           <v-list-item-title @click="wakeDisk(disk)">
                             {{ $t('wake up') }}
                           </v-list-item-title>
                         </v-list-item>
                         <v-list-item>
+                          <template #prepend>
+                            <v-icon>mdi-broom</v-icon>
+                          </template>
                           <v-list-item-title @click="openFormatDialog(disk)">
                             {{ $t('format') }}
                           </v-list-item-title>
