@@ -284,6 +284,14 @@
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
+                          <v-list v-else>
+                            <v-list-item @click="openTerminalLogs(containerName)">
+                              <template #prepend>
+                                <v-icon>mdi-math-log</v-icon>
+                              </template>
+                              <v-list-item-title>{{ $t('logs') }}</v-list-item-title>
+                            </v-list-item>
+                          </v-list>
                         </v-menu>
                       </td>
                       <td>
