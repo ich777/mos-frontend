@@ -25,32 +25,65 @@
                             </v-img>
                           </template>
                           <v-list>
+                            <v-list-item v-if="checkWebui(lxc)" @click="showWebui(lxc)">
+                              <template #prepend>
+                                <v-icon>mdi-web</v-icon>
+                              </template>
+                              <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
+                            </v-list-item>
                             <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-console</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
                             </v-list-item>
                             <v-divider />
                             <v-list-item v-if="lxc.state !== 'running'" @click="startLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-play-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.state === 'running'" @click="stopLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-stop-circle</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.state === 'running'" @click="killLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-close-octagon</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.state === 'running'" @click="restartLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-restart</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.state === 'running'" @click="freezeLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-snowflake</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('freeze') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.state === 'frozen'" @click="unfreezeLXC(lxc.name)">
+                              <template #prepend>
+                                <v-icon>mdi-snowflake-off</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('unfreeze') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item @click="openDeleteDialog(lxc)">
+                              <template #prepend>
+                                <v-icon>mdi-delete</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                             </v-list-item>
                             <v-list-item v-if="lxc.config && lxc.config != ''" @click="openFileEditor(lxc.config)">
+                              <template #prepend>
+                                <v-icon>mdi-text-box-edit</v-icon>
+                              </template>
                               <v-list-item-title>{{ $t('edit config') }}</v-list-item-title>
                             </v-list-item>
                           </v-list>
@@ -590,5 +623,26 @@ const getArchitectuesfromDistribution = (distribution, release) => {
     return image.releases[release].architectures || [];
   }
   return image ? image.architectures : [];
+};
+
+const checkWebui = (lxc) => {
+  if (lxc.state === 'running' && lxc.webui) {
+    return true;
+  }
+  return false;
+};
+
+const showWebui = (lxc) => {
+  if (!lxc.webui) return;
+  let webui = lxc.webui;
+  
+  // Replace [ADDRESS] with first IPv4 address of the container
+  const addressMatch = webui.match(/\[ADDRESS\]/g);
+  if (addressMatch) {
+    const ipv4 = Array.isArray(lxc.ipv4) && lxc.ipv4.length > 0 ? lxc.ipv4[0] : '';
+    webui = webui.replace(/\[ADDRESS\]/g, ipv4);
+  }
+  
+  window.open(webui, '_blank');
 };
 </script>
