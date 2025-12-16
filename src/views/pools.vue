@@ -112,44 +112,83 @@
               </template>
               <v-list>
                 <v-list-item v-if="!pool.status.mounted" @click="pool.config && pool.config.encrypted ? openPassphraseDialog(pool) : mountPool(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-connection</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('mount pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.status.mounted" @click="unmountPool(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-power-plug-off</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('unmount pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="openDeletePoolDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-delete</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('delete pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="wakePool(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-motion-play</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('spin up pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="sleepPool(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-motion-pause</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('spin down pool') }}</v-list-item-title>
                 </v-list-item>
                 <v-divider v-if="pool.type === 'mergerfs'"></v-divider>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openAddMergerfsDevicesDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-plus</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('add devices') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openRemoveMergerfsDevicesDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-remove</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('remove devices') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openReplaceMergerfsDeviceDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-file-replace</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('replace device') }}</v-list-item-title>
                 </v-list-item>
                 <v-divider v-if="pool.type === 'mergerfs'"></v-divider>
                 <v-list-item v-if="pool.type === 'mergerfs'" @click="openAddParityDevicesDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-plus</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('add parity devices') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openRemoveParityDevicesDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-remove</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('remove parity devices') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openReplaceParityDeviceDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-file-replace</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('replace parity device') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openSnapraidOperationDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-database-check</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('snapraid operation') }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openSnapraidSchedulesDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-clock-outline</v-icon>
+                  </template>
                   <v-list-item-title>{{ $t('snapraid schedules') }}</v-list-item-title>
                 </v-list-item>
               </v-list>
@@ -188,9 +227,15 @@
                     </template>
                     <v-list>
                       <v-list-item @click="openCreatePoolDialog(unassignedDisk)">
+                        <template #prepend>
+                          <v-icon>mdi-plus-circle</v-icon>
+                        </template>
                         <v-list-item-title>{{ $t('create pool') }}</v-list-item-title>
                       </v-list-item>
                       <v-list-item @click="openFormatDialog(unassignedDisk)">
+                        <template #prepend>
+                          <v-icon>mdi-broom</v-icon>
+                        </template>
                         <v-list-item-title>{{ $t('format') }}</v-list-item-title>
                       </v-list-item>
                     </v-list>
