@@ -179,6 +179,7 @@
                   </template>
                   <v-list-item-title>{{ $t('replace parity device') }}</v-list-item-title>
                 </v-list-item>
+                <v-divider v-if="pool.type === 'mergerfs'"></v-divider>                
                 <v-list-item v-if="pool.type === 'mergerfs' && pool.parity_devices.length > 0" @click="openSnapraidOperationDialog(pool)">
                   <template #prepend>
                     <v-icon>mdi-database-check</v-icon>
@@ -191,6 +192,19 @@
                   </template>
                   <v-list-item-title>{{ $t('snapraid schedules') }}</v-list-item-title>
                 </v-list-item>
+                <v-divider v-if="pool.type === 'nonraid'"></v-divider>
+                <v-list-item v-if="pool.type === 'nonraid'" @click="openAddNonRaidDeviceDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-plus</v-icon>
+                  </template>
+                  <v-list-item-title>{{ $t('add device') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="pool.type === 'nonraid'" @click="openAddNonRaidParityDialog(pool)">
+                  <template #prepend>
+                    <v-icon>mdi-harddisk-plus</v-icon>
+                  </template>
+                  <v-list-item-title>{{ $t('add parity device') }}</v-list-item-title>
+                </v-list-item>                
               </v-list>
             </v-menu>
           </v-card-actions>
@@ -212,7 +226,7 @@
               </template>
               <v-list-item v-for="unassignedDisk in unassignedDisks" :key="unassignedDisk.name">
                 <template v-slot:prepend>
-                  <v-icon class="cursor-pointer" :color="unassignedDisk.powerStatus === 'active' ? 'green' : unassignedDisk.powerStatus === 'standby' ? 'blue' : 'red'">
+                  <v-icon class="cursor-pointer" :color="unassignedDisk.powerStatus === 'active' ? 'green' : unassignedDisk.powerStatus === 'standby' ? 'blue' : 'red'" @dblclick="unassignedDisk.powerStatus === 'active' ? sleepDisk(unassignedDisk) : wakeDisk(unassignedDisk)">
                     {{ getDiskIcon(unassignedDisk.type) }}
                   </v-icon>
                 </template>
@@ -412,12 +426,13 @@
             :multiple="true"
             dense
           />
+          <v-text-field v-model="addMergerfsDevicesDialog.passphrase" :label="$t('passphrase (if encrypted)')" type="password"/>
           <v-switch v-model="addMergerfsDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-btn @click="addMergerfsDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
-        <v-btn @click="addMergerfsDevices(addMergerfsDevicesDialog.pool.id, addMergerfsDevicesDialog.devices, addMergerfsDevicesDialog.format)" color="onPrimary">
+        <v-btn @click="addMergerfsDevices(addMergerfsDevicesDialog.pool.id, addMergerfsDevicesDialog.devices, addMergerfsDevicesDialog.format, addMergerfsDevicesDialog.passphrase)" color="onPrimary">
           {{ $t('add') }}
         </v-btn>
       </v-card-actions>
@@ -607,6 +622,53 @@
     </v-card>
   </v-dialog>
 
+  <!-- Add Non-Raid Devices Dialog -->
+  <v-dialog v-model="addNonRaidDeviceDialog.value" max-width="600">
+    <v-card class="pa-0">
+      <v-card-title>{{ $t('add device') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select device to add to pool') }}</p>
+        <v-form>
+          <v-select
+            v-model="addNonRaidDeviceDialog.device"
+            :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []"
+            :label="$t('device')"
+            dense
+          />
+          <v-select v-model="addNonRaidDeviceDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense/>
+          <v-text-field v-model="addNonRaidDeviceDialog.passphrase" :label="$t('passphrase (if encrypted)')" type="password"/>          
+          <v-switch v-model="addNonRaidDeviceDialog.format" :label="$t('format')" density="compact" color="red" inset hide-details="auto"/>
+          <v-switch v-model="addNonRaidDeviceDialog.parity_valid" :label="$t('parity valid')" hide-details="auto" density="compact" color="green" inset />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="addNonRaidDeviceDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="addNonRaidDevice(addNonRaidDeviceDialog.device, addNonRaidDeviceDialog.filesystem, addNonRaidDeviceDialog.passphrase, addNonRaidDeviceDialog.parity_valid, addNonRaidDeviceDialog.format)" color="onPrimary">
+          {{ $t('add') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Add Non-Raid Parity Dialog -->
+  <v-dialog v-model="addNonRaidParityDialog.value" max-width="600">
+    <v-card class="pa-0">
+      <v-card-title>{{ $t('add parity devices') }}</v-card-title>
+      <v-card-text>
+        <p class="mb-4">{{ $t('select devices to add as parity') }}</p>
+        <v-form>
+          <v-select v-model="addNonRaidParityDialog.device" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('device')" dense />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="addNonRaidParityDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="addNonRaidParity(addNonRaidParityDialog.pool.id, addNonRaidParityDialog.device)" color="onPrimary">
+          {{ $t('add') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- Floating Action Button -->
   <v-fab color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon @click="openCreatePoolDialog()">
     <v-icon>mdi-plus</v-icon>
@@ -703,6 +765,7 @@ const addMergerfsDevicesDialog = reactive({
   pool: null,
   devices: [],
   format: false,
+  passphrase: '',
 });
 const removeMergerfsDevicesDialog = reactive({
   value: false,
@@ -732,6 +795,20 @@ const snapraidSchedulesDialog = reactive({
     },
   },
 });
+const addNonRaidDeviceDialog = reactive({
+  value: false,
+  pool: null,
+  device: "",
+  format: false,
+  filesystem: "xfs",
+  passphrase: "",
+  parity_valid: false,
+});
+const addNonRaidParityDialog = reactive({
+  value: false,
+  pool: null,
+  device: "",
+});
 
 onMounted(async () => {
   getPools();
@@ -744,6 +821,7 @@ const openAddMergerfsDevicesDialog = (pool) => {
   addMergerfsDevicesDialog.pool = pool;
   addMergerfsDevicesDialog.devices = [];
   addMergerfsDevicesDialog.format = false;
+  addMergerfsDevicesDialog.passphrase = '';
 };
 const openRemoveMergerfsDevicesDialog = (pool) => {
   removeMergerfsDevicesDialog.value = true;
@@ -826,6 +904,20 @@ const openRemoveParityDevicesDialog = (pool) => {
   removeParityDevicesDialog.pool = pool;
   removeParityDevicesDialog.devices = [];
   removeParityDevicesDialog.unmount = true;
+};
+const openAddNonRaidDeviceDialog = (pool) => {
+  addNonRaidDeviceDialog.value = true;
+  addNonRaidDeviceDialog.pool = pool;
+  addNonRaidDeviceDialog.device = "";
+  addNonRaidDeviceDialog.filesystem = "xfs";
+  addNonRaidDeviceDialog.passphrase = "";
+  addNonRaidDeviceDialog.parity_valid = false;
+  addNonRaidDeviceDialog.format = false;
+};
+const openAddNonRaidParityDialog = (pool) => {
+  addNonRaidParityDialog.value = true;
+  addNonRaidParityDialog.pool = pool;
+  addNonRaidParityDialog.device = "";
 };
 
 const getPools = async () => {
@@ -1464,11 +1556,12 @@ const saveSnapraidSchedules = async (id, sync) => {
   }
 };
 
-const addMergerfsDevices = async (poolId, devices, format) => {
+const addMergerfsDevices = async (poolId, devices, format, passphrase) => {
   overlay.value = true;
   const addDeviceData = {
     devices: devices,
     format: format,
+    passphrase: passphrase,
   };
 
   try {
@@ -1680,6 +1773,74 @@ const sleepDisk = async (disk) => {
     showSnackbarSuccess(t('disk put to sleep successfully'));
     getPools();
     getUnassignedDisks();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const addNonRaidDevice = async (device, filesystem, passphrase, parity_valid, format) => {
+  overlay.value = true;
+  const addDeviceData = {
+    device: device,
+    filesystem: filesystem,
+    passphrase: passphrase,
+    parity_valid: parity_valid,
+    format: format,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/nonraid/adddevice`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(addDeviceData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('device could not be added')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('device added successfully'));
+    getPools();
+    getUnassignedDisks();
+    addNonRaidDeviceDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const addNonRaidParity = async (device) => {
+  overlay.value = true;
+  const addParityData = {
+    device: device,
+  };
+
+  try {
+    const res = await fetch(`/api/v1/pools/nonraid/addparity`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(addParityData),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('parity device could not be added')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('parity device added successfully'));
+    getPools();
+    getUnassignedDisks();
+    addNonRaidParityDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);

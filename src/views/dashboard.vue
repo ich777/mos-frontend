@@ -289,7 +289,7 @@ const getLoadWS = () => {
     if (data.memory) memory.value = data.memory;
     if (data.network) network.value = data.network;
     if (data.temperature) temperature.value = data.temperature;
-    if (data.pools) disks.value = data.pools; //Für disks werden hier pools verwendet
+    if (data.pools) disks.value = data.pools;
   };
   socket.on('get-load', apply);
   socket.on('load-update', apply);

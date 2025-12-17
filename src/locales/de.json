@@ -804,5 +804,9 @@
   "widget settings": "Widget Einstellungen",
   "device(s)": "Gerät(e)",
   "disk successfully woken up": "Festplatte erfolgreich aufgeweckt",
-  "failed to wake up disk": "Festplatte konnte nicht aufgeweckt werden"
+  "failed to wake up disk": "Festplatte konnte nicht aufgeweckt werden",
+  "select device to add to pool": "Wähle Gerät zum Hinzufügen zum Pool aus",
+  "passphrase (if encrypted)": "Passphrase (falls verschlüsselt)",
+  "parity valid": "Parität gültig",
+  "add parity device": "Paritätsgerät hinzufügen"
 }

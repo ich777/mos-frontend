@@ -45,7 +45,6 @@
                 height: '7px',
                 borderRadius: '999px',
                 background: data_device.powerStatus === 'active' ? 'rgba(0, 200, 0, 0.8)' : 'rgba(0, 122, 255, 0.9)',
-                boxShadow: data_device.powerStatus === 'active' ? '0 0 0 2px rgba(0, 200, 0, 0.12)' : '0 0 0 2px rgba(0, 122, 255, 0.12)',
                 flex: '0 0 auto'
               }"
             ></span>
@@ -79,7 +78,6 @@
                 height: '7px',
                 borderRadius: '999px',
                 background: parity_device.powerStatus === 'active' ? 'rgba(0, 200, 0, 0.8)' : 'rgba(0, 122, 255, 0.9)',
-                boxShadow: parity_device.powerStatus === 'active' ? '0 0 0 2px rgba(0, 200, 0, 0.12)' : '0 0 0 2px rgba(0, 122, 255, 0.12)',
                 flex: '0 0 auto'
               }"
             ></span>

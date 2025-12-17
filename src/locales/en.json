@@ -804,5 +804,9 @@
   "widget settings": "Widget Settings",
   "device(s)": "Device(s)",
   "disk successfully woken up": "Disk successfully woken up",
-  "failed to wake up disk": "Failed to wake up disk"  
+  "failed to wake up disk": "Failed to wake up disk",
+  "select device to add to pool": "Select device to add to pool",
+  "passphrase (if encrypted)": "Passphrase (if encrypted)",
+  "parity valid": "Parity valid",
+  "add parity device": "Add parity device"
 }
