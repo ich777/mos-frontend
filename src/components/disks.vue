@@ -37,9 +37,17 @@
 
       <template v-if="(pool.data_devices && pool.data_devices.length) || (pool.parity_devices && pool.parity_devices.length)">
         <v-row v-for="(data_device, devIdx) in pool.data_devices ?? []" :key="`data-${devIdx}`" dense class="py-0" style="flex-wrap: nowrap; overflow: hidden">
-          <v-col cols="4" sm="4" class="d-flex align-center py-1" style="gap: 3px; min-width: 0; overflow: hidden">
+          <v-col cols="4" sm="4" class="d-flex align-center py-1" style="gap: 3px; min-width: 0; overflow: hidden; line-height: 1.1;">
             <span
-              style="display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: rgba(0, 200, 255, 0.8); box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.12); flex: 0 0 auto"
+              :style="{
+                display: 'inline-block',
+                width: '7px',
+                height: '7px',
+                borderRadius: '999px',
+                background: data_device.powerStatus === 'active' ? 'rgba(0, 200, 0, 0.8)' : 'rgba(0, 122, 255, 0.9)',
+                boxShadow: data_device.powerStatus === 'active' ? '0 0 0 2px rgba(0, 200, 0, 0.12)' : '0 0 0 2px rgba(0, 122, 255, 0.12)',
+                flex: '0 0 auto'
+              }"
             ></span>
             <div class="text-body-2" :title="data_device.device" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; min-width: 0">
               {{ data_device.device }}
@@ -63,17 +71,20 @@
         </v-row>
 
         <v-row v-for="(parity_device, devIdx) in pool.parity_devices ?? []" :key="`parity-${devIdx}`" dense class="py-0" style="flex-wrap: nowrap; overflow: hidden">
-          <v-col cols="4" sm="4" class="d-flex align-center py-1" style="gap: 3px; min-width: 0; overflow: hidden">
+          <v-col cols="4" sm="4" class="d-flex align-center py-1" style="gap: 3px; min-width: 0; overflow: hidden; line-height: 1.1;">
             <span
-              style="display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: rgba(255, 180, 0, 0.9); box-shadow: 0 0 0 2px rgba(255, 180, 0, 0.16); flex: 0 0 auto"
+              :style="{
+                display: 'inline-block',
+                width: '7px',
+                height: '7px',
+                borderRadius: '999px',
+                background: parity_device.powerStatus === 'active' ? 'rgba(0, 200, 0, 0.8)' : 'rgba(0, 122, 255, 0.9)',
+                boxShadow: parity_device.powerStatus === 'active' ? '0 0 0 2px rgba(0, 200, 0, 0.12)' : '0 0 0 2px rgba(0, 122, 255, 0.12)',
+                flex: '0 0 auto'
+              }"
             ></span>
             <div class="text-body-2" :title="parity_device.device" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; min-width: 0">
-              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: baseline">
-                {{ parity_device.device }}
-                <span class="text-caption text-medium-emphasis ma-0 pa-0" style="line-height: 1.1; font-size: inherit; display: inline; vertical-align: baseline; margin-left: 6px; overflow: hidden">
-                  (parity)
-                </span>
-              </span>
+              {{ parity_device.device }}
             </div>
           </v-col>
           <v-col cols="3" sm="3" class="py-1" style="min-width: 0; overflow: hidden">
