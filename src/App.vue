@@ -220,7 +220,11 @@ const getUserProfile = async () => {
 
     const result = await res.json();
 
-    theme.global.name.value = result.darkmode ? 'dark' : 'light';
+    if(result.darkmode) {
+      theme.change('dark');
+    } else {
+      theme.change('light');
+    }
     locale.value = result.language || 'en';
     theme.themes.value[theme.global.name.value].colors.primary = result.primary_color || '#1976D2';
     localStorage.setItem('userid', result.id);

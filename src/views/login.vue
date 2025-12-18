@@ -55,7 +55,6 @@ const { locale, t } = useI18n();
 const theme = useTheme();
 const username = ref('');
 const password = ref('');
-const remember = ref(true);
 const showPassword = ref(false);
 const loading = ref(false);
 const isValid = ref(false);
@@ -92,9 +91,13 @@ const login = async () => {
     localStorage.setItem('authToken', result.token);
     localStorage.setItem('userid', result.user.id);
     localStorage.setItem('byte_format', result.user.byte_format || 'binary');
-    if (remember.value) localStorage.setItem('rememberedUser', username.value);
+    localStorage.setItem('username', username.value);
 
-    theme.global.name.value = result.user.darkmode ? 'dark' : 'light';
+    if(result.user.darkmode) {
+      theme.change('dark');
+    } else {
+      theme.change('light');
+    }
     locale.value = result.user.language || 'en';
     theme.themes.value[theme.global.name.value].colors.primary = result.user.primary_color || '#1976D2';
 

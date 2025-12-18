@@ -18,9 +18,9 @@
             />
             <v-select
               v-model="selectedByteFormat"
-              :items="byte_format"
-              :item-title="(option) => $t(option)"
-              :item-value="(option) => option"
+              :items="byteFormats"
+              :item-title="(opt) => opt.title"
+              :item-value="(opt) => opt.value"
               :label="$t('byte unit')"
               required
               @update:modelValue="changeByteUnit()"
@@ -102,6 +102,7 @@ const authToken = ref(localStorage.getItem('authToken'));
 const overlay = ref(false);
 const selectedLanguage = ref(locale.value);
 const languages = ref(availableLocales);
+const byteFormats = ref([{ value: 'binary', title: t('binary') }, { value: 'decimal', title: t('decimal') }]);
 const selectedByteFormat = ref('');
 const expiryDays = ref(1);
 const byte_format = ref([t('binary'), t('decimal')]);
