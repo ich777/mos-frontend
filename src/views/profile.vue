@@ -45,7 +45,7 @@
                   {{ $t('add') }}
                 </v-btn>
               </v-col>
-            </v-row>            
+            </v-row>
             <v-card v-for="token in adminTokens" :key="token.id" class="mt-4 pa-0">
               <v-card-title class="d-flex justify-space-between align-center">
                 <div>
@@ -114,7 +114,10 @@ const authToken = ref(localStorage.getItem('authToken'));
 const overlay = ref(false);
 const selectedLanguage = ref(locale.value);
 const languages = ref(availableLocales);
-const byteFormats = ref([{ value: 'binary', title: t('binary') }, { value: 'decimal', title: t('decimal') }]);
+const byteFormats = ref([
+  { value: 'binary', title: t('binary') },
+  { value: 'decimal', title: t('decimal') },
+]);
 const selectedByteFormat = ref('');
 const expiryDays = ref(1);
 const byte_format = ref([t('binary'), t('decimal')]);
