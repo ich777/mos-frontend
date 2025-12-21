@@ -821,5 +821,6 @@
   "set wait times": "Wartezeiten festlegen",
   "wait (sec)": "Warten (Sek.)",
   "wait times saved successfully": "Wartezeiten erfolgreich gespeichert",
-  "wait times could not be saved": "Wartezeiten konnten nicht gespeichert werden"
+  "wait times could not be saved": "Wartezeiten konnten nicht gespeichert werden",
+  "select device to replace": "Wähle Gerät zum Ersetzen aus"
 }

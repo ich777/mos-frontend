@@ -821,5 +821,6 @@
   "set wait times": "Set Wait Times",
   "wait (sec)": "Wait (Sec)",
   "wait times saved successfully": "Wait times saved successfully",
-  "wait times could not be saved": "Wait times could not be saved"  
+  "wait times could not be saved": "Wait times could not be saved",
+  "select device to replace": "Select device to replace"
 }
