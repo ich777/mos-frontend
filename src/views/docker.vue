@@ -788,14 +788,19 @@
     <v-card max-height="80vh" style="display: flex; flex-direction: column;" class="pa-0">
       <v-card-title class="text-h6 pb-0">{{ $t('wait times') }}</v-card-title>
       <v-card-text style="overflow: auto; flex: 1; padding-bottom: 0;" class="px-1">
-        <v-row v-for="d in dockers" :key="d.Id" class="d-flex align-center pa-0 ma-0 ml-2">
-          <v-col cols="8" class="pa-0 ma-0 mb-1">
-            <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.Names?.[0] }}</div>
-          </v-col>
-          <v-col cols="4" class="px-2 py-0 ma-0 mb-2">
-            <v-text-field density="compact" dense hide-details="auto" type="number" min="0" max="999" maxlength="3" v-model="d.wait" :label="$t('wait (sec)')"/>
-          </v-col>
-        </v-row>
+        <draggable v-model="dockers" item-key="Id" handle=".drag-handle" @end="sortDockerIndex()">
+          <template #item="{ element: d }">
+            <v-row :key="d.Id" class="d-flex align-center pa-0 ma-0 ml-2">
+              <v-col cols="8" class="pa-0 ma-0 mb-1 d-flex align-center">
+                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right:8px">mdi-drag</v-icon>
+                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.Names?.[0] }}</div>
+              </v-col>
+              <v-col cols="4" class="px-2 py-0 ma-0 mb-2">
+                <v-text-field density="compact" dense hide-details="auto" type="number" min="0" max="999" maxlength="3" v-model="d.wait" :label="$t('wait (sec)')" />
+              </v-col>
+            </v-row>
+          </template>
+        </draggable>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -1007,6 +1012,7 @@ const getDockers = async () => {
       const mos = mosResult.find((item) => item.name === docker.Names[0]);
       docker.autostart = mos ? mos.autostart : false;
       docker.wait = mos ? mos.wait : 0;
+      docker.index = mos ? mos.index : Number.MAX_SAFE_INTEGER;
     });
 
     dockers.value = result;
@@ -1805,6 +1811,7 @@ const updateDockerWaitTimes = async () => {
   const waitTimes = dockers.value.map((docker) => ({
     name: docker.Names[0],
     wait: docker.wait,
+    index: docker.index
   }));
 
   try {
@@ -1830,6 +1837,13 @@ const updateDockerWaitTimes = async () => {
   } finally {
     overlay.value = false;
   }
+};
+
+const sortDockerIndex = () => {
+  dockers.value.forEach((d, idx) => {
+    d.index = idx + 1;
+  });
+  dockers.value = [...dockers.value];
 };
 
 const pullImagesForComposeStack = async (name) => {
@@ -1982,14 +1996,6 @@ const clearDeleteGroupDialog = () => {
 const openUnusedImagesDialog = async () => {
   await getUnusedImages();
   unusedImagesDialog.value = true;
-};
-const openCreateComposeStackDialog = () => {
-  createComposeStackDialog.value = true;
-  createComposeStackDialog.name = '';
-  createComposeStackDialog.yaml = '';
-  createComposeStackDialog.env = '';
-  createComposeStackDialog.icon = '';
-  createComposeStackDialog.webui = '';
 };
 const openRemoveComposeStackDialog = (name) => {
   removeComposeStackDialog.value = true;
