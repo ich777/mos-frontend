@@ -90,6 +90,7 @@ const installToDisk = async () => {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(installToDiskBody),
     });
