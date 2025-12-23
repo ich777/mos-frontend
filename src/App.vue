@@ -42,11 +42,11 @@
           <v-list-item v-if="mosServices.remote_mounting?.enabled" to="/remoteMounting" prepend-icon="mdi-cloud-sync">
             <v-list-item-title>{{ $t('remote mounting') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.docker?.enabled" to="/docker" prepend-icon="mdi-docker">
-            <v-list-item-title>{{ $t('docker') }}</v-list-item-title>
-          </v-list-item>
           <v-list-item v-if="mosServices.hub?.enabled" to="/mosHub" prepend-icon="mdi-hub">
             <v-list-item-title>{{ $t('mos hub') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="mosServices.docker?.enabled" to="/docker" prepend-icon="mdi-docker">
+            <v-list-item-title>{{ $t('docker') }}</v-list-item-title>
           </v-list-item>
           <v-list-item v-if="mosServices.lxc?.enabled" to="/lxc" prepend-icon="mdi-arrange-send-backward">
             <v-list-item-title>{{ $t('lxc') }}</v-list-item-title>
