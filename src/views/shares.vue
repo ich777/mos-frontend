@@ -36,6 +36,12 @@
                           </template>
                           <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
                         </v-list-item>
+                        <v-list-item v-if="checkMergerFs(share.pool)" @click="openTargetDevices(share)">
+                          <template #prepend>
+                            <v-icon>mdi-target</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('target devices') }}</v-list-item-title>
+                        </v-list-item>
                       </v-list>
                     </v-menu>
                   </template>
@@ -233,6 +239,12 @@ const handleFsSelected = (item) => {
   fsDialogCallback.value = null;
   fsDialog.value = false;
 };
+const targetDevices = ref({
+  targetDevices: [
+    3,
+    4
+  ]
+});
 
 onMounted(async () => {
   await getShares();
@@ -435,6 +447,11 @@ const deleteShare = async () => {
     overlay.value = false;
     showSnackbarError(e.message);
   }
+};
+
+const checkMergerFs = (pool) => {
+  const mergerFsPools = pools.value.filter((p) => p.type === 'mergerfs').map((p) => p.name);
+  return mergerFsPools.includes(pool);
 };
 
 const clearCreateDialog = () => {

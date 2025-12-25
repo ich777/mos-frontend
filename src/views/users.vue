@@ -106,7 +106,7 @@
               }
             "
           />
-          <v-switch v-model="addDialog.samba_user" :label="$t('samba user')" inset color="onPrimary" />
+          <v-switch v-model="addDialog.samba_user" :label="$t('samba user')" inset color="green" />
         </form>
       </v-card-text>
       <v-card-actions>
@@ -136,7 +136,7 @@
             :required="changeDialog.samba_user"
           />
           <v-select v-model="changeDialog.role" :items="['admin', 'samba_only']" :label="$t('role')" required />
-          <v-switch v-model="changeDialog.samba_user" :label="$t('samba user')" inset color="onPrimary" />
+          <v-switch v-model="changeDialog.samba_user" :label="$t('samba user')" inset color="green" />
         </form>
       </v-card-text>
       <v-card-actions>

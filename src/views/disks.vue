@@ -77,10 +77,10 @@
             <v-select v-model="formatDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense :rules="[(v) => !!v || $t('filesystem is required')]" />
           </v-col>
           <v-col cols="12">
-            <v-switch v-model="formatDialog.partition" :label="$t('create partition')" inset hide-details density="compact" color="onPrimary" />
+            <v-switch v-model="formatDialog.partition" :label="$t('create partition')" inset hide-details density="compact" color="green" />
           </v-col>
           <v-col cols="12">
-            <v-switch v-model="formatDialog.wipeExisting" :label="$t('wipe existing data')" inset hide-details density="compact" color="onPrimary" />
+            <v-switch v-model="formatDialog.wipeExisting" :label="$t('wipe existing data')" inset hide-details density="compact" color="green" />
           </v-col>
         </v-row>
       </v-card-text>

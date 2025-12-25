@@ -824,5 +824,6 @@
   "wait times could not be saved": "Wartezeiten konnten nicht gespeichert werden",
   "select device to replace": "Wähle Gerät zum Ersetzen aus",
   "pool order could not be saved": "Pool Reihenfolge konnte nicht gespeichert werden",
-  "pool order saved successfully": "Pool Reihenfolge erfolgreich gespeichert"
+  "pool order saved successfully": "Pool Reihenfolge erfolgreich gespeichert",
+  "target devices": "Zielgeräte"
 }

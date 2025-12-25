@@ -824,5 +824,6 @@
   "wait times could not be saved": "Wait times could not be saved",
   "select device to replace": "Select device to replace",
   "pool order could not be saved": "Pool order could not be saved",
-  "pool order saved successfully": "Pool order saved successfully"
+  "pool order saved successfully": "Pool order saved successfully",
+  "target devices": "Target Devices"
 }

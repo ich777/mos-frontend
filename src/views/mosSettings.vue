@@ -184,7 +184,7 @@
         </p>
         <v-select v-model="updateOsDialog.channel" :items="getMosChannels()" :label="t('channel')"></v-select>
         <v-select v-model="updateOsDialog.release" :items="getMosReleasesOfChannel()" :label="t('release')"></v-select>
-        <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact" color="onPrimary" />
+        <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact" color="green" />
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="updateOsDialog.value = false"></v-btn>

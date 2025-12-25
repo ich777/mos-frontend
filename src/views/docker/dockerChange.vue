@@ -40,7 +40,7 @@
             <v-text-field :label="$t('custom ip')" v-model="form.custom_ip"></v-text-field>
             <v-text-field :label="$t('default shell')" v-model="form.default_shell"></v-text-field>
             <v-select :label="$t('gpu')" v-model="form.gpus" :items="gpuIds" item-title="value" item-value="key" multiple clearable chips hide-selected></v-select>
-            <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="onPrimary" density="compact"></v-switch>
+            <v-switch :label="$t('privileged')" v-model="form.privileged" inset color="green" density="compact"></v-switch>
             <v-text-field :label="$t('extra parameters')" v-model="form.extra_parameters"></v-text-field>
             <v-text-field :label="$t('post parameters')" v-model="form.post_parameters"></v-text-field>
             <v-text-field :label="$t('web ui url')" v-model="form.web_ui_url"></v-text-field>
@@ -308,7 +308,7 @@
                       <v-text-field :label="$t('name')" v-model="variable.name" density="compact" hide-details class="mb-4"></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-switch :label="$t('masked')" v-model="variable.mask" inset color="onPrimary" density="compact" hide-details class="mb-4"></v-switch>
+                      <v-switch :label="$t('masked')" v-model="variable.mask" inset color="green" density="compact" hide-details class="mb-4"></v-switch>
                     </v-col>
                   </v-row>
                   <v-row class="mt-n8">
