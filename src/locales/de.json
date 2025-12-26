@@ -827,5 +827,6 @@
   "pool order saved successfully": "Pool Reihenfolge erfolgreich gespeichert",
   "target devices": "Zielgeräte",
   "target devices could not be set": "Zielgeräte konnten nicht festgelegt werden",
-  "target devices set successfully": "Zielgeräte erfolgreich festgelegt"
+  "target devices set successfully": "Zielgeräte erfolgreich festgelegt",
+  "target devices could not be loaded": "Zielgeräte konnten nicht geladen werden"
 }

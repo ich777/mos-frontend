@@ -827,5 +827,6 @@
   "pool order saved successfully": "Pool order saved successfully",
   "target devices": "Target Devices",
   "target devices could not be set": "Target devices could not be set",
-  "target devices set successfully": "Target devices set successfully"
+  "target devices set successfully": "Target devices set successfully",
+  "target devices could not be loaded": "Target devices could not be loaded"
 }

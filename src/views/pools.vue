@@ -280,7 +280,7 @@
         {{ $t('are you sure you want to format this disk?') }}
         <v-row class="mt-4">
           <v-col cols="12">
-            <v-select v-model="formatDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense :rules="[(v) => !!v || $t('filesystem is required')]" />
+            <v-select v-model="formatDialog.filesystem" :items="formatDialog.filesystems" :label="$t('filesystem')" dense :rules="[(v) => !!v || $t('filesystem is required')]" />
           </v-col>
           <v-col cols="12">
             <v-switch v-model="formatDialog.partition" :label="$t('create partition')" inset hide-details density="compact" color="green" />
@@ -322,7 +322,7 @@
       <v-card-text>
         <v-form>
           <v-text-field v-model="createPoolDialog.name" :label="$t('name')" />
-          <v-select v-model="createPoolDialog.type" :items="poolTypes" :label="$t('type')" dense @update:model-value="switchPoolType()" />
+          <v-select v-model="createPoolDialog.type" :items="poolTypes" :label="$t('type')" dense @update:model-value="switchPoolType" />
           <v-select
             v-model="createPoolDialog.devices"
             :items="
@@ -341,7 +341,7 @@
           />
           <v-select
             v-if="createPoolDialog.type === 'mergerfs'"
-            v-model="createPoolDialog.snapraidDevice"
+          v-model="createPoolDialog.snapraidDevice"
             :items="
               Array.isArray(unassignedDisks)
                 ? unassignedDisks.map((disk) => ({
@@ -354,7 +354,7 @@
             item-value="value"
             :label="$t('snapraid device')"
             dense
-            multiple="true"
+            :multiple="true"
           />
           <v-select
             v-if="createPoolDialog.type === 'nonraid'"
@@ -374,7 +374,7 @@
             dense
           />
           <v-select v-if="createPoolDialog.type === 'multi'" v-model="createPoolDialog.raidLevel" :items="raidLevels" :label="$t('raid level')" dense />
-          <v-select v-model="createPoolDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
+          <v-select v-model="createPoolDialog.filesystem" :items="createPoolDialog.filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-if="createPoolDialog.type === 'mergerfs'" v-model="createPoolDialog.comment" :label="$t('comment')" />
           <div v-if="createPoolDialog.type === 'mergerfs'">
             <v-divider></v-divider>
@@ -637,7 +637,7 @@
         <p class="mb-4">{{ $t('select device to add to pool') }}</p>
         <v-form>
           <v-select v-model="addNonRaidDeviceDialog.device" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('device')" dense />
-          <v-select v-model="addNonRaidDeviceDialog.filesystem" :items="filesystems" :label="$t('filesystem')" dense />
+          <v-select v-model="addNonRaidDeviceDialog.filesystem" :items="addNonRaidDeviceDialog.filesystems" :label="$t('filesystem')" dense />
           <v-text-field v-model="addNonRaidDeviceDialog.passphrase" :label="$t('passphrase (if encrypted)')" type="password" />
           <v-switch v-model="addNonRaidDeviceDialog.format" :label="$t('format')" density="compact" color="red" inset hide-details="auto" />
           <v-switch v-model="addNonRaidDeviceDialog.parity_valid" :label="$t('parity valid')" hide-details="auto" density="compact" color="green" inset />
@@ -699,15 +699,15 @@ const unassignedDisks = ref([]);
 const unassignedDisksLoading = ref(true);
 const overlay = ref(false);
 const { t } = useI18n();
-const filesystems = ref([]);
 const poolTypes = ref([]);
 const raidLevels = ['raid0', 'raid1', 'raid5'];
 const formatDialog = reactive({
   value: false,
   disk: null,
+  filesystems: [],
   filesystem: '',
   partition: true,
-  wipeExisting: true,
+  wipeExisting: true
 });
 const createPoolDialog = reactive({
   value: false,
@@ -715,6 +715,7 @@ const createPoolDialog = reactive({
   name: '',
   type: 'single',
   devices: [],
+  filesystems: [],
   filesystem: 'xfs',
   format: false,
   automount: true,
@@ -731,62 +732,63 @@ const createPoolDialog = reactive({
   policies: {
     create: 'epmfs',
     read: 'ff',
-    search: 'ff',
-  },
+    search: 'ff'
+  }
 });
 const deletePoolDialog = reactive({
   value: false,
   pool: null,
-  filesystem: '',
+  filesystems: [],
+  filesystem: ''
 });
 const passphraseDialog = reactive({
   value: false,
   pool: null,
-  passphrase: '',
+  passphrase: ''
 });
 const addParityDevicesDialog = reactive({
   value: false,
   pool: null,
   devices: [],
-  format: false,
+  format: false
 });
 const removeParityDevicesDialog = reactive({
   value: false,
   pool: null,
   devices: [],
-  unmount: true,
+  unmount: true
 });
 const snapraidOperationDialog = reactive({
   value: false,
   pool: null,
-  operation: '',
+  operation: ''
 });
 const replaceParityDeviceDialog = reactive({
   value: false,
   pool: null,
   oldDevice: null,
   newDevice: null,
-  format: false,
+  format: false
 });
 const addMergerfsDevicesDialog = reactive({
   value: false,
   pool: null,
   devices: [],
   format: false,
-  passphrase: '',
+  passphrase: ''
 });
 const removeMergerfsDevicesDialog = reactive({
   value: false,
   pool: null,
   devices: [],
-  unmount: true,
+  unmount: true
 });
 const replaceMergerfsDeviceDialog = reactive({
   value: false,
   pool: null,
   oldDevice: null,
   newDevice: null,
-  format: false,
+  format: false
 });
 const snapraidSchedulesDialog = reactive({
   value: false,
@@ -800,28 +802,28 @@ const snapraidSchedulesDialog = reactive({
     scrub: {
       enabled: false,
       schedule: '0 4 * * WED',
-    },
-  },
+    }
+  }
 });
 const addNonRaidDeviceDialog = reactive({
   value: false,
   pool: null,
   device: '',
   format: false,
+  filesystems: [],
   filesystem: 'xfs',
   passphrase: '',
-  parity_valid: false,
+  parity_valid: false
 });
 const addNonRaidParityDialog = reactive({
   value: false,
   pool: null,
-  device: '',
+  device: ''
 });
 
 onMounted(async () => {
   getPools();
   getUnassignedDisks();
-  getFilesystems();
   getPoolTypes();
 });
 const openAddMergerfsDevicesDialog = (pool) => {
@@ -877,11 +879,12 @@ const openPassphraseDialog = (pool) => {
   passphraseDialog.pool = pool;
   passphraseDialog.passphrase = '';
 };
-const openFormatDialog = (disk) => {
+const openFormatDialog = async (disk) => {
   formatDialog.value = true;
   formatDialog.disk = disk;
+  formatDialog.filesystems = await getFilesystems();
 };
-const openCreatePoolDialog = (disk) => {
+const openCreatePoolDialog = async(disk) => {
   createPoolDialog.value = true;
   createPoolDialog.disk = disk;
   createPoolDialog.single = 'single';
@@ -896,6 +899,10 @@ const openCreatePoolDialog = (disk) => {
   createPoolDialog.passphrase = '';
   createPoolDialog.create_keyfile = true;
   createPoolDialog.raidLevel = 'raid1';
+  createPoolDialog.showAdvanced = false;
+  createPoolDialog.parity = [];
+  createPoolDialog.parity_valid = false;
+  createPoolDialog.filesystems = await getFilesystems(createPoolDialog.type);
 };
 const openDeletePoolDialog = (pool) => {
   deletePoolDialog.value = true;
@@ -913,11 +920,12 @@ const openRemoveParityDevicesDialog = (pool) => {
   removeParityDevicesDialog.devices = [];
   removeParityDevicesDialog.unmount = true;
 };
-const openAddNonRaidDeviceDialog = (pool) => {
+const openAddNonRaidDeviceDialog = async (pool) => {
   addNonRaidDeviceDialog.value = true;
   addNonRaidDeviceDialog.pool = pool;
   addNonRaidDeviceDialog.device = '';
   addNonRaidDeviceDialog.filesystem = 'xfs';
+  addNonRaidDeviceDialog.filesystems = await getFilesystems('nonraid');
   addNonRaidDeviceDialog.passphrase = '';
   addNonRaidDeviceDialog.parity_valid = false;
   addNonRaidDeviceDialog.format = false;
@@ -972,25 +980,29 @@ const getUnassignedDisks = async () => {
   }
 };
 
-const getFilesystems = async () => {
-  try {
-    const res = await fetch('/api/v1/disks/availablefilesystems', {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      },
-    });
+  const getFilesystems = async (pooltype = '') => {
+    try {
+      const url = pooltype
+        ? `/api/v1/disks/availablefilesystems?pooltype=${encodeURIComponent(pooltype)}`
+        : '/api/v1/disks/availablefilesystems';
+      const res = await fetch(url, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        },
+      });
 
-    if (!res.ok) {
-      const errorDetails = await res.json();
-      throw new Error(`${t('filesystems could not be loaded')}|$| ${errorDetails.error || t('unknown error')}`);
+      if (!res.ok) {
+        const errorDetails = await res.json();
+        throw new Error(`${t('filesystems could not be loaded')}|$| ${errorDetails.error || t('unknown error')}`);
+      }
+      const result = await res.json();
+      return result || [];
+    } catch (e) {
+      const [userMessage, apiErrorMessage] = e.message.split('|$|');
+      showSnackbarError(userMessage, apiErrorMessage);
+      return [];
     }
-    const Result = await res.json();
-    filesystems.value = Result || [];
-  } catch (e) {
-    const [userMessage, apiErrorMessage] = e.message.split('|$|');
-    showSnackbarError(userMessage, apiErrorMessage);
-  }
-};
+  };
 
 const getPoolTypes = async () => {
   try {
@@ -1451,7 +1463,8 @@ const removeMergerfsParityDevice = async (poolId, devices, unmount) => {
   }
 };
 
-const switchPoolType = () => {
+const switchPoolType = async () => {
+  createPoolDialog.filesystems = await getFilesystems(createPoolDialog.type);
   if (createPoolDialog.type === 'single' || createPoolDialog.type === 'mergerfs') {
     createPoolDialog.filesystem = 'xfs';
   } else {

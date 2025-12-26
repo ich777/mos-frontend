@@ -9,7 +9,7 @@
         <v-card v-else style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list class="bg-transparent">
-              <template v-for="(share, index) in shares" :key="share.id ?? share.name">
+              <template v-for="(share, index) in shares" :key="share.id">
                 <v-list-item>
                   <template v-slot:prepend>
                     <v-icon>mdi-folder</v-icon>
@@ -161,7 +161,17 @@
     <v-card class="pa-0">
       <v-card-title>{{ $t('target devices') }}</v-card-title>
       <v-card-text>
-        <v-select v-model="targetDevicesDialog.selectedDevices" :items="targetDevicesDialog.targetDevices" item-title="name" item-value="value" :label="$t('target devices')" multiple chips clearable dense />
+        <v-select
+          v-model="targetDevicesDialog.selectedDevices"
+          :items="targetDevicesDialog.targetDevices"
+          item-title="name"
+          item-value="value"
+          :label="$t('target devices')"
+          multiple
+          chips
+          clearable
+          dense
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -260,7 +270,7 @@ const targetDevicesDialog = reactive({
   value: false,
   share: null,
   selectedDevices: [],
-  targetDevices: [ { name: '', value: '' }],
+  targetDevices: [{ name: '', value: '' }]
 });
 
 onMounted(async () => {
@@ -299,7 +309,7 @@ const openEditDialog = (share) => {
   editDialog.comment = share.comment || '';
 };
 
-const openTargetDevicesDialog =  async (share) => {
+const openTargetDevicesDialog = async (share) => {
   targetDevicesDialog.value = true;
   targetDevicesDialog.share = share;
   targetDevicesDialog.selectedDevices = [];
@@ -484,7 +494,12 @@ const getTargetDevices = async (share) => {
     });
     if (!res.ok) throw new Error(t('target devices could not be loaded'));
     const result = await res.json();
-    return result.target_devices || [];
+
+    if (result.data != null && result.data.pathRule != null && result.data.pathRule.targetDevices.length > 0) {
+      return result.data.pathRule.targetDevices;
+    } else {
+      return [];
+    }
   } catch (e) {
     showSnackbarError(e.message);
     return [];
