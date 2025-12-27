@@ -1083,7 +1083,6 @@ const stopDocker = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    overlay.value = false;
 
     if (!res.ok) {
       const error = await res.json();

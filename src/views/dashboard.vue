@@ -9,12 +9,12 @@
         <!-- Left Column -->
         <draggable v-model="left" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150">
           <template #item="{ element }">
-            <div class="card" v-if="widgetVisible(element.kind)">
+            <div class="card" v-if="widgetVisible(element.id)">
               <div class="card-head">
                 <span class="drag-handle">⋮⋮</span>
-                <span>{{ labelFor(element.kind) }}</span>
+                <span>{{ labelFor(element.id) }}</span>
               </div>
-              <component :is="components[element.kind]" v-bind="widgetProps(element.kind)"  />
+              <component :is="components[element.id]" v-bind="widgetProps(element.id)"  />
             </div>
           </template>
         </draggable>
@@ -22,12 +22,12 @@
         <!-- Right Column -->
         <draggable v-model="right" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150" >
           <template #item="{ element }" >
-            <div class="card" v-if="widgetVisible(element.kind)">
+            <div class="card" v-if="widgetVisible(element.id)">
               <div class="card-head">
                 <span class="drag-handle">⋮⋮</span>
-                <span>{{ labelFor(element.kind) }}</span>
+                <span>{{ labelFor(element.id) }}</span>
               </div>
-              <component :is="components[element.kind]" v-bind="widgetProps(element.kind)"  />
+              <component :is="components[element.id]" v-bind="widgetProps(element.id)"  />
             </div>
           </template>
         </draggable>
@@ -38,11 +38,11 @@
   <!-- Settings Dialog -->
   <v-dialog v-model="settingsDialog" max-width="460">
     <v-card class="pa-0">
-      <v-card-title class="text-h6">{{ t('widget settings') }}</v-card-title>
+      <v-card-title class="text-h6">{{ t('visibility') }}</v-card-title>
       <v-card-text>
         <v-row class="pa-0">
-          <v-col cols="12" v-for="kind in ALL_WIDGETS" :key="kind" class="pa-0 my-1">
-            <v-checkbox hide-details="auto" :label="labelFor(kind)" v-model="visibility[kind]" :true-value="true" :false-value="false" density="compact" class="pa-0 ma-0" />
+          <v-col cols="12" v-for="name in ALL_WIDGETS" :key="name" class="pa-0 my-1">
+            <v-checkbox hide-details="auto" :label="labelFor(name)" v-model="visibility[name]" :true-value="true" :false-value="false" density="compact" class="pa-0 ma-0" />
           </v-col>
         </v-row>
       </v-card-text>
@@ -66,23 +66,25 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { io } from 'socket.io-client';
 import draggable from 'vuedraggable';
-import Processor from '../components/processor.vue';
-import Memory from '../components/memory.vue';
-import OS from '../components/os.vue';
-import Network from '../components/network.vue';
-import Pools from '../components/pools.vue';
-import Disks from '../components/disks.vue';
+import Processor from '../components/cards/processor.vue';
+import Memory from '../components/cards/memory.vue';
+import OS from '../components/cards/os.vue';
+import Network from '../components/cards/network.vue';
+import Pools from '../components/cards/pools.vue';
+import Disks from '../components/cards/disks.vue';
+import Sensors from '../components/cards/sensors.vue';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
 const components = {
-  OS,
-  Processor,
-  Pools,
-  Network,
-  Memory,
-  Disks,
-};
+  os: OS,
+  processor: Processor,
+  pools: Pools,
+  network: Network,
+  memory: Memory,
+  disks: Disks,
+  sensors: Sensors,
+}
 
 const cpu = ref(null);
 const network = ref(null);
@@ -94,47 +96,51 @@ const isConnected = ref(false);
 const error = ref(null);
 const left = ref([]);
 const right = ref([]);
-const ALL_WIDGETS = ['OS', 'Processor', 'Pools', 'Network', 'Memory', 'Disks'];
+const ALL_WIDGETS = ['os', 'processor', 'pools', 'network', 'memory', 'disks', 'sensors'];
 const DEFAULT_LEFT = [
-  { id: 'os', kind: 'OS' },
-  { id: 'processor', kind: 'Processor' },
-  { id: 'pools', kind: 'Pools' },
+  { id: 'os', name: 'OS' },
+  { id: 'processor', name: 'Processor' },
+  { id: 'pools', name: 'Pools' },
+  { id: 'sensors', name: 'Sensors' },
 ];
 const DEFAULT_RIGHT = [
-  { id: 'network', kind: 'Network' },
-  { id: 'memory', kind: 'Memory' },
-  { id: 'disks', kind: 'Disks' },
+  { id: 'network', name: 'Network' },
+  { id: 'memory', name: 'Memory' },
+  { id: 'disks', name: 'Disks' },
 ];
 const DEFAULT_VISIBILITY = {
-  OS: true,
-  Processor: true,
-  Pools: true,
-  Network: true,
-  Memory: true,
-  Disks: true,
+  os: true,
+  processor: true,
+  pools: true,
+  network: true,
+  memory: true,
+  disks: true,
+  sensors: true,
 };
-const kindKeyMap = {
+const nameKeyMap = {
   OS: 'os',
   Processor: 'processor',
   Pools: 'pools',
   Network: 'network',
   Memory: 'memory',
   Disks: 'disks',
+  Sensors: 'sensors',
 };
 const settingsDialog = ref(false);
 const visibility = ref({
-  OS: true,
-  Processor: true,
-  Pools: true,
-  Network: true,
-  Memory: true,
-  Disks: true,
+  os: true,
+  processor: true,
+  pools: true,
+  network: true,
+  memory: true,
+  disks: true,
+  sensors: true,
 });
 let socket = null;
 
 onMounted(() => {
   loadLayout();
-  getLoad();
+  getData();
   getLoadWS();
 });
 
@@ -145,99 +151,161 @@ onUnmounted(() => {
   }
 });
 
-const labelFor = (kind) => {
-  const key = kindKeyMap[kind] || kind?.toLowerCase?.() || String(kind || '');
-  return t(key);
+const labelFor = (x) => {
+  const key = nameKeyMap?.[x] || String(x || '').toLowerCase()
+  return t(key)
 }
 
-const loadLayout = () => {
+const getDashboard = async () => {
   try {
-    const saved = JSON.parse(localStorage.getItem('dashLayout'));
-    if (saved?.left && saved?.right && saved?.visibility) {
-      const savedLeft = Array.isArray(saved.left) ? saved.left.map(({ id, kind }) => ({ id, kind })) : [];
-      const savedRight = Array.isArray(saved.right) ? saved.right.map(({ id, kind }) => ({ id, kind })) : [];
-      const kindsSeen = new Set();
-      const filterUnique = (arr) => arr.filter(({ kind }) => {
-        if (!kind || kindsSeen.has(kind)) return false;
-        kindsSeen.add(kind);
-        return true;
-      });
+    const res = await fetch(`/api/v1/mos/dashboard`, {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
 
-      const normLeft = filterUnique(savedLeft);
-      const normRight = filterUnique(savedRight);
-
-      const missing = ALL_WIDGETS.filter(k => !kindsSeen.has(k));
-      missing.forEach((kind, i) => {
-        const baseId = kindKeyMap[kind] || kind.toLowerCase();
-        const newId = `${baseId}-added-${i}`;
-        if (normLeft.length <= normRight.length) normLeft.push({ id: newId, kind });
-        else normRight.push({ id: newId, kind });
-      });
-
-      left.value = normLeft;
-      right.value = normRight;
-      visibility.value = { ...DEFAULT_VISIBILITY, ...(saved.visibility || {}) };
-      ALL_WIDGETS.forEach(k => {
-        if (visibility.value[k] === undefined) visibility.value[k] = !!DEFAULT_VISIBILITY[k];
-      });
-      return;
-    } else {
-      localStorage.removeItem('dashLayout');
-      left.value = DEFAULT_LEFT;
-      right.value = DEFAULT_RIGHT;
-      visibility.value = { ...DEFAULT_VISIBILITY };
-      return;
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('dashboard could not be loaded')}|$| ${error.error || t('unknown error')}`);
     }
-  } catch (_) {
-      left.value = DEFAULT_LEFT;
-      right.value = DEFAULT_RIGHT;
-      visibility.value = { ...DEFAULT_VISIBILITY };
-      return;
-  }
-};
+    return await res.json();
 
-const saveLayout = () => {
-  localStorage.setItem(
-    'dashLayout',
-    JSON.stringify({
-      left: left.value.map(({ id, kind }) => ({ id, kind })),
-      right: right.value.map(({ id, kind }) => ({ id, kind })),
-      visibility: visibility.value,
-    })
-  );
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+  }
+}
+
+const setDashboard = async (dashboard) => {
+  try {
+    const res = await fetch(`/api/v1/mos/dashboard`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(dashboard),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('dashboard could not be saved')}|$| ${error.error || t('unknown error')}`);
+    }
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+  }
+}
+
+const loadLayout = async () => {
+  const toId = (item) => {
+    const rawId = item?.id
+    if (typeof rawId === 'string' && rawId.trim()) return rawId.trim().toLowerCase()
+    const rawName = item?.name
+    if (typeof rawName === 'string' && rawName.trim()) {
+      const n = rawName.trim()
+      return (nameKeyMap[n] || n.toLowerCase())
+    }
+    return null
+  }
+
+  const makeItem = (id) => ({ id, name: id })
+
+  try {
+    const saved = await getDashboard()
+    const normalizeVisibility = (v) => {
+      const out = { ...DEFAULT_VISIBILITY }
+      if (v && typeof v === 'object') {
+        for (const k of ALL_WIDGETS) {
+          if (v[k] !== undefined) out[k] = !!v[k]
+        }
+
+        for (const [oldName, id] of Object.entries(nameKeyMap)) {
+          if (v[oldName] !== undefined) out[id] = !!v[oldName]
+        }
+      }
+      return out
+    }
+    const normalizeSide = (arr) => {
+      const seen = new Set()
+      const out = []
+      if (Array.isArray(arr)) {
+        for (const it of arr) {
+          const id = toId(it)
+          if (!id) continue
+          if (!ALL_WIDGETS.includes(id)) continue
+          if (seen.has(id)) continue
+          seen.add(id)
+          out.push(makeItem(id))
+        }
+      }
+      return { out, seen }
+    }
+    if (!saved || typeof saved !== 'object') throw new Error('no saved')
+    const leftRes = normalizeSide(saved.left)
+    const rightRes = normalizeSide(saved.right)
+    const seenAll = new Set([...leftRes.seen, ...rightRes.seen])
+    const normLeft = leftRes.out
+    const normRight = rightRes.out
+    const missing = ALL_WIDGETS.filter((id) => !seenAll.has(id))
+    for (const id of missing) {
+      if (normLeft.length <= normRight.length) normLeft.push(makeItem(id))
+      else normRight.push(makeItem(id))
+    }
+    left.value = normLeft.length ? normLeft : DEFAULT_LEFT.map(({ id }) => makeItem(id))
+    right.value = normRight.length ? normRight : DEFAULT_RIGHT.map(({ id }) => makeItem(id))
+    visibility.value = normalizeVisibility(saved.visibility)
+  } catch (e) {
+    left.value = DEFAULT_LEFT.map(({ id }) => ({ id, name: id }))
+    right.value = DEFAULT_RIGHT.map(({ id }) => ({ id, name: id }))
+    visibility.value = { ...DEFAULT_VISIBILITY }
+  }
+}
+
+
+const saveLayout = async () => {
+  setDashboard({
+    left: left.value.map(({ id, name }) => ({ id, name })),
+    right: right.value.map(({ id, name }) => ({ id, name })),
+    visibility: visibility.value,
+  });
 }
 
 watch([left, right, visibility], saveLayout, { deep: true });
 
-const widgetProps = (kind) => {
-  switch (kind) {
-    case 'Processor':
+const widgetProps = (id) => {
+  switch (id) {
+    case 'processor':
       return { cpu: cpu.value, temperature: temperature.value };
-    case 'Network':
+    case 'network':
       return { network: network.value };
-    case 'Memory':
+    case 'memory':
       return { memory: memory.value };
-    case 'Disks':
+    case 'disks':
       return { disks: disks.value };
-    case 'Pools':
+    case 'pools':
       return { pools: pools.value };
     default:
       return {};
   }
 }
 
-const widgetVisible = (kind) => {
-  if (visibility.value && visibility.value[kind] === false) return false;
-  if (kind === 'OS') return !!visibility.value?.OS;
-  if (kind === 'Processor') return !!visibility.value?.Processor && !!cpu.value;
-  if (kind === 'Network') return !!visibility.value?.Network && !!network.value;
-  if (kind === 'Memory') return !!visibility.value?.Memory && !!memory.value;
-  if (kind === 'Pools') return !!visibility.value?.Pools && !!pools.value;
-  if (kind === 'Disks') return !!visibility.value?.Disks && !!pools.value;
-  return !!visibility.value?.[kind];
+const widgetVisible = (id) => {
+  if (visibility.value && visibility.value[id] === false) return false;
+  if (id === 'os') return !!visibility.value?.os;
+  if (id === 'processor') return !!visibility.value?.processor && !!cpu.value;
+  if (id === 'network') return !!visibility.value?.network && !!network.value;
+  if (id === 'memory') return !!visibility.value?.memory && !!memory.value;
+  if (id === 'pools') return !!visibility.value?.pools && !!pools.value;
+  if (id === 'disks') return !!visibility.value?.disks && !!pools.value;
+  if (id === 'sensors') return !!visibility.value?.sensors;
+  return !!visibility.value?.[id];
 }
 
-const getLoad = async () => {
+const getData = async () => {
   try {
     const res = await fetch('/api/v1/system/load', {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },

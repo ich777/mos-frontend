@@ -828,5 +828,9 @@
   "target devices": "Target Devices",
   "target devices could not be set": "Target devices could not be set",
   "target devices set successfully": "Target devices set successfully",
-  "target devices could not be loaded": "Target devices could not be loaded"
+  "target devices could not be loaded": "Target devices could not be loaded",
+  "dashboard could not be loaded": "Dashboard could not be loaded",
+  "dashboard could not be saved": "Dashboard could not be saved",
+  "visibility": "Visibility",
+  "sensors": "Sensors"
 }

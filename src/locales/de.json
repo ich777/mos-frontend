@@ -828,5 +828,9 @@
   "target devices": "Zielgeräte",
   "target devices could not be set": "Zielgeräte konnten nicht festgelegt werden",
   "target devices set successfully": "Zielgeräte erfolgreich festgelegt",
-  "target devices could not be loaded": "Zielgeräte konnten nicht geladen werden"
+  "target devices could not be loaded": "Zielgeräte konnten nicht geladen werden",
+  "dashboard could not be loaded": "Dashboard konnte nicht geladen werden",
+  "dashboard could not be saved": "Dashboard konnte nicht gespeichert werden",
+  "visibility": "Sichtbarkeit",
+  "sensors": "Sensoren"
 }
