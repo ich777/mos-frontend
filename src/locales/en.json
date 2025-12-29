@@ -833,5 +833,6 @@
   "dashboard could not be saved": "Dashboard could not be saved",
   "visibility": "Visibility",
   "sensors": "Sensors",
-  "groups": "Groups"
+  "groups": "Groups",
+  "sensor settings": "Sensor Settings"
 }

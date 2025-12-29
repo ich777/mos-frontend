@@ -26,6 +26,7 @@ import mosSettingsLogs from '../views/mosSettings/logs.vue';
 import mosSettingsDrivers from '../views/mosSettings/drivers.vue';
 import mosSettingsBoot from '../views/mosSettings/boot.vue';
 import mosSettingsHub from '../views/mosSettings/mosHub.vue';
+import mosSettingsSensors from '../views/mosSettings/sensors.vue';
 import webterminal from '../views/webterminal.vue';
 import webterminalPopup from '../views/webterminalPopup.vue';
 import Notifications from '../views/notifications.vue';
@@ -84,6 +85,7 @@ const routes = [
   { path: '/mosSettings/drivers', component: mosSettingsDrivers, meta: { hideAppBar: false, title: 'MOS Settings - Drivers', description: 'Manage device drivers' } },
   { path: '/mosSettings/boot', component: mosSettingsBoot, meta: { hideAppBar: false, title: 'MOS Settings - Boot', description: 'Manage boot settings' } },
   { path: '/mosSettings/mosHub', component: mosSettingsHub, meta: { hideAppBar: false, title: 'MOS Settings - MOS Hub', description: 'Manage MOS Hub settings' } },
+  { path: '/mosSettings/sensors', component: mosSettingsSensors, meta: { hideAppBar: false, title: 'MOS Settings - Sensors', description: 'Manage system sensors' } },
   { path: '/profile', component: profile, meta: { hideAppBar: false, title: 'Profile', description: 'Manage your profile' } },
   { path: '/webTerminal', component: webterminal, meta: { hideAppBar: false, title: 'Web Terminal', description: 'Access the web terminal' } },
   {

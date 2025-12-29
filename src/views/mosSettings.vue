@@ -134,10 +134,14 @@
                   <v-icon start>mdi-expansion-card</v-icon>
                   {{ $t('drivers') }}
                 </v-btn>
-                <v-btn color="primary" block rounded to="/mosSettings/boot">
+                <v-btn color="primary" block  class="mb-2" rounded to="/mosSettings/boot">
                   <v-icon start>mdi-usb-flash-drive</v-icon>
                   {{ $t('boot') }}
                 </v-btn>
+                <v-btn color="primary" block rounded to="/mosSettings/sensors">
+                  <v-icon start>mdi-access-point</v-icon>
+                  {{ $t('sensors') }}
+                </v-btn>                
               </v-card-text>
             </v-card>
           </v-col>
