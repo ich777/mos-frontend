@@ -130,6 +130,10 @@
                 {{ $t('hardware') }}
               </v-card-title>
               <v-card-text>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/sensors">
+                    <v-icon start>mdi-thermometer</v-icon>
+                    {{ $t('sensors') }}
+                </v-btn>
                 <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/drivers">
                   <v-icon start>mdi-expansion-card</v-icon>
                   {{ $t('drivers') }}
