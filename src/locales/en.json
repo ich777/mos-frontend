@@ -839,5 +839,6 @@
   "voltage": "Voltage",
   "power": "Power",
   "psu": "PSU",
-  "other": "Other"  
+  "other": "Other",
+  "cpu": "CPU"
 }
