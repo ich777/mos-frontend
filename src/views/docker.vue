@@ -541,54 +541,107 @@
   <v-dialog v-model="infoDialog.value" max-width="500">
     <v-card v-if="infoDialog.docker" class="pa-0">
       <v-card-title class="text-h6">{{ infoDialog.docker.Names[0] }}</v-card-title>
-      <v-card-text>
-        <div>
-          <strong>{{ $t('state') }}:</strong>
-          {{ infoDialog.docker.State }}
-        </div>
-        <div>
-          <strong>{{ $t('image') }}:</strong>
-          {{ infoDialog.docker.Image }}
-        </div>
-        <div>
-          <strong>{{ $t('network') }}:</strong>
-          {{ infoDialog.docker.HostConfig.NetworkMode }}
-        </div>
-        <div v-if="infoDialog.docker.Mounts && infoDialog.docker.Mounts.length">
-          <div v-for="(mount, idx) in infoDialog.docker.Mounts" :key="idx">
-            <div>
-              <strong>{{ $t('type') }}:</strong>
-              {{ mount.Type }}
-            </div>
-            <div>
-              <strong>{{ $t('source') }}:</strong>
-              {{ mount.Source }} &#8594; {{ mount.Destination }}
-            </div>
-            <div>
-              <strong>{{ $t('read/write') }}:</strong>
-              {{ mount.RW ? 'Yes' : 'No' }}
-            </div>
-            <div>
-              <strong>{{ $t('mode') }}:</strong>
-              {{ mount.Mode }}
-            </div>
-            <div>
-              <strong>{{ $t('propagation') }}:</strong>
-              {{ mount.Propagation }}
-            </div>
-          </div>
-        </div>
-        <div>
-          <strong>{{ $t('ports') }}:</strong>
-          <div v-if="infoDialog.docker.Ports && infoDialog.docker.Ports.length">
-            <div v-for="(port, idx) in infoDialog.docker.Ports" :key="idx">
-              {{ port.PrivatePort }}
-              <span v-if="port.PublicPort">&#8594; {{ port.PublicPort }}</span>
-              ({{ port.Type }})
-            </div>
-          </div>
-          <span v-else>-</span>
-        </div>
+      <v-card-text class="pa-4">
+        <v-row dense>
+          <v-col cols="12" md="6">
+            <v-sheet rounded="lg" variant="tonal" class="pa-4">
+              <div class="text-subtitle-1 font-weight-medium mb-3">{{ $t('info') }}</div>
+              <v-list density="compact" class="bg-transparent pa-0">
+                <v-list-item class="px-0">
+                  <template #prepend>
+                    <v-icon class="mr-2" color="grey-darken-1">mdi-heart-pulse</v-icon>
+                  </template>
+                  <v-list-item-title class="d-flex align-center justify-space-between">
+                    <span class="text-body-2">{{ $t('state') }}</span>
+                    <v-chip size="small" :color="infoDialog.docker.State === 'running' ? 'green' : 'red'" variant="tonal" class="ml-2">
+                      {{ infoDialog.docker.State }}
+                    </v-chip>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-divider class="my-2" />
+                <v-list-item class="px-0">
+                  <template #prepend>
+                    <v-icon class="mr-2" color="grey-darken-1">mdi-docker</v-icon>
+                  </template>
+                  <v-list-item-title class="d-flex align-center justify-space-between">
+                    <span class="text-body-2">{{ $t('image') }}</span>
+                    <span class="text-body-2 text-truncate ml-2" style="max-width: 260px" :title="infoDialog.docker.Image">
+                      {{ infoDialog.docker.Image }}
+                    </span>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-divider class="my-2" />
+                <v-list-item class="px-0">
+                  <template #prepend>
+                    <v-icon class="mr-2" color="grey-darken-1">mdi-lan</v-icon>
+                  </template>
+                  <v-list-item-title class="d-flex align-center justify-space-between">
+                    <span class="text-body-2">{{ $t('network') }}</span>
+                    <v-chip size="small" color="primary" variant="tonal" class="ml-2">
+                      {{ infoDialog.docker.HostConfig.NetworkMode }}
+                    </v-chip>
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-sheet>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-sheet rounded="lg" variant="tonal" class="pa-4">
+              <div class="text-subtitle-1 font-weight-medium mb-3">{{ $t('ports') }}</div>
+              <div v-if="infoDialog.docker.Ports && infoDialog.docker.Ports.length" class="d-flex flex-wrap ga-2">
+                <v-chip v-for="(port, idx) in infoDialog.docker.Ports" :key="idx" size="small" variant="outlined" class="text-body-2">
+                  {{ port.PublicPort ? `${port.PublicPort}:${port.PrivatePort}` : `${port.PrivatePort}` }}
+                  <span class="ml-2 text-caption text-medium-emphasis">({{ port.Type }})</span>
+                </v-chip>
+              </div>
+              <div v-else class="text-body-2 text-medium-emphasis">-</div>
+            </v-sheet>
+          </v-col>
+          <v-col cols="12">
+            <v-sheet rounded="lg" variant="tonal" class="pa-4">
+              <div class="text-subtitle-1 font-weight-medium mb-3">{{ $t('mounts') }}</div>
+              <div v-if="infoDialog.docker.Mounts && infoDialog.docker.Mounts.length">
+                <v-expansion-panels variant="accordion" class="bg-transparent">
+                  <v-expansion-panel v-for="(mount, idx) in infoDialog.docker.Mounts" :key="idx">
+                    <v-expansion-panel-title>
+                      <div class="d-flex align-center justify-space-between w-100">
+                        <div class="text-body-2 text-truncate" style="max-width: 520px">{{ mount.Source }} &#8594; {{ mount.Destination }}</div>
+                        <v-chip size="x-small" :color="mount.RW ? 'green' : 'red'" variant="tonal" class="ml-2">
+                          {{ mount.RW ? $t('read/write') : $t('read only') }}
+                        </v-chip>
+                      </div>
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      <v-list density="compact" class="bg-transparent pa-0">
+                        <v-list-item class="px-0">
+                          <v-list-item-title class="d-flex justify-space-between">
+                            <span class="text-body-2">{{ $t('type') }}</span>
+                            <span class="text-body-2 text-medium-emphasis">{{ mount.Type || '-' }}</span>
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-divider class="my-2" />
+                        <v-list-item class="px-0">
+                          <v-list-item-title class="d-flex justify-space-between">
+                            <span class="text-body-2">{{ $t('mode') }}</span>
+                            <span class="text-body-2 text-medium-emphasis">{{ mount.Mode || '-' }}</span>
+                          </v-list-item-title>
+                        </v-list-item>
+                        <v-divider class="my-2" />
+                        <v-list-item class="px-0">
+                          <v-list-item-title class="d-flex justify-space-between">
+                            <span class="text-body-2">{{ $t('propagation') }}</span>
+                            <span class="text-body-2 text-medium-emphasis">{{ mount.Propagation || '-' }}</span>
+                          </v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </div>
+              <div v-else class="text-body-2 text-medium-emphasis">-</div>
+            </v-sheet>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" text @click="infoDialog.value = false">{{ $t('close') }}</v-btn>
@@ -785,19 +838,19 @@
 
   <!-- Docker Waittime Dialog -->
   <v-dialog v-model="dockerWaitTimesDialog.value" persistent width="600">
-    <v-card max-height="80vh" style="display: flex; flex-direction: column;" class="pa-0">
+    <v-card max-height="80vh" style="display: flex; flex-direction: column" class="pa-0">
       <v-card-title class="text-h6 pb-0">{{ $t('sort / wait times') }}</v-card-title>
-      <v-card-text style="overflow: auto; flex: 1; padding-bottom: 0;" class="px-1 pt-1">
+      <v-card-text style="overflow: auto; flex: 1; padding-bottom: 0" class="px-1 pt-1">
         <span class="pl-3 text-subtitle-1 font-weight-medium">{{ $t('groups') }}</span>
-        <draggable v-model="dockerGroups" item-key="id" handle=".drag-handle" @end="onDragEnd()" style="line-height: 1.5;">
+        <draggable v-model="dockerGroups" item-key="id" handle=".drag-handle" @end="onDragEnd()" style="line-height: 1.5">
           <template #item="{ element: d }">
             <v-row :key="d.id" class="d-flex align-center pa-0 ma-0 ml-2">
               <v-col cols="8" class="pa-0 ma-0 mb-1 d-flex align-center">
-                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right:8px">mdi-drag</v-icon>
+                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right: 8px">mdi-drag</v-icon>
                 <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.name }}</div>
               </v-col>
               <v-col cols="4" class="px-2 py-0 ma-0 mb-2">
-                <v-text-field density="compact" dense hide-details="auto" readonly tabindex="-1" style="visibility:hidden; height: 40px;" />
+                <v-text-field density="compact" dense hide-details="auto" readonly tabindex="-1" style="visibility: hidden; height: 40px" />
               </v-col>
             </v-row>
           </template>
@@ -807,7 +860,7 @@
           <template #item="{ element: d }">
             <v-row :key="d.Id" class="d-flex align-center pa-0 ma-0 ml-2">
               <v-col cols="9" class="pa-0 ma-0 mb-1 d-flex align-center">
-                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right:8px">mdi-drag</v-icon>
+                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right: 8px">mdi-drag</v-icon>
                 <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.Names?.[0] }}</div>
               </v-col>
               <v-col cols="3" class="px-2 py-0 ma-0 mb-2">
@@ -820,7 +873,17 @@
       <v-divider />
       <v-card-actions>
         <v-spacer />
-        <v-btn text color="onPrimary" @click="dockerWaitTimesDialog.value = false; getDockers(); getDockerGroups();">{{ $t('cancel') }}</v-btn>
+        <v-btn
+          text
+          color="onPrimary"
+          @click="
+            dockerWaitTimesDialog.value = false;
+            getDockers();
+            getDockerGroups();
+          "
+        >
+          {{ $t('cancel') }}
+        </v-btn>
         <v-btn text color="onPrimary" @click="updateDockerWaitTimes()">
           {{ $t('save') }}
         </v-btn>
@@ -1824,7 +1887,7 @@ const updateDockerWaitTimes = async () => {
   const waitTimes = dockers.value.map((docker) => ({
     name: docker.Names[0],
     wait: docker.wait,
-    index: docker.index
+    index: docker.index,
   }));
 
   try {
