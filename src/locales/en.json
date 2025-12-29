@@ -834,5 +834,10 @@
   "visibility": "Visibility",
   "sensors": "Sensors",
   "groups": "Groups",
-  "sensor settings": "Sensor Settings"
+  "sensor settings": "Sensor Settings",
+  "fan": "Fan",
+  "voltage": "Voltage",
+  "power": "Power",
+  "psu": "PSU",
+  "other": "Other"  
 }

@@ -72,7 +72,12 @@ import OS from '../components/cards/os.vue';
 import Network from '../components/cards/network.vue';
 import Pools from '../components/cards/pools.vue';
 import Disks from '../components/cards/disks.vue';
-import Sensors from '../components/cards/sensors.vue';
+import Fan from '../components/cards/fan.vue';
+import Temperature from '../components/cards/temperature.vue';
+import Power from '../components/cards/power.vue';
+import Voltage from '../components/cards/voltage.vue';
+import PSU from '../components/cards/psu.vue';
+import Other from '../components/cards/other.vue';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
@@ -83,7 +88,12 @@ const components = {
   network: Network,
   memory: Memory,
   disks: Disks,
-  sensors: Sensors,
+  fan: Fan,
+  temperature: Temperature,
+  power: Power,
+  voltage: Voltage,
+  psu: PSU,
+  other: Other
 }
 
 const cpu = ref(null);
@@ -93,21 +103,27 @@ const pools = ref([]);
 const disks = ref([]);
 const temperature = ref(null);
 const osInfo = ref({});
-const isConnected = ref(false);
+const sensors = ref();
+const isConnected = ref({});
 const error = ref(null);
 const left = ref([]);
 const right = ref([]);
-const ALL_WIDGETS = ['os', 'processor', 'pools', 'network', 'memory', 'disks', 'sensors'];
+const ALL_WIDGETS = ['os', 'processor', 'pools', 'network', 'memory', 'disks', 'fan', 'temperature', 'power', 'voltage', 'psu', 'other'];
 const DEFAULT_LEFT = [
   { id: 'os', name: 'OS' },
   { id: 'processor', name: 'Processor' },
   { id: 'pools', name: 'Pools' },
-  { id: 'sensors', name: 'Sensors' },
+  { id: 'fan', name: 'Fan' },
+  { id: 'voltage', name: 'Voltage' },
+  { id: 'psu', name: 'PSU' },
 ];
 const DEFAULT_RIGHT = [
   { id: 'network', name: 'Network' },
   { id: 'memory', name: 'Memory' },
   { id: 'disks', name: 'Disks' },
+  { id: 'temperature', name: 'Temperature' },
+  { id: 'power', name: 'Power' },
+  { id: 'other', name: 'Other' },
 ];
 const DEFAULT_VISIBILITY = {
   os: true,
@@ -116,7 +132,12 @@ const DEFAULT_VISIBILITY = {
   network: true,
   memory: true,
   disks: true,
-  sensors: true,
+  fan: true,
+  temperature: false,
+  power: false,
+  voltage: false,
+  psu: false,
+  other: false,
 };
 const nameKeyMap = {
   OS: 'os',
@@ -125,7 +146,12 @@ const nameKeyMap = {
   Network: 'network',
   Memory: 'memory',
   Disks: 'disks',
-  Sensors: 'sensors',
+  Fan: 'fan',
+  Temperature: 'temperature',
+  Power: 'power',
+  Voltage: 'voltage',
+  PSU: 'psu',
+  Other: 'other',
 };
 const settingsDialog = ref(false);
 const visibility = ref({
@@ -135,7 +161,12 @@ const visibility = ref({
   network: true,
   memory: true,
   disks: true,
-  sensors: true,
+  fan: false,
+  temperature: false,
+  power: false,
+  voltage: false,
+  psu: false,
+  other: false,
 });
 let socket = null;
 
@@ -290,6 +321,18 @@ const widgetProps = (id) => {
       return { pools: pools.value };
     case 'os':
       return { osInfo: osInfo.value };
+    case 'fan':
+      return { sensors: sensors.value };
+    case 'temperature':
+      return { temperature: sensors.value };
+    case 'power':
+      return { sensors: sensors.value };
+    case 'voltage':
+      return { sensors: sensors.value };
+    case 'psu':
+      return { sensors: sensors.value };
+    case 'other':
+      return { sensors: sensors.value };
     default:
       return {};
   }
@@ -303,22 +346,32 @@ const widgetVisible = (id) => {
   if (id === 'memory') return !!visibility.value?.memory && !!memory.value;
   if (id === 'pools') return !!visibility.value?.pools && !!pools.value;
   if (id === 'disks') return !!visibility.value?.disks && !!pools.value;
-  if (id === 'sensors') return !!visibility.value?.sensors;
+  if (id === 'fan') return !!visibility.value?.fan;
+  if (id === 'temperature') return !!visibility.value?.temperature && !!temperature.value;
+  if (id === 'power') return !!visibility.value?.power;
+  if (id === 'voltage') return !!visibility.value?.voltage;
+  if (id === 'psu') return !!visibility.value?.psu;
+  if (id === 'other') return !!visibility.value?.other;
   return !!visibility.value?.[id];
 }
 
 const getData = async () => {
   try {
     const res = await fetch('/api/v1/system/load', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
     });
     const resPools = await fetch('/api/v1/pools', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') },
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
     });
     const resOs = await fetch('/api/v1/mos/osinfo', {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      },
+      }
+    });
+    const resSensors = await fetch('/api/v1/mos/sensors', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      }
     });
 
     if (!res.ok) throw new Error('API-Error');
@@ -333,6 +386,9 @@ const getData = async () => {
 
     if (!resOs.ok) throw new Error('API-Error');
     osInfo.value = await resOs.json();
+
+    if (!resSensors.ok) throw new Error('API-Error');
+    sensors.value = await resSensors.json();
 
   } catch (e) {
     error.value = e.message;

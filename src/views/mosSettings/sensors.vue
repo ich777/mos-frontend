@@ -15,9 +15,7 @@
         <v-skeleton-loader :loading="sensorsLoading" type="card" class="w-100">
           <v-card class="w-100">
             <v-card-text>
-              <v-form>
-
-            </v-form>
+              <v-form></v-form>
             </v-card-text>
           </v-card>
         </v-skeleton-loader>
@@ -54,7 +52,6 @@ onMounted(() => {
 
 const getSensorsSettings = async () => {
   try {
-
   } catch (error) {
     showSnackbarError(t('failed to load sensor settings'));
   } finally {
@@ -73,5 +70,4 @@ const setSensorsSettings = async () => {
     overlay.value = false;
   }
 };
-
 </script>
