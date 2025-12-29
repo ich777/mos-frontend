@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card>
+        <v-card fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text>
             <v-text-field :label="$t('hostname')" v-model="settingsSystem.hostname"></v-text-field>
             <v-select :items="keymaps" :label="$t('keymap')" v-model="settingsSystem.keymap" item-title="keymap" item-value="keymap"></v-select>

@@ -13,7 +13,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <div v-for="(categories, driverType) in installedDrivers" :key="driverType">
-          <v-card class="mb-4">
+          <v-card style="margin-bottom: 80px" class="pa-0 mb-4">
             <v-card-title>{{ driverType }}</v-card-title>
             <v-card-text>
               <v-list class="pa-0" style="background-color: transparent">

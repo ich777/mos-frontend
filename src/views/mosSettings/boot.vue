@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card class="px-0" style="margin-bottom: 80px">
+        <v-card class="pa-0" style="margin-bottom: 80px">
           <v-card-text>
             <v-btn color="primary" rounded @click="installToDiskDialog.value = true">
               {{ $t('install to disk') }}

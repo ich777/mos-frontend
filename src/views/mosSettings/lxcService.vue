@@ -13,7 +13,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-skeleton-loader :loading="lxcServiceLoading" type="card" class="w-100">
-          <v-card class="w-100">
+          <v-card fluid style="margin-bottom: 80px" class="pa-0">
             <v-card-text>
               <v-form>
                 <v-switch :label="$t('lxc service')" color="green" inset density="compact" v-model="settingsLXC.enabled"></v-switch>
@@ -21,7 +21,6 @@
                 <v-text-field
                   :label="$t('directory')"
                   v-model="settingsLXC.directory"
-                  hide-details="auto"
                   append-inner-icon="mdi-folder"
                   @click:append-inner="
                     openFsDialog((item) => {

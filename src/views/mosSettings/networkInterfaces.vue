@@ -12,7 +12,7 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card class="pl-0 pr-0">
+        <v-card fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pb-0">
             <v-form>
               <v-row v-for="(iface, idx) in settingsNetwork.filter((i) => ['ethernet', 'bridged'].includes(i.type))" :key="idx">

@@ -13,9 +13,8 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-skeleton-loader :loading="dockerServiceLoading" type="card" class="w-100">
-          <v-card class="w-100">
+          <v-card fluid style="margin-bottom: 80px" class="pa-0">
             <v-card-text>
-              <v-form>
                 <v-switch :label="$t('docker service')" inset density="compact" v-model="settingsDocker.enabled" color="green"></v-switch>
                 <v-text-field
                   v-model="settingsDocker.directory"
@@ -48,8 +47,9 @@
                     <v-combobox v-model="settingsDocker.docker_net.config" :label="$t('docker start parameters')" multiple chips></v-combobox>
                   </v-col>
                 </v-row>
-                <v-text-field v-model.number="settingsDocker.start_wait" :label="$t('start wait')" type="number" min="0"></v-text-field>
-                <v-divider class="my-2"></v-divider>
+                <v-text-field v-model.number="settingsDocker.start_wait" :label="$t('start wait')" type="number" min="0" hide-details="auto"></v-text-field>
+                <v-divider class="my-4"></v-divider>
+                <span class="text-subtitle-1 font-weight-medium">{{ $t('update schedule') }}</span>
                 <v-row class="align-center">
                   <v-col cols="12" md="4">
                     <v-switch v-model="settingsDocker.update_check.enabled" :label="$t('update check')" inset color="green" hide-details></v-switch>
@@ -73,7 +73,7 @@
                       density="compact"
                       :disabled="!settingsDocker.update_check.enabled"
                       color="green"
-                      hide-details
+                      hide-details="auto"
                     ></v-switch>
                   </v-col>
                   <v-col cols="12" md="8">
@@ -86,7 +86,6 @@
                     ></v-text-field>
                   </v-col>
                 </v-row>
-              </v-form>
             </v-card-text>
           </v-card>
         </v-skeleton-loader>

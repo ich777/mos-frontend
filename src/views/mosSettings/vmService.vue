@@ -13,32 +13,33 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-skeleton-loader :loading="vmServiceLoading" type="card" class="w-100">
-          <v-card class="w-100">
+          <v-card fluid style="margin-bottom: 80px" class="pa-0">
             <v-card-text>
-              <v-form>
-                <v-switch :label="$t('enabled')" color="green" inset density="compact" v-model="vmSettings.enabled"></v-switch>
-                <v-text-field
-                  :label="$t('directory')"
-                  v-model="vmSettings.directory"
-                  append-inner-icon="mdi-folder"
-                  @click:append-inner="
-                    openFsDialog((item) => {
-                      vmSettings.directory = item.path;
-                    })
-                  "
-                ></v-text-field>
-                <v-text-field
-                  :label="$t('vdisk directory')"
-                  v-model="vmSettings.vdisk_directory"
-                  append-inner-icon="mdi-folder"
-                  @click:append-inner="
-                    openFsDialog((item) => {
-                      vmSettings.vdisk_directory = item.path;
-                    })
-                  "
-                  hide-details="auto"
-                ></v-text-field>
-              </v-form>
+              <v-switch :label="$t('enabled')" color="green" inset density="compact" v-model="vmSettings.enabled"></v-switch>
+              <v-text-field
+                :label="$t('directory')"
+                v-model="vmSettings.directory"
+                append-inner-icon="mdi-folder"
+                @click:append-inner="
+                  openFsDialog((item) => {
+                    vmSettings.directory = item.path;
+                  })
+                "
+              ></v-text-field>
+              <v-text-field
+                :label="$t('vdisk directory')"
+                v-model="vmSettings.vdisk_directory"
+                append-inner-icon="mdi-folder"
+                @click:append-inner="
+                  openFsDialog((item) => {
+                    vmSettings.vdisk_directory = item.path;
+                  })
+                "
+                hide-details="auto"
+              ></v-text-field>
+            <v-divider class="my-4"></v-divider>
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('virtio isos') }}</span>
+            
             </v-card-text>
           </v-card>
         </v-skeleton-loader>
