@@ -266,7 +266,6 @@ const loadLayout = async () => {
   }
 }
 
-
 const saveLayout = async () => {
   setDashboard({
     left: left.value.map(({ id, name }) => ({ id, name })),

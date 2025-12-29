@@ -783,19 +783,34 @@
     </v-card>
   </v-dialog>
 
-  <!-- Docker Waittime dialog -->
-  <v-dialog v-model="dockerWaitTimesDialog.value" persistent width="500">
+  <!-- Docker Waittime Dialog -->
+  <v-dialog v-model="dockerWaitTimesDialog.value" persistent width="600">
     <v-card max-height="80vh" style="display: flex; flex-direction: column;" class="pa-0">
-      <v-card-title class="text-h6 pb-0">{{ $t('wait times') }}</v-card-title>
-      <v-card-text style="overflow: auto; flex: 1; padding-bottom: 0;" class="px-1">
+      <v-card-title class="text-h6 pb-0">{{ $t('sort / wait times') }}</v-card-title>
+      <v-card-text style="overflow: auto; flex: 1; padding-bottom: 0;" class="px-1 pt-1">
+        <span class="pl-3 text-subtitle-1 font-weight-medium">{{ $t('groups') }}</span>
+        <draggable v-model="dockerGroups" item-key="id" handle=".drag-handle" @end="onDragEnd()" style="line-height: 1.5;">
+          <template #item="{ element: d }">
+            <v-row :key="d.id" class="d-flex align-center pa-0 ma-0 ml-2">
+              <v-col cols="8" class="pa-0 ma-0 mb-1 d-flex align-center">
+                <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right:8px">mdi-drag</v-icon>
+                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.name }}</div>
+              </v-col>
+              <v-col cols="4" class="px-2 py-0 ma-0 mb-2">
+                <v-text-field density="compact" dense hide-details="auto" readonly tabindex="-1" style="visibility:hidden; height: 40px;" />
+              </v-col>
+            </v-row>
+          </template>
+        </draggable>
+        <span class="pl-3 text-subtitle-1 font-weight-medium">{{ $t('containers') }}</span>
         <draggable v-model="dockers" item-key="Id" handle=".drag-handle" @end="sortDockerIndex()">
           <template #item="{ element: d }">
             <v-row :key="d.Id" class="d-flex align-center pa-0 ma-0 ml-2">
-              <v-col cols="8" class="pa-0 ma-0 mb-1 d-flex align-center">
+              <v-col cols="9" class="pa-0 ma-0 mb-1 d-flex align-center">
                 <v-icon class="drag-handle" color="grey-darken-1" style="cursor: grab; margin-right:8px">mdi-drag</v-icon>
                 <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.Names?.[0] }}</div>
               </v-col>
-              <v-col cols="4" class="px-2 py-0 ma-0 mb-2">
+              <v-col cols="3" class="px-2 py-0 ma-0 mb-2">
                 <v-text-field density="compact" dense hide-details="auto" type="number" min="0" max="999" maxlength="3" v-model="d.wait" :label="$t('wait (sec)')" />
               </v-col>
             </v-row>
@@ -805,7 +820,7 @@
       <v-divider />
       <v-card-actions>
         <v-spacer />
-        <v-btn text color="onPrimary" @click="dockerWaitTimesDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn text color="onPrimary" @click="dockerWaitTimesDialog.value = false; getDockers(); getDockerGroups();">{{ $t('cancel') }}</v-btn>
         <v-btn text color="onPrimary" @click="updateDockerWaitTimes()">
           {{ $t('save') }}
         </v-btn>
@@ -843,7 +858,7 @@
         <template v-slot:prepend>
           <v-icon>mdi-timer-sand</v-icon>
         </template>
-        <v-list-item-title>{{ $t('set wait times') }}</v-list-item-title>
+        <v-list-item-title>{{ $t('sort / wait times') }}</v-list-item-title>
       </v-list-item>
       <v-list-item @click="openUnusedImagesDialog()">
         <template v-slot:prepend>

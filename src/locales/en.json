@@ -817,7 +817,7 @@
   "installation summary": "Installation summary",
   "stack images": "Stack Images",
   "donate": "Donate",
-  "wait times": "Wait Times",
+  "sort / wait times": "Sort / Wait Times",
   "set wait times": "Set Wait Times",
   "wait (sec)": "Wait (Sec)",
   "wait times saved successfully": "Wait times saved successfully",
@@ -832,5 +832,6 @@
   "dashboard could not be loaded": "Dashboard could not be loaded",
   "dashboard could not be saved": "Dashboard could not be saved",
   "visibility": "Visibility",
-  "sensors": "Sensors"
+  "sensors": "Sensors",
+  "groups": "Groups"
 }
