@@ -27,7 +27,7 @@
               </v-col>
             </v-row>
             <v-divider class="my-4"></v-divider>
-            <h3 class="mb-2">{{ $t('tailscale') }}</h3>
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('tailscale') }}</span>
             <v-row>
               <v-col cols="12" md="6">
                 <v-switch :label="$t('tailscale')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.tailscale.enabled"></v-switch>
@@ -38,7 +38,7 @@
             </v-row>
             <v-text-field class="mt-2" :label="$t('tailscale params')" v-model="settingsNetwork.tailscale.tailscaled_params" hide-details="auto"></v-text-field>
             <v-divider class="my-4"></v-divider>
-            <h3 class="mb-2">{{ $t('netbird') }}</h3>
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('netbird') }}</span>
             <v-row>
               <v-col cols="12" md="6">
                 <v-switch :label="$t('netbird')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.netbird.enabled"></v-switch>

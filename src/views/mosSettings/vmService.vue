@@ -37,6 +37,9 @@
                 "
                 hide-details="auto"
               ></v-text-field>
+            <v-divider class="my-4"></v-divider>
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('virtio isos') }}</span>
+            
             </v-card-text>
           </v-card>
         </v-skeleton-loader>

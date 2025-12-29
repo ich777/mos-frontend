@@ -840,5 +840,7 @@
   "power": "Power",
   "psu": "PSU",
   "other": "Other",
-  "cpu": "CPU"
+  "cpu": "CPU",
+  "update schedule": "Update Schedule",
+  "virtio isos": "VirtIO ISOs"
 }

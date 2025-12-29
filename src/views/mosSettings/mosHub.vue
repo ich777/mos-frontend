@@ -15,11 +15,9 @@
         <v-skeleton-loader :loading="mosHubLoading" type="card" class="w-100">
           <v-card fluid style="margin-bottom: 80px" class="pa-0">
             <v-card-text>
-              <v-form>
-                <v-switch :label="$t('mos hub')" color="green" inset density="compact" v-model="settingsMosHub.enabled"></v-switch>
-                <v-switch :label="$t('initial update')" color="green" inset density="compact" v-model="settingsMosHub.initial_update"></v-switch>
-                <v-text-field :label="$t('schedule')" v-model="settingsMosHub.schedule" hide-details="auto"></v-text-field>
-              </v-form>
+              <v-switch :label="$t('mos hub')" color="green" inset density="compact" v-model="settingsMosHub.enabled" hide-details="auto"></v-switch>
+              <v-switch :label="$t('initial update')" color="green" inset density="compact" v-model="settingsMosHub.initial_update"></v-switch>
+              <v-text-field :label="$t('update schedule')" v-model="settingsMosHub.schedule" hide-details="auto"></v-text-field>
             </v-card-text>
           </v-card>
         </v-skeleton-loader>
