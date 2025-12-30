@@ -863,5 +863,6 @@
   "source is required": "Source ist vorausgesetzt",
   "sensor mappings could not be loaded": "Sensorzuordnungen konnten nicht geladen werden",
   "value range": "Wertebereich",
-  "transform": "Umwandlung"
+  "transform": "Umwandlung",
+  "dark mode": "Dunkler Modus"
 }

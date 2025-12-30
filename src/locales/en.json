@@ -863,5 +863,6 @@
   "source is required": "Source is required",
   "sensor mappings could not be loaded": "Sensor mappings could not be loaded",
   "value range": "Value Range",
-  "transform": "Transform"
+  "transform": "Transform",
+  "dark mode": "Dark Mode"
 }

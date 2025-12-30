@@ -7,6 +7,14 @@
       <v-container fluid class="pa-0">
         <v-card class="px-0" style="margin-bottom: 80px">
           <v-card-text>
+            <v-switch
+              v-model="darkMode"
+              :label="$t('dark mode')"
+              :true-value="'dark'"
+              :false-value="'light'"
+              @update:modelValue="setDarkMode( $event )"
+              inset
+            />
             <v-select
               v-model="selectedLanguage"
               :items="languages"
@@ -91,7 +99,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="text" @click="createAdminTokenDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" variant="text" @click="createAdminTokenDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="createAdminToken()">{{ $t('create') }}</v-btn>
       </v-card-actions>
     </v-card>
@@ -120,7 +128,6 @@ const byteFormats = ref([
 ]);
 const selectedByteFormat = ref('');
 const expiryDays = ref(1);
-const byte_format = ref([t('binary'), t('decimal')]);
 const theme = useTheme();
 const color = ref(theme.themes.value[theme.global.name.value].colors.primary || '#1976D2');
 const adminTokens = ref([]);
@@ -130,6 +137,7 @@ const createAdminTokenDialog = reactive({
   description: '',
 });
 const showPassword = ref(false);
+const darkMode = ref(false);
 
 onMounted(() => {
   getUser();
@@ -158,6 +166,7 @@ const getUser = async () => {
     }
     const user = await res.json();
     selectedByteFormat.value = user.byte_format || 'binary';
+    darkMode.value = user.darkmode ? 'dark' : 'light';
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
@@ -383,4 +392,30 @@ const copyAuthToken = async (token) => {
     }
   }
 };
+
+const setDarkMode = async (targetTheme) => {
+  const payload = { darkmode: targetTheme === 'dark' ? true : false };
+
+  try {
+    const res = await fetch(`/api/v1/auth/users/${localStorage.getItem('userid')}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+
+    const result = await res.json();
+    theme.change(result.darkmode ? 'dark' : 'light')
+    darkMode.value = theme.global.name.value;
+    theme.themes.value[theme.global.name.value].colors.primary = result.primary_color || '#1976D2';    
+
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+};
+
 </script>
