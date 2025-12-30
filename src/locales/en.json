@@ -864,5 +864,7 @@
   "sensor mappings could not be loaded": "Sensor mappings could not be loaded",
   "value range": "Value Range",
   "transform": "Transform",
-  "dark mode": "Dark Mode"
+  "dark mode": "Dark Mode",
+  "others": "Others",
+  "thanks": "Thanks"
 }

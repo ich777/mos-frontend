@@ -864,5 +864,7 @@
   "sensor mappings could not be loaded": "Sensorzuordnungen konnten nicht geladen werden",
   "value range": "Wertebereich",
   "transform": "Umwandlung",
-  "dark mode": "Dunkler Modus"
+  "dark mode": "Dunkler Modus",
+  "others": "Andere",
+  "thanks": "Danke"
 }

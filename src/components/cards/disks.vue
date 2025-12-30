@@ -107,6 +107,8 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
+
 
 const props = defineProps({
   disks: {
@@ -114,5 +116,15 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+watch(
+  () => props.disks,
+  (newDisks) => {
+    if (newDisks && newDisks.length) {
+      newDisks.sort((a, b) => a.index - b.index);
+    }
+  },
+  { immediate: true }
+);
 
 </script>

@@ -146,6 +146,24 @@
             </v-card>
           </v-col>
 
+          <!-- Others Card -->
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
+            <v-card class="pa-0">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-help-box</v-icon>
+                {{ $t('others') }}
+              </v-card-title>
+              <v-card-text>
+                <v-btn color="primary" block rounded @click="thanksDialog = true">
+                  <v-icon start>mdi-handshake</v-icon>
+                  {{ $t('thanks') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-col>
+
+
+          <!-- Special Actions Card -->
           <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
               <v-card-title class="text-h6 mb-3">
@@ -244,6 +262,30 @@
     </v-card>
   </v-dialog>
 
+  <!-- Thanks Dialog -->
+  <v-dialog v-model="thanksDialog" max-width="600">
+    <v-card max-width="600" class="pa-0" style="max-height: 80vh; display: flex; flex-direction: column;" :title="t('thanks')" prepend-icon="mdi-handshake">
+      <v-card-text style="overflow-y: auto; flex: 1 1 auto; padding-right: 16px;">
+          <v-container v-if="osInfo && osInfo.base && osInfo.base.length" v-for="(baseItem, i) in osInfo.base" :key="i" class="pa-0">
+            <div class="text-subtitle-1 font-weight-medium">
+              {{ baseItem.os_name }} <span v-if="baseItem.os_version">({{ baseItem.os_version }})</span>
+            </div>
+            <v-list class="pa-0">
+              <v-list-item v-for="pkg in baseItem.packages" :key="pkg.name">
+                <div class="v-list-item-content">
+                  <v-list-item-title class="text-body-1">{{ pkg.name }}</v-list-item-title>
+                  <v-list-item-subtitle class="text--secondary">{{ pkg.version }}</v-list-item-subtitle>
+                </div>
+              </v-list-item>
+            </v-list>
+        </v-container>
+      </v-card-text>
+      <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
+        <v-btn color="onPrimary" :text="t('close')" @click="thanksDialog = false"></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
@@ -259,6 +301,7 @@ const mosReleases = ref({});
 const mosKernel = ref([]);
 const rebootDialog = ref(false);
 const shutdownDialog = ref(false);
+const thanksDialog = ref(false);
 const rollbackKernelDialog = ref(false);
 const osInfo = ref({});
 const overlay = ref(false);
