@@ -274,8 +274,8 @@ const handleFsSelected = (item) => {
       fsDialogCallback.value(item);
     } else {
       const relativePath = item.path.replace(fsDialogInitialPath.value, '');
-      const pathWithLeadingSlash = relativePath.startsWith('/') ? relativePath : '/' + relativePath;
-      fsDialogCallback.value({ ...item, path: pathWithLeadingSlash });
+      const trimmedPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+      fsDialogCallback.value({ ...item, path: trimmedPath });
     }
   }
   fsDialogCallback.value = null;
