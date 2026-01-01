@@ -14,20 +14,20 @@
                 <span class="drag-handle">⋮⋮</span>
                 <span>{{ labelFor(element.id) }}</span>
               </div>
-              <component :is="components[element.id]" v-bind="widgetProps(element.id)"  />
+              <component :is="components[element.id]" v-bind="widgetProps(element.id)" />
             </div>
           </template>
         </draggable>
 
         <!-- Right Column -->
-        <draggable v-model="right" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150" >
-          <template #item="{ element }" >
+        <draggable v-model="right" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150">
+          <template #item="{ element }">
             <div class="card" v-if="widgetVisible(element.id)">
               <div class="card-head">
                 <span class="drag-handle">⋮⋮</span>
                 <span>{{ labelFor(element.id) }}</span>
               </div>
-              <component :is="components[element.id]" v-bind="widgetProps(element.id)"  />
+              <component :is="components[element.id]" v-bind="widgetProps(element.id)" />
             </div>
           </template>
         </draggable>
@@ -48,17 +48,23 @@
       </v-card-text>
       <v-card-actions>
         <v-btn color="onPrimary" text @click="settingsDialog = false">{{ t('close') || 'Close' }}</v-btn>
-        <v-btn color="onPrimary" @click="saveLayout(); settingsDialog = false">{{ t('save') || 'Save' }}</v-btn>
+        <v-btn
+          color="onPrimary"
+          @click="
+            saveLayout();
+            settingsDialog = false;
+          "
+        >
+          {{ t('save') || 'Save' }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab @click="settingsDialog = true" color="primary"
-    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+  <v-fab @click="settingsDialog = true" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-tune</v-icon>
   </v-fab>
-
 </template>
 
 <script setup>
@@ -93,8 +99,8 @@ const components = {
   power: Power,
   voltage: Voltage,
   psu: PSU,
-  other: Other
-}
+  other: Other,
+};
 
 const cpu = ref(null);
 const network = ref(null);
@@ -184,9 +190,9 @@ onUnmounted(() => {
 });
 
 const labelFor = (x) => {
-  const key = nameKeyMap?.[x] || String(x || '').toLowerCase()
-  return t(key)
-}
+  const key = nameKeyMap?.[x] || String(x || '').toLowerCase();
+  return t(key);
+};
 
 const getDashboard = async () => {
   try {
@@ -202,13 +208,12 @@ const getDashboard = async () => {
       throw new Error(`${t('dashboard could not be loaded')}|$| ${error.error || t('unknown error')}`);
     }
     return await res.json();
-
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
   }
-}
+};
 
 const setDashboard = async (dashboard) => {
   try {
@@ -230,72 +235,72 @@ const setDashboard = async (dashboard) => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
   }
-}
+};
 
 const loadLayout = async () => {
   const toId = (item) => {
-    const rawId = item?.id
-    if (typeof rawId === 'string' && rawId.trim()) return rawId.trim().toLowerCase()
-    const rawName = item?.name
+    const rawId = item?.id;
+    if (typeof rawId === 'string' && rawId.trim()) return rawId.trim().toLowerCase();
+    const rawName = item?.name;
     if (typeof rawName === 'string' && rawName.trim()) {
-      const n = rawName.trim()
-      return (nameKeyMap[n] || n.toLowerCase())
+      const n = rawName.trim();
+      return nameKeyMap[n] || n.toLowerCase();
     }
-    return null
-  }
+    return null;
+  };
 
-  const makeItem = (id) => ({ id, name: id })
+  const makeItem = (id) => ({ id, name: id });
 
   try {
-    const saved = await getDashboard()
+    const saved = await getDashboard();
     const normalizeVisibility = (v) => {
-      const out = { ...DEFAULT_VISIBILITY }
+      const out = { ...DEFAULT_VISIBILITY };
       if (v && typeof v === 'object') {
         for (const k of ALL_WIDGETS) {
-          if (v[k] !== undefined) out[k] = !!v[k]
+          if (v[k] !== undefined) out[k] = !!v[k];
         }
 
         for (const [oldName, id] of Object.entries(nameKeyMap)) {
-          if (v[oldName] !== undefined) out[id] = !!v[oldName]
+          if (v[oldName] !== undefined) out[id] = !!v[oldName];
         }
       }
-      return out
-    }
+      return out;
+    };
     const normalizeSide = (arr) => {
-      const seen = new Set()
-      const out = []
+      const seen = new Set();
+      const out = [];
       if (Array.isArray(arr)) {
         for (const it of arr) {
-          const id = toId(it)
-          if (!id) continue
-          if (!ALL_WIDGETS.includes(id)) continue
-          if (seen.has(id)) continue
-          seen.add(id)
-          out.push(makeItem(id))
+          const id = toId(it);
+          if (!id) continue;
+          if (!ALL_WIDGETS.includes(id)) continue;
+          if (seen.has(id)) continue;
+          seen.add(id);
+          out.push(makeItem(id));
         }
       }
-      return { out, seen }
-    }
-    if (!saved || typeof saved !== 'object') throw new Error('no saved')
-    const leftRes = normalizeSide(saved.left)
-    const rightRes = normalizeSide(saved.right)
-    const seenAll = new Set([...leftRes.seen, ...rightRes.seen])
-    const normLeft = leftRes.out
-    const normRight = rightRes.out
-    const missing = ALL_WIDGETS.filter((id) => !seenAll.has(id))
+      return { out, seen };
+    };
+    if (!saved || typeof saved !== 'object') throw new Error('no saved');
+    const leftRes = normalizeSide(saved.left);
+    const rightRes = normalizeSide(saved.right);
+    const seenAll = new Set([...leftRes.seen, ...rightRes.seen]);
+    const normLeft = leftRes.out;
+    const normRight = rightRes.out;
+    const missing = ALL_WIDGETS.filter((id) => !seenAll.has(id));
     for (const id of missing) {
-      if (normLeft.length <= normRight.length) normLeft.push(makeItem(id))
-      else normRight.push(makeItem(id))
+      if (normLeft.length <= normRight.length) normLeft.push(makeItem(id));
+      else normRight.push(makeItem(id));
     }
-    left.value = normLeft.length ? normLeft : DEFAULT_LEFT.map(({ id }) => makeItem(id))
-    right.value = normRight.length ? normRight : DEFAULT_RIGHT.map(({ id }) => makeItem(id))
-    visibility.value = normalizeVisibility(saved.visibility)
+    left.value = normLeft.length ? normLeft : DEFAULT_LEFT.map(({ id }) => makeItem(id));
+    right.value = normRight.length ? normRight : DEFAULT_RIGHT.map(({ id }) => makeItem(id));
+    visibility.value = normalizeVisibility(saved.visibility);
   } catch (e) {
-    left.value = DEFAULT_LEFT.map(({ id }) => ({ id, name: id }))
-    right.value = DEFAULT_RIGHT.map(({ id }) => ({ id, name: id }))
-    visibility.value = { ...DEFAULT_VISIBILITY }
+    left.value = DEFAULT_LEFT.map(({ id }) => ({ id, name: id }));
+    right.value = DEFAULT_RIGHT.map(({ id }) => ({ id, name: id }));
+    visibility.value = { ...DEFAULT_VISIBILITY };
   }
-}
+};
 
 const saveLayout = async () => {
   setDashboard({
@@ -303,7 +308,7 @@ const saveLayout = async () => {
     right: right.value.map(({ id, name }) => ({ id, name })),
     visibility: visibility.value,
   });
-}
+};
 
 watch([left, right, visibility], saveLayout, { deep: true });
 
@@ -336,7 +341,7 @@ const widgetProps = (id) => {
     default:
       return {};
   }
-}
+};
 
 const widgetVisible = (id) => {
   if (visibility.value && visibility.value[id] === false) return false;
@@ -353,25 +358,26 @@ const widgetVisible = (id) => {
   if (id === 'psu') return !!visibility.value?.psu;
   if (id === 'other') return !!visibility.value?.other;
   return !!visibility.value?.[id];
-}
+};
 
 const getData = async () => {
   try {
-    const res = await fetch('/api/v1/system/load', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
-    });
-    const resPools = await fetch('/api/v1/pools', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('authToken') }
-    });
-    const resOs = await fetch('/api/v1/mos/osinfo', {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      }
-    });
+    const auth = localStorage.getItem('authToken');
+    const [res, resPools, resOs] = await Promise.all([
+      fetch('/api/v1/system/load', {
+        headers: { Authorization: 'Bearer ' + auth },
+      }),
+      fetch('/api/v1/pools', {
+        headers: { Authorization: 'Bearer ' + auth },
+      }),
+      fetch('/api/v1/mos/osinfo', {
+        headers: { Authorization: 'Bearer ' + auth },
+      }),
+    ]);
     const resSensors = await fetch('/api/v1/mos/sensors', {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      }
+      },
     });
 
     if (!res.ok) throw new Error('API-Error');
@@ -389,7 +395,6 @@ const getData = async () => {
 
     if (!resSensors.ok) throw new Error('API-Error');
     sensors.value = await resSensors.json();
-
   } catch (e) {
     error.value = e.message;
   } finally {
