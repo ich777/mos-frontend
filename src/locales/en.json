@@ -866,5 +866,7 @@
   "transform": "Transform",
   "dark mode": "Dark Mode",
   "others": "Others",
-  "thanks": "Thanks"
+  "thanks": "Thanks",
+  "expand": "Expand",
+  "collapse": "Collapse"
 }

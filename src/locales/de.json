@@ -866,5 +866,7 @@
   "transform": "Umwandlung",
   "dark mode": "Dunkler Modus",
   "others": "Andere",
-  "thanks": "Danke"
+  "thanks": "Danke",
+  "expand": "Erweitern",
+  "collapse": "Reduzieren"
 }

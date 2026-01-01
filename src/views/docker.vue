@@ -471,14 +471,37 @@
                     </td>
                     <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ docker.Image }}</td>
                     <td>
-                      {{
-                        docker.Ports && docker.Ports.some((p) => p.PublicPort)
-                          ? docker.Ports.filter((p) => p.PublicPort)
-                              .filter((p, i, self) => i === self.findIndex((x) => x.PrivatePort === p.PrivatePort))
-                              .map((p) => `${p.PublicPort}:${p.PrivatePort}`)
-                              .join(', ')
-                          : 'none'
-                      }}
+                      <template v-if="docker.Ports && docker.Ports.some((p) => p.PublicPort)">
+                        <div>
+                          <div
+                            class="text-body-2"
+                            v-html="
+                              (function () {
+                                const mappings = (docker.Ports || [])
+                                  .filter((p) => p.PublicPort)
+                                  .filter((p, i, self) => i === self.findIndex((x) => x.PrivatePort === p.PrivatePort))
+                                  .map((p) => `${p.PublicPort}:${p.PrivatePort}`);
+                                const chunks = [];
+                                for (let i = 0; i < mappings.length; i += 2) chunks.push(mappings.slice(i, i + 2).join(', '));
+                                return (docker._portsExpanded ? chunks.join('<br/>') : chunks[0] || '') || 'none';
+                              })()
+                            "
+                            :style="{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: docker._portsExpanded ? 'normal' : 'nowrap' }"
+                          />
+                          <div v-if="(docker.Ports || []).filter((p) => p.PublicPort).filter((p, i, self) => i === self.findIndex((x) => x.PrivatePort === p.PrivatePort)).length > 2" class="mt-0">
+                            <v-icon
+                              @click.stop="docker._portsExpanded = !docker._portsExpanded"
+                              :title="docker._portsExpanded ? $t('collapse') : $t('expand')"
+                              color="grey-darken-1"
+                              style="cursor: pointer; transition: transform 0.18s"
+                              :style="{ transform: docker._portsExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }"
+                            >
+                              mdi-chevron-down
+                            </v-icon>
+                          </div>
+                        </div>
+                      </template>
+                      <template v-else>none</template>
                     </td>
                     <td>
                       <template v-if="docker.HostConfig.NetworkMode === 'bridge'">
@@ -588,11 +611,33 @@
           <v-col cols="12" md="6">
             <v-sheet rounded="lg" variant="tonal" class="pa-4">
               <div class="text-subtitle-1 font-weight-medium mb-3">{{ $t('ports') }}</div>
-              <div v-if="infoDialog.docker.Ports && infoDialog.docker.Ports.length" class="d-flex flex-wrap ga-2">
-                <v-chip v-for="(port, idx) in infoDialog.docker.Ports" :key="idx" size="small" variant="outlined" class="text-body-2">
-                  {{ port.PublicPort ? `${port.PublicPort}:${port.PrivatePort}` : `${port.PrivatePort}` }}
-                  <span class="ml-2 text-caption text-medium-emphasis">({{ port.Type }})</span>
-                </v-chip>
+              <div v-if="infoDialog.docker.Ports && infoDialog.docker.Ports.length">
+                <v-row no-gutters>
+                  <v-col cols="6">
+                    <v-list density="compact" class="pa-0">
+                      <v-list-item v-for="(port, idx) in infoDialog.docker.Ports.filter((_, i) => i % 2 === 0)" :key="`left-${idx}`" class="px-0">
+                        <div class="v-list-item-content">
+                          <div class="text-body-2">
+                            {{ port.PublicPort ? `${port.PublicPort}:${port.PrivatePort}` : `${port.PrivatePort}` }}
+                            <span class="ml-2 text-caption text-medium-emphasis">({{ port.Type }})</span>
+                          </div>
+                        </div>
+                      </v-list-item>
+                    </v-list>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-list density="compact" class="pa-0">
+                      <v-list-item v-for="(port, idx) in infoDialog.docker.Ports.filter((_, i) => i % 2 === 1)" :key="`right-${idx}`" class="px-0">
+                        <div class="v-list-item-content">
+                          <div class="text-body-2">
+                            {{ port.PublicPort ? `${port.PublicPort}:${port.PrivatePort}` : `${port.PrivatePort}` }}
+                            <span class="ml-2 text-caption text-medium-emphasis">({{ port.Type }})</span>
+                          </div>
+                        </div>
+                      </v-list-item>
+                    </v-list>
+                  </v-col>
+                </v-row>
               </div>
               <div v-else class="text-body-2 text-medium-emphasis">-</div>
             </v-sheet>
