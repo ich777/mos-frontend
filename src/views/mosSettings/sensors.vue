@@ -134,11 +134,9 @@
             :loading="unmappedLoading"
           />
           <v-text-field v-model="createSensorDialog.unit" :label="$t('unit')" clearable class="mt-4" />
+          <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
           <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
           <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
-          <v-divider class="my-2" />
-          <v-text-field v-model="createSensorDialog.value_range" :label="$t('value range')" placeholder="null" clearable />
-          <v-select v-model="createSensorDialog.transform" :items="sensorTransformations" :label="$t('transform')" dense clearable />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -169,11 +167,9 @@
             :loading="unmappedLoading"
           />
           <v-text-field v-model="editSensorDialog.unit" :label="$t('unit')" clearable class="mt-4" />
+          <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
           <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
           <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
-          <v-divider class="my-2" />
-          <v-text-field v-model="editSensorDialog.value_range" :label="$t('value range')" placeholder="null" clearable />
-          <v-select v-model="editSensorDialog.transform" :items="sensorTransformations" :label="$t('transform')" dense clearable />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -208,11 +204,10 @@ const sensors = ref({
 });
 
 const preferredOrder = ['fan', 'temperature', 'power', 'voltage', 'psu', 'other'];
-const subtypeOrder = ['voltage', 'wattage', 'temperature', 'speed'];
+const subtypeOrder = ['voltage', 'wattage', 'temperature', 'speed', 'percentage', 'mode'];
 
 const sensorTypes = ['fan', 'temperature', 'power', 'voltage', 'psu', 'other'];
-const sensorSubtypes = ['voltage', 'wattage', 'temperature', 'speed'];
-const sensorTransformations = ['percentage'];
+const sensorSubtypes = ['voltage', 'wattage', 'temperature', 'speed', 'percentage', 'mode'];
 
 const createSensorDialog = ref({
   value: false,
@@ -223,8 +218,7 @@ const createSensorDialog = ref({
   type: null,
   source: '',
   unit: '',
-  value_range: null,
-  transform: null,
+  multiplier: null,
   enabled: true,
 });
 
@@ -238,8 +232,7 @@ const editSensorDialog = ref({
   type: null,
   source: '',
   unit: '',
-  value_range: null,
-  transform: null,
+  multiplier: null,
   enabled: true,
 });
 
@@ -280,7 +273,6 @@ const unmappedOptions = computed(() => {
     }
   }
 
-  // stabil sortiert
   return out.sort((a, b) => a.title.localeCompare(b.title));
 });
 
@@ -358,8 +350,7 @@ const editSensor = async (s) => {
   editSensorDialog.value.type = details.type ?? null;
   editSensorDialog.value.source = details.source ?? '';
   editSensorDialog.value.unit = details.unit ?? '';
-  editSensorDialog.value.value_range = details.value_range ?? null;
-  editSensorDialog.value.transform = details.transform ?? null;
+  editSensorDialog.value.multiplier = details.multiplier ?? '';
   editSensorDialog.value.enabled = details.enabled ?? true;
 
   editSensorDialog.value.value = true;
@@ -397,8 +388,7 @@ const updateSensor = async () => {
     type: editSensorDialog.value.type,
     source: editSensorDialog.value.source.trim(),
     unit: editSensorDialog.value.unit.trim(),
-    value_range: editSensorDialog.value.value_range ?? null,
-    transform: transformPercentage.value ?? null,
+    multiplier: editSensorDialog.value.multiplier || null,
     enabled: true,
   };
 
@@ -421,7 +411,6 @@ const updateSensor = async () => {
 
     showSnackbarSuccess(t('sensor updated successfully'));
     editSensorDialog.value.value = false;
-    transformPercentage.value = false;
     await getSensors();
   } catch (e) {
     const [userMessage, apiErrorMessage] = String(e.message || e).split('|$|');
@@ -490,8 +479,7 @@ async function createSensor() {
       type: createSensorDialog.value.type,
       source: createSensorDialog.value.source.trim(),
       unit: createSensorDialog.value.unit.trim(),
-      value_range: createSensorDialog.value.value_range.trim(),
-      transform: createSensorDialog.value.transform || null,
+      multiplier: createSensorDialog.value.multiplier || null,
       enabled: true,
     },
   ];
@@ -523,8 +511,7 @@ async function createSensor() {
     createSensorDialog.value.type = null;
     createSensorDialog.value.source = '';
     createSensorDialog.value.unit = '';
-    createSensorDialog.value.value_range = null;
-    createSensorDialog.value.transform = null;
+    createSensorDialog.value.multiplier = null;
     createSensorDialog.value.enabled = true;
 
     await getSensors();
@@ -560,34 +547,34 @@ const getSensors = async () => {
   }
 };
 
-function sortSensors(arr = []) {
-  const orderMap = new Map(subtypeOrder.map((s, i) => [s.toLowerCase(), i]));
+//function sortSensors(arr = []) {
+//  const orderMap = new Map(subtypeOrder.map((s, i) => [s.toLowerCase(), i]));
 
-  return [...arr].sort((a, b) => {
-    const as = (a?.subtype ?? '').toLowerCase();
-    const bs = (b?.subtype ?? '').toLowerCase();
-    const aHas = !!as;
-    const bHas = !!bs;
+//  return [...arr].sort((a, b) => {
+//    const as = (a?.subtype ?? '').toLowerCase();
+//    const bs = (b?.subtype ?? '').toLowerCase();
+//    const aHas = !!as;
+//    const bHas = !!bs;
 
-    if (aHas && bHas) {
-      const ai = orderMap.has(as) ? orderMap.get(as) : Number.POSITIVE_INFINITY;
-      const bi = orderMap.has(bs) ? orderMap.get(bs) : Number.POSITIVE_INFINITY;
+//    if (aHas && bHas) {
+//      const ai = orderMap.has(as) ? orderMap.get(as) : Number.POSITIVE_INFINITY;
+//      const bi = orderMap.has(bs) ? orderMap.get(bs) : Number.POSITIVE_INFINITY;
 
-      if (ai !== bi) return ai - bi;
-      if (ai === Number.POSITIVE_INFINITY && as !== bs) return as.localeCompare(bs);
-    } else if (aHas !== bHas) {
-      return aHas ? -1 : 1;
-    }
+//      if (ai !== bi) return ai - bi;
+//      if (ai === Number.POSITIVE_INFINITY && as !== bs) return as.localeCompare(bs);
+//    } else if (aHas !== bHas) {
+//      return aHas ? -1 : 1;
+//    }
 
-    const aidx = Number.isFinite(a?.index) ? a.index : Number.POSITIVE_INFINITY;
-    const bidx = Number.isFinite(b?.index) ? b.index : Number.POSITIVE_INFINITY;
-    if (aidx !== bidx) return aidx - bidx;
+//    const aidx = Number.isFinite(a?.index) ? a.index : Number.POSITIVE_INFINITY;
+//    const bidx = Number.isFinite(b?.index) ? b.index : Number.POSITIVE_INFINITY;
+//    if (aidx !== bidx) return aidx - bidx;
 
-    const an = (a?.name ?? '').toLowerCase();
-    const bn = (b?.name ?? '').toLowerCase();
-    return an.localeCompare(bn);
-  });
-}
+//    const an = (a?.name ?? '').toLowerCase();
+//    const bn = (b?.name ?? '').toLowerCase();
+//    return an.localeCompare(bn);
+//  });
+//}
 
 const sections = computed(() => {
   const obj = sensors.value ?? {};
@@ -598,7 +585,8 @@ const sections = computed(() => {
   return ordered.map((key) => ({
     key,
     title: key.toUpperCase(),
-    items: sortSensors(Array.isArray(obj[key]) ? obj[key] : []),
+    // items: sortSensors(Array.isArray(obj[key]) ? obj[key] : []),
+    items: Array.isArray(obj[key]) ? obj[key] : [],
   }));
 });
 </script>

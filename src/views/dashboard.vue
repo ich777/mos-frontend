@@ -329,7 +329,7 @@ const widgetProps = (id) => {
     case 'fan':
       return { sensors: sensors.value };
     case 'temperature':
-      return { temperature: sensors.value };
+      return { sensors: sensors.value };
     case 'power':
       return { sensors: sensors.value };
     case 'voltage':
@@ -430,6 +430,7 @@ const getLoadWS = () => {
     if (data.network) network.value = data.network;
     if (data.temperature) temperature.value = data.temperature;
     if (data.pools) disks.value = data.pools;
+    if (data.sensors) sensors.value = data.sensors;
   };
   socket.on('get-load', apply);
   socket.on('load-update', apply);
