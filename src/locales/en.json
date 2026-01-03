@@ -874,6 +874,8 @@
   "12V Utilization": "12V Utilization",
   "5V Utilization": "5V Utilization",
   "3.3V Utilization": "3.3V Utilization",
+  "duty cycle": "Duty Cycle",
+  "divisor": "Divisor",
   "no fan data available": "No fan data available",
   "no temperature data available": "No temperature data available",
   "no voltage data available": "No voltage data available",

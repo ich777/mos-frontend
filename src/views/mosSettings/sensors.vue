@@ -12,80 +12,59 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-skeleton-loader v-if="sensorsLoading" type="card" />
-        <v-card v-else class="pa-4">
-          <v-row dense>
-            <v-col cols="12" v-for="section in sections" :key="section.key">
-              <div class="d-flex align-center justify-space-between mb-2">
-                <div class="text-subtitle-1 font-weight-medium">
-                  {{ section.title }}
-                  <span class="text-caption text-medium-emphasis">({{ section.items.length }})</span>
-                </div>
-              </div>
-
-              <template v-if="section.items.length">
-                <v-table density="compact" class="sensors-table">
-                  <thead>
-                    <tr>
-                      <th class="text-left" style="width: 64px">#</th>
-                      <th class="text-left">{{ $t('name') }}</th>
-                      <th class="text-left">{{ $t('subtype') }}</th>
-                      <th class="text-left">{{ $t('manufacturer') }}</th>
-                      <th class="text-left">{{ $t('model') }}</th>
-                      <th class="text-right" style="width: 120px">{{ $t('value') }}</th>
-                      <th class="text-left" style="width: 80px">{{ $t('unit') }}</th>
-                      <th class="text-left" style="width: 120px"></th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr v-for="s in section.items" :key="s.id ?? `${section.key}-${s.index}-${s.name}`">
-                      <td>{{ s.index }}</td>
-                      <td>
-                        <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px">
-                          {{ s.name }}
-                        </div>
-                      </td>
-                      <td>
-                        <span class="text-body-2">{{ s.subtype || '-' }}</span>
-                      </td>
-                      <td>
-                        <span class="text-body-2">{{ s.manufacturer || '-' }}</span>
-                      </td>
-                      <td>
-                        <span class="text-body-2">{{ s.model || '-' }}</span>
-                      </td>
-                      <td class="text-right">
-                        <span class="text-body-2">
-                          {{ s.value === '' || s.value === null || s.value === undefined ? '-' : formatValue(s.value) }}
-                        </span>
-                      </td>
-                      <td>
-                        <span class="text-body-2">{{ s.unit }}</span>
-                      </td>
-                      <td>
-                        <v-btn icon variant="text" size="small" @click="editSensor(s)">
-                          <v-icon size="18">mdi-pencil</v-icon>
-                        </v-btn>
-                        <v-btn icon variant="text" size="small" @click="deleteSensor(s)">
-                          <v-icon size="18">mdi-delete</v-icon>
-                        </v-btn>
-                      </td>
-                    </tr>
-                  </tbody>
-                </v-table>
-              </template>
-
-              <template v-else>
-                <div class="text-body-2 text-medium-emphasis">
-                  {{ $t('no sensors in this category') }}
-                </div>
-              </template>
-
-              <v-divider class="my-4" />
-            </v-col>
-          </v-row>
-        </v-card>
+          <v-skeleton-loader v-if="sensorsLoading" type="card" />
+          <v-card v-else class="pa-4 mb-4">
+            <v-row>
+                <v-col cols="12">
+                    <v-text-field v-model="searchQuery"
+                                :label="$t('search')"
+                                prepend-inner-icon="mdi-magnify"
+                                variant="outlined"
+                                hide-details
+                                single-line
+                                clearable />
+                </v-col>
+            </v-row>
+              <v-data-table :v-model:sort-by="sortedBy"
+                            :headers="allSensorsHeaders"
+                            :items="filteredAllSensors"
+                            :items-per-page="10"
+                            density="compact"
+                            class="mt-4">
+                  <template #item.name="{ item }">
+                      <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px">
+                          {{ item.name }}
+                      </div>
+                  </template>
+                  <template #item.type="{ item }">
+                      {{ item.type }}
+                  </template>
+                  <template #item.subtype="{ item }">
+                      {{ item.subtype || '-' }}
+                  </template>
+                  <template #item.manufacturer="{ item }">
+                      {{ item.manufacturer || '-' }}
+                  </template>
+                  <template #item.model="{ item }">
+                      {{ item.model || '-' }}
+                  </template>
+                  <template #item.value="{ item }">
+                      <span class="text-right">
+                          {{ item.value === '' || item.value === null || item.value === undefined ? '-' : formatValue(item.value) }}
+                      </span>
+                  </template>
+                  <template #item.actions="{ item }">
+                      <div class="d-flex">
+                          <v-btn icon variant="text" size="small" @click="editSensor(item)">
+                              <v-icon size="18">mdi-pencil</v-icon>
+                          </v-btn>
+                          <v-btn icon variant="text" size="small" @click="deleteSensor(item)">
+                              <v-icon size="18">mdi-delete</v-icon>
+                          </v-btn>
+                      </div>
+                  </template>
+              </v-data-table>
+          </v-card>
       </v-container>
     </v-container>
   </v-container>
@@ -118,26 +97,43 @@
     <v-card class="pa-0">
       <v-card-title>{{ $t('create sensor') }}</v-card-title>
       <v-card-text>
-        <v-form>
-          <v-text-field v-model="createSensorDialog.name" :label="$t('name')" />
-          <v-select v-model="createSensorDialog.type" :items="sensorTypes" :label="$t('type')" dense />
-          <v-select v-model="createSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
-          <v-autocomplete
-            v-model="createSensorDialog.source"
-            :items="unmappedOptions"
-            item-title="title"
-            item-value="value"
-            :label="$t('source')"
-            dense
-            hide-details="auto"
-            clearable
-            :loading="unmappedLoading"
-          />
-          <v-text-field v-model="createSensorDialog.unit" :label="$t('unit')" clearable class="mt-4" />
-          <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
-          <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
-          <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
-        </v-form>
+          <v-form>
+              <v-text-field v-model="createSensorDialog.name" clearable>
+                  <template #label>
+                      <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-text-field>
+              <v-select v-model="createSensorDialog.type" :items="sensorTypes" dense>
+                  <template #label>
+                      <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-select>
+              <v-select v-model="createSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
+              <v-autocomplete v-model="createSensorDialog.source"
+                              :items="unmappedOptions"
+                              item-title="title"
+                              item-value="value"
+                              dense
+                              hide-details="auto"
+                              clearable
+                              :loading="unmappedLoading">
+                  <template #label>
+                      <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-autocomplete>
+              <v-text-field v-model="createSensorDialog.unit" clearable class="mt-4">
+                  <template #label>
+                      <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-text-field>
+              <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
+              <v-text-field v-model="createSensorDialog.divisor" :label="$t('divisor')" clearable />
+              <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
+              <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
+              <div class="text-caption text-medium-emphasis">
+                  <small><span style="color: red" aria-hidden="true">*</span> required</small>
+              </div>
+          </v-form>
       </v-card-text>
       <v-card-actions>
         <v-btn @click="createSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
@@ -151,26 +147,40 @@
     <v-card class="pa-0">
       <v-card-title>{{ $t('edit sensor') }}</v-card-title>
       <v-card-text>
-        <v-form>
-          <v-text-field v-model="editSensorDialog.name" :label="$t('name')" />
-          <v-select v-model="editSensorDialog.type" :items="sensorTypes" :label="$t('type')" dense />
-          <v-select v-model="editSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
-          <v-autocomplete
-            v-model="editSensorDialog.source"
-            :items="editSourceOptions"
-            item-title="title"
-            item-value="value"
-            :label="$t('source')"
-            dense
-            hide-details="auto"
-            clearable
-            :loading="unmappedLoading"
-          />
-          <v-text-field v-model="editSensorDialog.unit" :label="$t('unit')" clearable class="mt-4" />
-          <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
-          <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
-          <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
-        </v-form>
+          <v-form>
+              <v-text-field v-model="editSensorDialog.name" clearable>
+                  <template #label>
+                      <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-text-field>
+              <v-select v-model="editSensorDialog.type" :items="sensorTypes" dense>
+                  <template #label>
+                      <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-select>
+              <v-select v-model="editSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
+              <v-autocomplete v-model="editSensorDialog.source"
+                              :items="unmappedOptions"
+                              item-title="title"
+                              item-value="value"
+                              dense
+                              hide-details="auto"
+                              clearable
+                              :loading="unmappedLoading">
+                  <template #label>
+                      <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-autocomplete>
+              <v-text-field v-model="editSensorDialog.unit" clearable class="mt-4">
+                  <template #label>
+                      <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
+                  </template>
+              </v-text-field>
+              <v-text-field v-model="editSensorDialog.multiplier" :label="$t('multiplier')" clearable />
+              <v-text-field v-model="editSensorDialog.divisor" :label="$t('divisor')" clearable />
+              <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
+              <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
+          </v-form>
       </v-card-text>
       <v-card-actions>
         <v-btn @click="editSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
@@ -219,6 +229,7 @@ const createSensorDialog = ref({
   source: '',
   unit: '',
   multiplier: null,
+  divisor: null,
   enabled: true,
 });
 
@@ -233,6 +244,7 @@ const editSensorDialog = ref({
   source: '',
   unit: '',
   multiplier: null,
+  divisor: null,
   enabled: true,
 });
 
@@ -244,6 +256,60 @@ function formatValue(v) {
   }
   return v;
 }
+
+const sortedBy = ref([{ key: 'type', order: 'asc' }])
+const searchQuery = ref('');
+
+const allSensors = computed(() => {
+    const all = [];
+    const obj = sensors.value ?? {};
+
+    for (const [type, items] of Object.entries(obj)) {
+        if (Array.isArray(items)) {
+            items.forEach(item => {
+                all.push({
+                    ...item,
+                    type: type
+                });
+            });
+        }
+    }
+
+    return all.sort((a, b) => {
+        const aIndex = typeof a?.index === 'number' ? a.index : Infinity;
+        const bIndex = typeof b?.index === 'number' ? b.index : Infinity;
+        if (aIndex !== bIndex) return aIndex - bIndex;
+        return (a?.name || '').localeCompare(b?.name || '');
+    });
+});
+
+const filteredAllSensors = computed(() => {
+    if (!searchQuery.value) return allSensors.value;
+
+    const query = searchQuery.value.toLowerCase();
+    return allSensors.value.filter(sensor => {
+        return (
+            sensor.name?.toLowerCase().includes(query) ||
+            sensor.type?.toLowerCase().includes(query) ||
+            sensor.subtype?.toLowerCase().includes(query) ||
+            sensor.manufacturer?.toLowerCase().includes(query) ||
+            sensor.model?.toLowerCase().includes(query) ||
+            sensor.unit?.toLowerCase().includes(query)
+        );
+    });
+});
+
+const allSensorsHeaders = computed(() => [
+    { title: '#', key: 'index', width: 60 },
+    { title: t('name'), key: 'name' },
+    { title: t('type'), key: 'type', width: 100 },
+    { title: t('subtype'), key: 'subtype', width: 120 },
+    { title: t('manufacturer'), key: 'manufacturer' },
+    { title: t('model'), key: 'model' },
+    { title: t('value'), key: 'value', align: 'end', width: 100 },
+    { title: t('unit'), key: 'unit', width: 80 },
+    { title: '', key: 'actions', sortable: false, width: 100 }
+]);
 
 const unmappedLoading = ref(false);
 const unmappedRaw = ref(null);
@@ -344,13 +410,14 @@ const editSensor = async (s) => {
 
   editSensorDialog.value.id = details.id;
   editSensorDialog.value.name = details.name ?? '';
-  editSensorDialog.value.manufacturer = details.manufacturer ?? null;
-  editSensorDialog.value.model = details.model ?? null;
+  editSensorDialog.value.manufacturer = details.manufacturer ?? '';
+  editSensorDialog.value.model = details.model ?? '';
   editSensorDialog.value.subtype = details.subtype ?? null;
   editSensorDialog.value.type = details.type ?? null;
   editSensorDialog.value.source = details.source ?? '';
   editSensorDialog.value.unit = details.unit ?? '';
   editSensorDialog.value.multiplier = details.multiplier ?? '';
+  editSensorDialog.value.divisor = details.divisor ?? '';
   editSensorDialog.value.enabled = details.enabled ?? true;
 
   editSensorDialog.value.value = true;
@@ -389,6 +456,7 @@ const updateSensor = async () => {
     source: editSensorDialog.value.source.trim(),
     unit: editSensorDialog.value.unit.trim(),
     multiplier: editSensorDialog.value.multiplier || null,
+    divisor: editSensorDialog.value.divisor || null,
     enabled: true,
   };
 
@@ -480,6 +548,7 @@ async function createSensor() {
       source: createSensorDialog.value.source.trim(),
       unit: createSensorDialog.value.unit.trim(),
       multiplier: createSensorDialog.value.multiplier || null,
+      divisor: createSensorDialog.value.divisor || null,
       enabled: true,
     },
   ];
@@ -505,13 +574,14 @@ async function createSensor() {
 
     createSensorDialog.value.value = false;
     createSensorDialog.value.name = '';
-    createSensorDialog.value.manufacturer = null;
-    createSensorDialog.value.model = null;
+    createSensorDialog.value.manufacturer = '';
+    createSensorDialog.value.model = '';
     createSensorDialog.value.subtype = null;
     createSensorDialog.value.type = null;
     createSensorDialog.value.source = '';
     createSensorDialog.value.unit = '';
     createSensorDialog.value.multiplier = null;
+    createSensorDialog.value.divisor = null;
     createSensorDialog.value.enabled = true;
 
     await getSensors();
@@ -547,35 +617,6 @@ const getSensors = async () => {
   }
 };
 
-//function sortSensors(arr = []) {
-//  const orderMap = new Map(subtypeOrder.map((s, i) => [s.toLowerCase(), i]));
-
-//  return [...arr].sort((a, b) => {
-//    const as = (a?.subtype ?? '').toLowerCase();
-//    const bs = (b?.subtype ?? '').toLowerCase();
-//    const aHas = !!as;
-//    const bHas = !!bs;
-
-//    if (aHas && bHas) {
-//      const ai = orderMap.has(as) ? orderMap.get(as) : Number.POSITIVE_INFINITY;
-//      const bi = orderMap.has(bs) ? orderMap.get(bs) : Number.POSITIVE_INFINITY;
-
-//      if (ai !== bi) return ai - bi;
-//      if (ai === Number.POSITIVE_INFINITY && as !== bs) return as.localeCompare(bs);
-//    } else if (aHas !== bHas) {
-//      return aHas ? -1 : 1;
-//    }
-
-//    const aidx = Number.isFinite(a?.index) ? a.index : Number.POSITIVE_INFINITY;
-//    const bidx = Number.isFinite(b?.index) ? b.index : Number.POSITIVE_INFINITY;
-//    if (aidx !== bidx) return aidx - bidx;
-
-//    const an = (a?.name ?? '').toLowerCase();
-//    const bn = (b?.name ?? '').toLowerCase();
-//    return an.localeCompare(bn);
-//  });
-//}
-
 const sections = computed(() => {
   const obj = sensors.value ?? {};
   const keys = Object.keys(obj);
@@ -585,7 +626,6 @@ const sections = computed(() => {
   return ordered.map((key) => ({
     key,
     title: key.toUpperCase(),
-    // items: sortSensors(Array.isArray(obj[key]) ? obj[key] : []),
     items: Array.isArray(obj[key]) ? obj[key] : [],
   }));
 });

@@ -874,6 +874,8 @@
   "12V Utilization": "12V Auslastung",
   "5V Utilization": "5V Auslastung",
   "3.3V Utilization": "3.3V Auslastung",
+  "duty cycle": "Tastgrad",
+  "divisor": "Divisor",
   "no fan data available": "Keine Lüfterdaten verfügbar",
   "no temperature data available": "Keine Temperaturdaten verfügbar",
   "no voltage data available": "Keine Spannungsdaten verfügbar",

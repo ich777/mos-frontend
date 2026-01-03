@@ -2,39 +2,39 @@
     <v-row dense v-if="groupedFans.length > 0">
         <v-col cols="12">
             <v-row dense>
-                <v-col cols="4">
+                <v-col :cols="hasPercentageData ? 4 : 6">
                     <div class="text-caption text-medium-emphasis">
                         <v-icon size="small" class="mr-1">mdi-fan</v-icon>
                         <strong>{{ $t('name') }}</strong>
                     </div>
                 </v-col>
-                <v-col cols="4">
+                <v-col :cols="hasPercentageData ? 4 : 6">
                     <div class="text-caption text-medium-emphasis text-right">
                         <v-icon size="small" class="mr-1">mdi-speedometer</v-icon>
                         <strong>{{ $t('speed') }}</strong>
                     </div>
                 </v-col>
-                <v-col cols="4">
+                <v-col v-if="hasPercentageData" cols="4">
                     <div class="text-caption text-medium-emphasis text-right">
                         <v-icon size="small" class="mr-1">mdi-percent-outline</v-icon>
-                        <strong>{{ $t('load') }}</strong>
+                        <strong>{{ $t('duty cycle') }}</strong>
                     </div>
                 </v-col>
             </v-row>
         </v-col>
         <v-col cols="12" v-for="fan in groupedFans" :key="fan.name">
             <v-row dense align="center">
-                <v-col cols="4">
+                <v-col :cols="hasPercentageData ? 4 : 6">
                     <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
                         {{ fan.name }}
                     </div>
                 </v-col>
-                <v-col cols="4">
+                <v-col :cols="hasPercentageData ? 4 : 6">
                     <div class="text-body-2 text-right" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
                         {{ fan.speed ?? '-' }} {{ fan.speedUnit ?? '' }}
                     </div>
                 </v-col>
-                <v-col cols="4">
+                <v-col v-if="hasPercentageData" cols="4">
                     <div class="text-body-2 text-right" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
                         {{ fan.percentage ?? '-' }} {{ fan.percentageUnit ?? '' }}
                     </div>
@@ -100,5 +100,9 @@ const groupedFans = computed(() => {
         if (a.minIndex !== Infinity) return -1
         if (b.minIndex !== Infinity) return 1
     })
+})
+
+const hasPercentageData = computed(() => {
+    return groupedFans.value.some(fan => fan.percentage !== null && fan.percentage !== undefined)
 })
 </script>
