@@ -25,10 +25,10 @@
                                 clearable />
                 </v-col>
             </v-row>
-              <v-data-table :v-model:sort-by="sortedBy"
+              <v-data-table v-model:sort-by="sortedBy"
                             :headers="allSensorsHeaders"
                             :items="filteredAllSensors"
-                            :items-per-page="10"
+                            :items-per-page="25"
                             density="compact"
                             class="mt-4">
                   <template #item.name="{ item }">
