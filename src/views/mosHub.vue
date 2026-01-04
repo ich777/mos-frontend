@@ -85,7 +85,7 @@
                           installDialog.type = 'docker';
                           installDialog.value = true;
                         "
-                        :disabled="!mosServices.docker.enabled"
+                        :disabled="!mosServices.docker.running"
                       >
                         {{ $t('install') }}
                       </v-btn>
@@ -99,7 +99,7 @@
                           installDialog.type = 'compose';
                           installDialog.value = true;
                         "
-                        :disabled="!mosServices.docker.enabled"
+                        :disabled="!mosServices.docker.running"
                       >
                         {{ $t('install') }}
                       </v-btn>
@@ -284,7 +284,7 @@
                 </div>
               </div>
             </v-card>
-            <v-alert v-if="mosServices?.docker && !mosServices.docker.enabled" class="mt-4" type="warning" variant="tonal" density="compact">
+            <v-alert v-if="mosServices?.docker && !mosServices.docker.running" class="mt-4" type="warning" variant="tonal" density="compact">
               {{ $t('service not available') }}
             </v-alert>
           </v-col>
@@ -298,7 +298,7 @@
         </v-btn>
         <v-btn
           color="onPrimary"
-          :disabled="!mosServices?.docker?.enabled"
+          :disabled="!mosServices?.docker?.running"
           :prepend-icon="installDialog.type === 'docker' ? 'mdi-docker' : 'mdi-toy-brick-plus'"
           @click="
             installDialog.type === 'docker'
