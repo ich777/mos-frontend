@@ -131,11 +131,11 @@
               <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
               <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
               <div class="text-caption text-medium-emphasis">
-                  <small><span style="color: red" aria-hidden="true">*</span> required</small>
+                  <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
               </div>
           </v-form>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="createSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="createSensor()" color="onPrimary">{{ $t('create') }}</v-btn>
       </v-card-actions>
@@ -180,9 +180,12 @@
               <v-text-field v-model="editSensorDialog.divisor" :label="$t('divisor')" clearable />
               <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
               <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
+              <div class="text-caption text-medium-emphasis">
+                  <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
+              </div>
           </v-form>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="editSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="updateSensor()" color="onPrimary">{{ $t('save') }}</v-btn>
       </v-card-actions>
