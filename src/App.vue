@@ -45,13 +45,13 @@
           <v-list-item v-if="mosServices.hub?.enabled" to="/mosHub" prepend-icon="mdi-hub">
             <v-list-item-title>{{ $t('mos hub') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.docker?.enabled" to="/docker" prepend-icon="mdi-docker">
+          <v-list-item v-if="mosServices.docker?.running" to="/docker" prepend-icon="mdi-docker">
             <v-list-item-title>{{ $t('docker') }}</v-list-item-title>
           </v-list-item>
           <v-list-item v-if="mosServices.lxc?.enabled" to="/lxc" prepend-icon="mdi-arrange-send-backward">
             <v-list-item-title>{{ $t('lxc') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="mosServices.vm?.enabled" to="/vm" prepend-icon="mdi-monitor-account">
+          <v-list-item v-if="mosServices.vm?.running" to="/vm" prepend-icon="mdi-monitor-account">
             <v-list-item-title>{{ $t('vm') }}</v-list-item-title>
           </v-list-item>
           <v-list-item to="/users" prepend-icon="mdi-account">
