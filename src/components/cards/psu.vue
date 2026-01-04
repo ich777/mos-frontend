@@ -1,56 +1,56 @@
 <template>
-    <v-row dense>
+    <v-row dense v-if="psuSensors.length > 0">
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('model') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ manufacturer }} {{ model }}
+                {{ modelDisplayed }}
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('VRM Temp') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ vrmTemp }} {{ tempUnit }}
+                {{ vrmTemp ?? '-' }} {{ tempUnit }}
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('Case Temp') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ caseTemp }} {{ tempUnit }}
+                {{ caseTemp ?? '-' }} {{ tempUnit }}
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('fan') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ fanRPM }} rpm
+                {{ fanRPM ?? '-' }} rpm
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('load') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ wattageTotal }} W
+                {{ wattageTotal ?? '-' }} W
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('12V Utilization') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ wattage12V }} W
+                {{ wattage12V ?? '-' }} W
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('5V Utilization') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ wattage5V }} W
+                {{ wattage5V ?? '-' }} W
             </div>
         </v-col>
         <v-col cols="3" sm="3" md="3" xl="3">
             <div class="text-caption text-medium-emphasis"><strong>{{ $t('3.3V Utilization') }}</strong></div>
             <div class="text-body-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-                {{ wattage3_3V }} W
+                {{ wattage3_3V ?? '-' }} W
             </div>
         </v-col>
     </v-row>
-    <v-divider class="my-2"></v-divider>
-    <v-row dense>
+    <v-divider class="my-2" v-if="psuSensors.length > 0"></v-divider>
+    <v-row dense v-if="psuSensors.length > 0">
         <v-col cols="12">
             <v-progress-linear :model-value="loadPercent"
                                height="16"
@@ -63,6 +63,9 @@
             </v-progress-linear>
         </v-col>
     </v-row>
+    <div v-else class="text-body-2 text-medium-emphasis pa-4 text-center">
+        {{ $t('no psu data available') }}
+    </div>
 </template>
 
 <script setup>
@@ -77,6 +80,14 @@
 
     const manufacturer = computed(() => byName('Power Total')?.manufacturer ?? null)
     const model = computed(() => byName('Power Total')?.model ?? null)
+
+    const modelDisplayed = computed(() => {
+        const psuManufacturer = manufacturer.value
+        const psuModel = model.value
+        if (!psuManufacturer && !psuModel) return '-'
+        if (psuManufacturer && psuModel) return `${psuManufacturer} ${psuModel}`
+        return psuManufacturer || psuModel
+    })
 
     const wattageMax = 750
     const wattageTotal = computed(() => byName('Power Total')?.value ?? null)
