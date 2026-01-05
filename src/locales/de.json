@@ -876,9 +876,14 @@
   "3.3V Utilization": "3.3V Auslastung",
   "duty cycle": "Tastgrad",
   "divisor": "Divisor",
+  "index": "Index",
+  "actions": "Aktionen",
+  "view settings saved successfully": "Ansichtseinstellungen erfolgreich gespeichert",
+  "view settings could not be saved": "Ansichtseinstellungen konnten nicht gespeichert werden",
   "no fan data available": "Keine Lüfterdaten verfügbar",
   "no temperature data available": "Keine Temperaturdaten verfügbar",
   "no voltage data available": "Keine Spannungsdaten verfügbar",
   "no power data available": "Keine Leistungsdaten verfügbar",
+  "no psu data available": "Keine Netzteildaten verfügbar",
   "no custom data available": "Keine benutzerdefinierten Daten verfügbar"
 }

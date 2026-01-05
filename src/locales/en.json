@@ -876,9 +876,14 @@
   "3.3V Utilization": "3.3V Utilization",
   "duty cycle": "Duty Cycle",
   "divisor": "Divisor",
+  "index": "Index",
+  "actions": "Actions",
+  "view settings saved successfully": "View settings saved successfully",
+  "view settings could not be saved": "View settings could not be saved",
   "no fan data available": "No fan data available",
   "no temperature data available": "No temperature data available",
   "no voltage data available": "No voltage data available",
   "no power data available": "No power data available",
+  "no psu data available": "No PSU data available",
   "no custom data available": "No custom data available"
 }

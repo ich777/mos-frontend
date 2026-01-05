@@ -192,6 +192,30 @@
     </v-card>
   </v-dialog>
 
+  <!-- View Settings Dialog -->
+  <v-dialog v-model="viewSettingsDialog" max-width="600">
+    <v-card class="pa-0">
+      <v-card-title>{{ $t('edit view') }}</v-card-title>
+      <v-card-text>
+        <v-form>
+            <v-checkbox v-model="viewSettings.index" :label="$t('index')" hide-details />
+            <v-checkbox v-model="viewSettings.name" :label="$t('name')" disabled hide-details />
+            <v-checkbox v-model="viewSettings.type" :label="$t('type')" hide-details />
+            <v-checkbox v-model="viewSettings.subtype" :label="$t('subtype')" hide-details />
+            <v-checkbox v-model="viewSettings.manufacturer" :label="$t('manufacturer')" hide-details />
+            <v-checkbox v-model="viewSettings.model" :label="$t('model')" hide-details />
+            <v-checkbox v-model="viewSettings.value" :label="$t('value')" hide-details />
+            <v-checkbox v-model="viewSettings.unit" :label="$t('unit')" hide-details />
+            <v-checkbox v-model="viewSettings.actions" :label="$t('actions')" disabled hide-details />
+        </v-form>
+      </v-card-text>
+      <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
+        <v-btn @click="viewSettingsDialog = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
+        <v-btn @click="saveViewSettings()" color="onPrimary">{{ $t('save') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate />
   </v-overlay>
@@ -251,6 +275,19 @@ const editSensorDialog = ref({
   enabled: true,
 });
 
+const viewSettingsDialog = ref(false);
+const viewSettings = ref({
+  index: true,
+  name: true,
+  type: true,
+  subtype: true,
+  manufacturer: true,
+  model: true,
+  value: true,
+  unit: true,
+  actions: true,
+});
+
 function formatValue(v) {
   if (v === null || v === undefined) return '-';
   if (typeof v === 'number') {
@@ -302,17 +339,21 @@ const filteredAllSensors = computed(() => {
     });
 });
 
-const allSensorsHeaders = computed(() => [
-    { title: '#', key: 'index', width: 60 },
-    { title: t('name'), key: 'name' },
-    { title: t('type'), key: 'type', width: 100 },
-    { title: t('subtype'), key: 'subtype', width: 120 },
-    { title: t('manufacturer'), key: 'manufacturer' },
-    { title: t('model'), key: 'model' },
-    { title: t('value'), key: 'value', align: 'end', width: 100 },
-    { title: t('unit'), key: 'unit', width: 80 },
-    { title: '', key: 'actions', sortable: false, width: 100 }
-]);
+const allSensorsHeaders = computed(() => {
+  const headers = [
+    { title: '#', key: 'index', width: 60, visible: viewSettings.value.index },
+    { title: t('name'), key: 'name', visible: viewSettings.value.name },
+    { title: t('type'), key: 'type', width: 100, visible: viewSettings.value.type },
+    { title: t('subtype'), key: 'subtype', width: 120, visible: viewSettings.value.subtype },
+    { title: t('manufacturer'), key: 'manufacturer', visible: viewSettings.value.manufacturer },
+    { title: t('model'), key: 'model', visible: viewSettings.value.model },
+    { title: t('value'), key: 'value', align: 'end', width: 100, visible: viewSettings.value.value },
+    { title: t('unit'), key: 'unit', width: 80, visible: viewSettings.value.unit },
+    { title: '', key: 'actions', sortable: false, width: 100, visible: viewSettings.value.actions }
+  ];
+
+  return headers.filter(h => h.visible);
+});
 
 const unmappedLoading = ref(false);
 const unmappedRaw = ref(null);
@@ -598,6 +639,7 @@ async function createSensor() {
 
 onMounted(() => {
   getSensors();
+  loadViewSettings();
 });
 
 const getSensors = async () => {
@@ -618,6 +660,68 @@ const getSensors = async () => {
   } finally {
     sensorsLoading.value = false;
   }
+};
+
+const loadViewSettings = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/sensors/view', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      return;
+    }
+
+    const settings = await res.json();
+
+    if (settings && typeof settings === 'object') {
+      viewSettings.value = {
+        index: settings.index !== undefined ? settings.index : true,
+        name: true,
+        type: settings.type !== undefined ? settings.type : true,
+        subtype: settings.subtype !== undefined ? settings.subtype : true,
+        manufacturer: settings.manufacturer !== undefined ? settings.manufacturer : true,
+        model: settings.model !== undefined ? settings.model : true,
+        value: settings.value !== undefined ? settings.value : true,
+        unit: settings.unit !== undefined ? settings.unit : true,
+        actions: true,
+      };
+    }
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+};
+
+const saveViewSettings = async () => {
+  try {
+    overlay.value = true;
+
+    const res = await fetch('/api/v1/mos/sensors/view', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(viewSettings.value),
+    });
+
+    if (!res.ok) {
+      throw new Error(t('view settings could not be saved'));
+    }
+
+    showSnackbarSuccess(t('view settings saved successfully'));
+    viewSettingsDialog.value = false;
+  } catch (e) {
+    showSnackbarError(e.message);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const editView = () => {
+  viewSettingsDialog.value = true;
 };
 
 const sections = computed(() => {
