@@ -45,7 +45,7 @@
                   hide-details
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" class="py-0 mb-6">
+              <v-col cols="12" class="py-0 mb-2">
                 <div class="d-flex align-center my-2">
                   <v-divider class="flex-grow-1"></v-divider>
                   <v-btn class="mx-4" color="green" size="small" density="comfortable" variant="tonal" icon aria-label="Add NTP server" @click="settingsSystem.ntp.servers.push('')">

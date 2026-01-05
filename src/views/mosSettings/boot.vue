@@ -30,7 +30,7 @@
 
   <!-- Install to Disk Dialog -->
   <v-dialog v-model="installToDiskDialog.value" max-width="500">
-    <v-card>
+    <v-card class="pa-0">
       <v-card-title>{{ $t('install to disk') }}</v-card-title>
       <v-card-text>
         <p class="mb-4">{{ $t('transfer usb data to disk device') }}</p>

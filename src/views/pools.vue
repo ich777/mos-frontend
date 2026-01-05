@@ -10,7 +10,9 @@
           <template #item="{ element: pool, index }">
             <v-card class="mb-4 pa-0">
               <v-card-title class="d-flex align-center pb-0">
-                <span class="mr-2 drag-handle" style="cursor: grab" aria-label="drag handle">⋮⋮</span>
+                <span class="mr-2 drag-handle"  style="cursor: grab" aria-label="drag handle" aria-hidden>
+                  <v-icon size="20">mdi-drag</v-icon>
+                </span>
                 <span>{{ pool.name }}</span>
                 <v-spacer />
                 <v-chip v-if="pool.type" size="small" class="mr-2">{{ pool.type }}</v-chip>

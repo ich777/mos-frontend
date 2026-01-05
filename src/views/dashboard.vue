@@ -11,7 +11,9 @@
           <template #item="{ element }">
             <div class="card" v-if="widgetVisible(element.id)">
               <div class="card-head">
-                <span class="drag-handle">⋮⋮</span>
+                <span class="drag-handle" aria-hidden>
+                  <v-icon size="20">mdi-drag</v-icon>
+                </span>
                 <span>{{ labelFor(element.id) }}</span>
               </div>
               <component :is="components[element.id]" v-bind="widgetProps(element.id)" />
@@ -24,7 +26,9 @@
           <template #item="{ element }">
             <div class="card" v-if="widgetVisible(element.id)">
               <div class="card-head">
-                <span class="drag-handle">⋮⋮</span>
+                <span class="drag-handle" aria-hidden>
+                  <v-icon size="20">mdi-drag</v-icon>
+                </span>
                 <span>{{ labelFor(element.id) }}</span>
               </div>
               <component :is="components[element.id]" v-bind="widgetProps(element.id)" />
