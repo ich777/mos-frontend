@@ -143,6 +143,7 @@ const setVMService = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
+  }
 };
 
 const getVirtioIsoVersions = async () => {
