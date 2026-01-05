@@ -889,5 +889,11 @@
   "no custom data available": "Keine benutzerdefinierten Daten verfügbar",
   "shared": "Geteilt",
   "lxc registry": "LXC Registry",
-  "start wait (seconds)": "Start Wartezeit (Sekunden)"
+  "start wait (seconds)": "Start Wartezeit (Sekunden)",
+  "could not fetch virtio iso versions": "VirtIO ISO Versionen konnten nicht abgerufen werden",
+  "could not fetch installed virtio isos": "Installierte VirtIO ISOs konnten nicht abgerufen werden",
+  "could not download virtio iso": "VirtIO ISO konnte nicht heruntergeladen werden",
+  "virtio iso downloaded successfully": "VirtIO ISO erfolgreich heruntergeladen",
+  "could not cleanup virtio isos": "VirtIO ISOs konnten nicht bereinigt werden",
+  "virtio isos cleaned up successfully": "VirtIO ISOs erfolgreich bereinigt"
 }

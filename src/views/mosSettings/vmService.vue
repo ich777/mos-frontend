@@ -74,12 +74,15 @@ const vmSettings = ref({
   directory: '',
   vdisk_directory: '',
 });
+const virtioIsos = ref([]);
 const { t } = useI18n();
 const overlay = ref(false);
 const vmServiceLoading = ref(true);
 
 onMounted(() => {
   getVMService();
+  getVirtioIsoVersions();
+  getVirtioIsoInstalled();
 });
 
 const openFsDialog = (cb) => {
@@ -102,10 +105,15 @@ const getVMService = async () => {
       },
     });
 
-    if (!res.ok) throw new Error(t('vm service could not be loaded'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('vm service could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
     vmSettings.value = await res.json();
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     vmServiceLoading.value = false;
   }
@@ -122,14 +130,116 @@ const setVMService = async () => {
       },
       body: JSON.stringify(vmSettings.value),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('vm service could not be changed'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('vm service could not be changed')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('vm service changed successfully'));
     emit('refresh-drawer');
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
+};
+
+const getVirtioIsoVersions = async () => {
+  try {
+    const res = await fetch('/api/v1/vm/virtioiso/versions', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not fetch virtio iso versions')}|$| ${error.error || t('unknown error')}`);
+    }
+    virtioIsos.value = await res.json();
+
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+    return [];
   }
 };
+
+const getVirtioIsoInstalled = async () => {
+  try {
+    const res = await fetch('/api/v1/vm/virtioiso/installed', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not fetch installed virtio isos')}|$| ${error.error || t('unknown error')}`);
+    }
+    return await res.json();
+
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+    return [];
+  }
+};
+
+const downloadVirtioIso = async (version) => {
+  const payload = {
+    version: version,
+  };
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/virtioiso/download/${version}`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not download virtio iso')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('virtio iso downloaded successfully'));
+    getVirtioIsoInstalled();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const cleanupVirtioIsos = async () => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/vm/virtioiso/cleanup`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken')
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not cleanup virtio isos')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('virtio isos cleaned up successfully'));
+    getVirtioIsoInstalled();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
 </script>

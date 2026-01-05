@@ -889,5 +889,11 @@
   "no custom data available": "No custom data available",
   "shared": "Shared",
   "lxc registry": "LXC Registry",
-  "start wait (seconds)": "Start wait (seconds)"  
+  "start wait (seconds)": "Start wait (seconds)",
+  "could not fetch virtio iso versions": "Could not fetch VirtIO ISO versions",
+  "could not fetch installed virtio isos": "Could not fetch installed VirtIO ISOs",
+  "could not download virtio iso": "Could not download VirtIO ISO",
+  "virtio iso downloaded successfully": "VirtIO ISO successfully downloaded",
+  "could not cleanup virtio isos": "Could not cleanup VirtIO ISOs",
+  "virtio isos cleaned up successfully": "VirtIO ISOs successfully cleaned up"
 }
