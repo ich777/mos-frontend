@@ -5,7 +5,7 @@
         <h2>{{ $t('pools') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-skeleton-loader v-if="poolsLoading" type="card" />
+        <v-skeleton-loader v-if="poolsLoading" :loading="true" type="card" />
         <draggable v-model="pools" item-key="id" handle=".drag-handle" @end="onDragEndPool">
           <template #item="{ element: pool, index }">
             <v-card class="mb-4 pa-0">
@@ -223,7 +223,7 @@
         </v-card>
         <v-card fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-title>{{ $t('unassigned disks') }}</v-card-title>
-          <v-skeleton-loader v-if="unassignedDisksLoading" type="list-item" />
+          <v-skeleton-loader v-if="unassignedDisksLoading" :loading="true" type="list-item" />
           <v-card-text class="pa-0">
             <v-list class="pa-0" style="background-color: transparent">
               <template v-if="unassignedDisks.length === 0 && !unassignedDisksLoading">

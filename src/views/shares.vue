@@ -5,7 +5,7 @@
         <h2>{{ $t('shares') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-skeleton-loader v-if="sharesLoading" type="card" />
+        <v-skeleton-loader v-if="sharesLoading" :loading="true" type="card" />
         <v-card v-else style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list class="bg-transparent">

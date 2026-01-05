@@ -1,4 +1,5 @@
 <template>
+  <template v-if="network && network.interfaces && network.interfaces.length">
   <v-row dense>
     <template v-if="nic">
       <v-col cols="6" sm="6" md="3" xl="2" v-if="nic.interface">
@@ -37,6 +38,10 @@
       <p>{{ $t('no network interface found') }}</p>
     </template>
   </v-row>
+  </template>
+  <template v-else>
+    <v-skeleton-loader type="article" :loading="true" class="my-2" />
+  </template>
 </template>
 
 <script setup>

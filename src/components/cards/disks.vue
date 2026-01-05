@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.disks && props.disks.length" style="overflow: hidden">
+  <template v-if="props.disks && props.disks.length" style="overflow: hidden">
     <div v-for="(pool, poolIdx) in props.disks" :key="poolIdx" class="mb-1" style="overflow: hidden">
       <div class="d-flex align-center justify-space-between mb-0 mt-2" style="overflow: hidden">
         <div class="text-subtitle-2 font-weight-medium" style="min-width: 0; line-height: 1; overflow: hidden">
@@ -103,7 +103,10 @@
         </v-row>
       </template>
     </div>
-  </div>
+  </template>
+  <template v-else>
+    <v-skeleton-loader type="article" :loading="true" class="my-2" />
+  </template>
 </template>
 
 <script setup>

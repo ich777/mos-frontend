@@ -5,7 +5,7 @@
         <h2>{{ $t('vm') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-skeleton-loader v-if="vmsloading" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
+        <v-skeleton-loader v-if="vmsloading" :loading="true" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
         <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list class="bg-transparent">
