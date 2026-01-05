@@ -850,6 +850,7 @@
   "no sensors in this category": "Keine Sensoren in dieser Kategorie",
   "edit view": "Ansichtseinstellungen",
   "create sensor": "Sensor erstellen",
+  "unmapped sensors": "Nicht zugeordnete Sensoren",
   "edit sensor": "Sensor bearbeiten",
   "sensor could not be created": "Sensor konnte nicht erstellt werden",
   "sensor created successfully": "Sensor erfolgreich erstellt",

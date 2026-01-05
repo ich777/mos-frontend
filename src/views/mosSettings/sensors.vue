@@ -93,47 +93,64 @@
   </v-menu>
 
   <!-- Create Sensor Dialog -->
-  <v-dialog v-model="createSensorDialog.value" max-width="600">
+  <v-dialog v-model="createSensorDialog.value" max-width="1200">
     <v-card class="pa-0">
       <v-card-title>{{ $t('create sensor') }}</v-card-title>
       <v-card-text>
-          <v-form>
-              <v-text-field v-model="createSensorDialog.name" clearable>
-                  <template #label>
-                      <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-text-field>
-              <v-select v-model="createSensorDialog.type" :items="sensorTypes" dense>
-                  <template #label>
-                      <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-select>
-              <v-select v-model="createSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
-              <v-autocomplete v-model="createSensorDialog.source"
-                              :items="unmappedOptions"
-                              item-title="title"
-                              item-value="value"
-                              dense
-                              hide-details="auto"
-                              clearable
-                              :loading="unmappedLoading">
-                  <template #label>
-                      <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-autocomplete>
-              <v-text-field v-model="createSensorDialog.unit" clearable class="mt-4">
-                  <template #label>
-                      <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-text-field>
-              <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
-              <v-text-field v-model="createSensorDialog.divisor" :label="$t('divisor')" clearable />
-              <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
-              <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
-              <div class="text-caption text-medium-emphasis">
-                  <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
-              </div>
-          </v-form>
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-form>
+                <v-text-field v-model="createSensorDialog.name" clearable>
+                    <template #label>
+                        <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-text-field>
+                <v-select v-model="createSensorDialog.type" :items="sensorTypes" dense>
+                    <template #label>
+                        <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-select>
+                <v-select v-model="createSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
+                <v-autocomplete v-model="createSensorDialog.source"
+                                :items="unmappedOptions"
+                                item-title="title"
+                                item-value="value"
+                                dense
+                                hide-details="auto"
+                                clearable
+                                :loading="unmappedLoading">
+                    <template #label>
+                        <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-autocomplete>
+                <v-text-field v-model="createSensorDialog.unit" clearable class="mt-4">
+                    <template #label>
+                        <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-text-field>
+                <v-text-field v-model="createSensorDialog.multiplier" :label="$t('multiplier')" clearable />
+                <v-text-field v-model="createSensorDialog.divisor" :label="$t('divisor')" clearable />
+                <v-text-field v-model="createSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
+                <v-text-field v-model="createSensorDialog.model" :label="$t('model')" clearable />
+                <div class="text-caption text-medium-emphasis">
+                    <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
+                </div>
+            </v-form>
+          </v-col>
+          <v-col cols="12" md="6">
+            <div class="text-caption text-medium-emphasis mb-2">
+              <strong>{{ $t('unmapped sensors') }}</strong>
+            </div>
+            <v-textarea
+              :model-value="unmappedRawJSON"
+              readonly
+              variant="outlined"
+              rows="25"
+              style="font-family: monospace; font-size: 12px;"
+              no-resize
+            />
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="createSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
@@ -143,47 +160,64 @@
   </v-dialog>
 
   <!-- Edit Sensor Dialog -->
-  <v-dialog v-model="editSensorDialog.value" max-width="600">
+  <v-dialog v-model="editSensorDialog.value" max-width="1200">
     <v-card class="pa-0">
       <v-card-title>{{ $t('edit sensor') }}</v-card-title>
       <v-card-text>
-          <v-form>
-              <v-text-field v-model="editSensorDialog.name" clearable>
-                  <template #label>
-                      <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-text-field>
-              <v-select v-model="editSensorDialog.type" :items="sensorTypes" dense>
-                  <template #label>
-                      <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-select>
-              <v-select v-model="editSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
-              <v-autocomplete v-model="editSensorDialog.source"
-                              :items="unmappedOptions"
-                              item-title="title"
-                              item-value="value"
-                              dense
-                              hide-details="auto"
-                              clearable
-                              :loading="unmappedLoading">
-                  <template #label>
-                      <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-autocomplete>
-              <v-text-field v-model="editSensorDialog.unit" clearable class="mt-4">
-                  <template #label>
-                      <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
-                  </template>
-              </v-text-field>
-              <v-text-field v-model="editSensorDialog.multiplier" :label="$t('multiplier')" clearable />
-              <v-text-field v-model="editSensorDialog.divisor" :label="$t('divisor')" clearable />
-              <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
-              <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
-              <div class="text-caption text-medium-emphasis">
-                  <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
-              </div>
-          </v-form>
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-form>
+                <v-text-field v-model="editSensorDialog.name" clearable>
+                    <template #label>
+                        <span>{{ $t('name') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-text-field>
+                <v-select v-model="editSensorDialog.type" :items="sensorTypes" dense>
+                    <template #label>
+                        <span>{{ $t('type') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-select>
+                <v-select v-model="editSensorDialog.subtype" :items="sensorSubtypes" :label="$t('subtype')" dense clearable />
+                <v-autocomplete v-model="editSensorDialog.source"
+                                :items="unmappedOptions"
+                                item-title="title"
+                                item-value="value"
+                                dense
+                                hide-details="auto"
+                                clearable
+                                :loading="unmappedLoading">
+                    <template #label>
+                        <span>{{ $t('source') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-autocomplete>
+                <v-text-field v-model="editSensorDialog.unit" clearable class="mt-4">
+                    <template #label>
+                        <span>{{ $t('unit') }} <span style="color: red" aria-hidden="true">*</span></span>
+                    </template>
+                </v-text-field>
+                <v-text-field v-model="editSensorDialog.multiplier" :label="$t('multiplier')" clearable />
+                <v-text-field v-model="editSensorDialog.divisor" :label="$t('divisor')" clearable />
+                <v-text-field v-model="editSensorDialog.manufacturer" :label="$t('manufacturer')" clearable />
+                <v-text-field v-model="editSensorDialog.model" :label="$t('model')" clearable />
+                <div class="text-caption text-medium-emphasis">
+                    <small><span style="color: red" aria-hidden="true">*</span> {{ $t('required') }}</small>
+                </div>
+            </v-form>
+          </v-col>
+          <v-col cols="12" md="6">
+            <div class="text-caption text-medium-emphasis mb-2">
+              <strong>{{ $t('unmapped sensors') }}</strong>
+            </div>
+            <v-textarea
+              :model-value="unmappedRawJSON"
+              readonly
+              variant="outlined"
+              rows="20"
+              style="font-family: monospace; font-size: 12px;"
+              no-resize
+            />
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="editSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
@@ -357,6 +391,11 @@ const allSensorsHeaders = computed(() => {
 
 const unmappedLoading = ref(false);
 const unmappedRaw = ref(null);
+
+const unmappedRawJSON = computed(() => {
+  if (!unmappedRaw.value) return '';
+  return JSON.stringify(unmappedRaw.value, null, 2);
+});
 
 const unmappedOptions = computed(() => {
   const root = unmappedRaw.value;
