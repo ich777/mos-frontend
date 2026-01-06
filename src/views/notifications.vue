@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, onUnmounted  } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 
@@ -109,7 +109,16 @@ const { t } = useI18n();
 
 onMounted(() => {
   getNotifications();
+  window.addEventListener('notification-received', refreshHandler);
 });
+
+onUnmounted(() => {
+  window.removeEventListener('notification-received', refreshHandler);
+});
+
+const refreshHandler = () => {
+  getNotifications();
+};
 
 const getNotifications = async () => {
   try {

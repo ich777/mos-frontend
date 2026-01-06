@@ -375,6 +375,7 @@ function connectNotificationWS() {
       ws?.send?.(JSON.stringify({ type: 'pong' }));
     } else {
       notificationsBadge.value = true;
+      window.dispatchEvent(new CustomEvent('notification-received'));
       if (msg?.priority === 'error' || msg?.priority === 'alert') {
         showSnackbarError(msg?.message || 'New notification received', '', 'mdi-bell-ring', 'top-toaster');
       } else if (msg?.priority === 'warning') {
