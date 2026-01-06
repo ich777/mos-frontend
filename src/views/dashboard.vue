@@ -142,7 +142,7 @@ const DEFAULT_VISIBILITY = {
   network: true,
   memory: true,
   disks: true,
-  fan: true,
+  fan: false,
   temperature: false,
   power: false,
   voltage: false,
