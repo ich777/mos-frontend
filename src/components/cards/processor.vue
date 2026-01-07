@@ -1,5 +1,8 @@
 <template>
-  <template v-if="osInfo && Object.keys(osInfo).length">
+  <template v-if="osInfo && Object.keys(osInfo).length === 0">
+    <p>{{ $t('no os data available') }}</p>
+  </template>
+  <template v-else-if="osInfo && Object.keys(osInfo).length">
     <v-row dense>
       <v-col cols="6" sm="6" md="6" xl="6" v-if="osInfo && osInfo.cpu">
         <div class="text-caption text-medium-emphasis">

@@ -910,4 +910,11 @@
   "currently": "Currently",
   "set date or leave empty to keep current": "Set date or leave empty to keep current",
   "set time or leave empty to keep current": "Set time or leave empty to keep current"
+  "source & license": "Source & License",  
+  "open source": "Open Source",
+  "no disks in pools available": "No disks in pools available",
+  "no memory data available": "No memory data available",
+  "no pools available": "No pools available",
+  "no os data available": "No OS data available",
+  "no cpu data available": "No CPU data available"  
 }

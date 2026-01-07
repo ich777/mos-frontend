@@ -1,5 +1,8 @@
 <template>
-  <template v-if="network && network.interfaces && network.interfaces.length">
+  <template v-if="network && network.interfaces && network.interfaces.length === 0">
+    <p>{{ $t('no network interface found') }}</p>
+  </template>
+  <template v-else-if="network && network.interfaces && network.interfaces.length > 0">
   <v-row dense>
     <template v-if="nic">
       <v-col cols="6" sm="6" md="3" xl="2" v-if="nic.interface">
@@ -125,8 +128,10 @@ function observeThemeChanges() {
 }
 
 function initChart() {
-  if (!chartEl.value) return
-  chart = markRaw(new Chart(chartEl.value.getContext('2d'), {
+  if (chart || !chartEl.value) return
+  const ctx = chartEl.value.getContext && chartEl.value.getContext('2d')
+  if (!ctx) return
+  chart = markRaw(new Chart(ctx, {
     type: 'line',
     data: {
       labels,
@@ -200,6 +205,8 @@ watch(
   },
   { immediate: true, deep: true }
 )
+
+watch(() => chartEl.value, (v) => { if (v && !chart) initChart() }, { immediate: true })
 
 onMounted(() => initChart())
 onBeforeUnmount(() => {
