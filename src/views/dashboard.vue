@@ -109,11 +109,11 @@ const components = {
 const cpu = ref(null);
 const network = ref(null);
 const memory = ref(null);
-const pools = ref([]);
-const disks = ref([]);
+const pools = ref(null);
+const disks = ref(null);
 const temperature = ref(null);
-const osInfo = ref({});
-const sensors = ref();
+const osInfo = ref(null);
+const sensors = ref(null);
 const isConnected = ref({});
 const error = ref(null);
 const left = ref([]);
@@ -349,12 +349,12 @@ const widgetProps = (id) => {
 
 const widgetVisible = (id) => {
   if (visibility.value && visibility.value[id] === false) return false;
-  if (id === 'os') return !!visibility.value?.os && !!osInfo.value;
-  if (id === 'processor') return !!visibility.value?.processor && !!cpu.value && !!osInfo.value;
-  if (id === 'network') return !!visibility.value?.network && !!network.value;
-  if (id === 'memory') return !!visibility.value?.memory && !!memory.value;
-  if (id === 'pools') return !!visibility.value?.pools && !!pools.value;
-  if (id === 'disks') return !!visibility.value?.disks && !!pools.value;
+  if (id === 'os') return !!visibility.value?.os;
+  if (id === 'processor') return !!visibility.value?.processor;
+  if (id === 'network') return !!visibility.value?.network;
+  if (id === 'memory') return !!visibility.value?.memory;
+  if (id === 'pools') return !!visibility.value?.pools;
+  if (id === 'disks') return !!visibility.value?.disks;
   if (id === 'fan') return !!visibility.value?.fan;
   if (id === 'temperature') return !!visibility.value?.temperature && !!temperature.value;
   if (id === 'power') return !!visibility.value?.power;

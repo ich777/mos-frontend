@@ -904,5 +904,10 @@
   "official channels": "Offizielle Kanäle",
   "the team": "Das Team",
   "source & license": "Quellcode & Lizenz",
-  "open source": "Open Source"
+  "open source": "Open Source",
+  "no disks in pools available": "Keine Festplatten sind den Pools zugewiesen",
+  "no memory data available": "Keine Speicherdaten verfügbar",
+  "no pools available": "Keine Pools vorhanden",
+  "no os data available": "Keine OS Daten verfügbar",
+  "no cpu data available": "Keine CPU Daten verfügbar"
 }

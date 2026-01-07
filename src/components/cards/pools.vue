@@ -1,5 +1,8 @@
 <template>
-  <template v-if="props.pools && props.pools.length" style="overflow: hidden">
+  <template v-if="props.pools && props.pools.length === 0">
+    <p>{{ $t('no pools available') }}</p>
+  </template>
+  <template v-else-if="props.pools && props.pools.length" style="overflow: hidden">
     <div v-for="(pool, index) in props.pools" :key="index" class="py-1">
       <div class="d-flex justify-space-between align-center w-100 mb-1">
         <div class="text-body-2 font-weight-medium">{{ pool.name }}</div>
