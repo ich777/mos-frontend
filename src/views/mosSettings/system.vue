@@ -31,14 +31,34 @@
             <v-switch :label="$t('sound on shutdown')" color="green" inset density="compact" v-model="settingsSystem.notification_sound.shutdown"></v-switch>
             <v-switch :label="$t('sound on startup')" color="green" inset density="compact" v-model="settingsSystem.notification_sound.startup"></v-switch>
             <v-divider class="my-2"></v-divider>
-            <h3 class="mb-2">{{ $t('ntp') }}</h3>
+            <h3 class="mb-2">{{ $t('date & time') }}</h3>
+            <v-text-field
+              class="mt-4"
+              :label="$t('currently')"
+              :model-value="`${currentTimeDate.date} ${currentTimeDate.time}`"
+              readonly
+            ></v-text-field>
+            <v-text-field v-if="!settingsSystem.ntp.enabled"
+              :label="$t('set date or leave empty to keep current')"
+              v-model="timedate.date"
+              placeholder="YYYY-MM-DD"
+              hint="Format: YYYY-MM-DD"
+            ></v-text-field>
+            <v-text-field v-if="!settingsSystem.ntp.enabled"
+              class="mt-2"
+              :label="$t('set time or leave empty to keep current')"
+              v-model="timedate.time"
+              placeholder="HH:mm:ss"
+              hint="Format: HH:mm:ss"
+            ></v-text-field>
             <v-switch :label="$t('ntp enabled')" color="green" inset density="compact" v-model="settingsSystem.ntp.enabled"></v-switch>
-            <v-text-field :label="$t('ntp mode')" v-model="settingsSystem.ntp.mode"></v-text-field>
+            <v-text-field :label="$t('ntp mode')" v-model="settingsSystem.ntp.mode" :disabled="!settingsSystem.ntp.enabled"></v-text-field>
             <v-row>
               <v-col cols="12" v-for="(server, i) in settingsSystem.ntp.servers" :key="`ntp-${i}`">
                 <v-text-field
                   :label="$t('ntp servers')"
                   v-model="settingsSystem.ntp.servers[i]"
+                  :disabled="!settingsSystem.ntp.enabled"
                   :hint="i === 0 ? 'First NTP server' : undefined"
                   append-inner-icon="mdi-delete"
                   @click:append-inner="settingsSystem.ntp.servers.splice(i, 1)"
@@ -48,7 +68,10 @@
               <v-col cols="12" class="py-0 mb-2">
                 <div class="d-flex align-center my-2">
                   <v-divider class="flex-grow-1"></v-divider>
-                  <v-btn class="mx-4" color="green" size="small" density="comfortable" variant="tonal" icon aria-label="Add NTP server" @click="settingsSystem.ntp.servers.push('')">
+                  <v-btn class="mx-4" color="green" size="small" density="comfortable" variant="tonal" icon aria-label="Add NTP server" 
+                    @click="settingsSystem.ntp.servers.push('')"
+                    :disabled="!settingsSystem.ntp.enabled"
+                  >
                     <v-icon size="18">mdi-plus</v-icon>
                   </v-btn>
                   <v-divider class="flex-grow-1"></v-divider>
@@ -77,7 +100,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 
@@ -125,7 +148,52 @@ onMounted(() => {
   getTimezones();
   getProxies();
   getGovernors();
+  dateTimeInterval = setInterval(updateDateTime, 1000);
 });
+
+onUnmounted(() => {
+  if (dateTimeInterval) {
+    clearInterval(dateTimeInterval);
+  }
+});
+
+const getCurrentDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getCurrentTime = () => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+const timedate = ref({
+  date: '',
+  time: '',
+});
+
+const currentTimeDate = ref({
+  date: getCurrentDate(),
+  time: getCurrentTime(),
+});
+
+const updateDateTime = () => {
+  if (settingsSystem.value.ntp.enabled) {
+    currentTimeDate.value.date = getCurrentDate();
+    currentTimeDate.value.time = getCurrentTime();
+  }
+  else {
+    getTimeDate();
+  }
+};
+
+let dateTimeInterval = null;
 
 const getSystemSettings = async () => {
   try {
@@ -137,8 +205,49 @@ const getSystemSettings = async () => {
 
     if (!res.ok) throw new Error(t('system settings could not be loaded'));
     settingsSystem.value = await res.json();
+
+    if (!settingsSystem.value.ntp.enabled) {
+      await getTimeDate();
+    }
   } catch (e) {
     showSnackbarError(e.message);
+  }
+};
+
+const getTimeDate = async () => {
+  try {
+    const res = await fetch('/api/v1/system/timedate', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) throw new Error(t('time and date could not be loaded'));
+    const data = await res.json();
+    currentTimeDate.value.date = data.date;
+    currentTimeDate.value.time = data.time;
+  } catch (e) {
+    showSnackbarError(e.message);
+  }
+};
+
+const setTimeDate = async () => {
+  try {
+    const res = await fetch('/api/v1/system/timedate', {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        date: timedate.value.date,
+        time: timedate.value.time,
+      }),
+    });
+
+    if (!res.ok) throw new Error(t('time and date could not be changed'));
+  } catch (e) {
+    throw e;
   }
 };
 
@@ -161,14 +270,21 @@ const setSystemSettings = async () => {
       },
       body: JSON.stringify(proxies.value),
     });
-    overlay.value = false;
 
     if (!res.ok) throw new Error(t('system settings could not be changed'));
     if (!resProxy.ok) throw new Error(t('proxies could not be changed'));
+
+    if (!settingsSystem.value.ntp.enabled) {
+      if (timedate.value.date || timedate.value.time) {
+        await setTimeDate();
+      }
+    }
+
     showSnackbarSuccess(t('system settings changed successfully'));
   } catch (e) {
-    overlay.value = false;
     showSnackbarError(e.message);
+  } finally {
+    overlay.value = false;
   }
 };
 
