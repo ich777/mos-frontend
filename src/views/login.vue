@@ -5,7 +5,7 @@
         <!-- Left side -->
         <v-col cols="12" md="6" class="pa-6 d-flex flex-column justify-center align-center text-center">
           <div class="brand centered">
-            <v-img src="mos_black.png" alt="MOS Logo" max-width="140" class="mx-auto mb-6" contain />
+            <v-img :src="logoColorThemed" alt="MOS Logo" max-width="140" class="mx-auto mb-6" contain />
             <h1 class="brand__title">MOS Portal</h1>
             <p class="brand__copy">{{ t('mos slogan') }}</p>
           </div>
@@ -46,10 +46,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from 'vuetify';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
+import mosBlack from '/mos_black.png';
+import mosWhite from '/mos_white.png';
 
 const { locale, t } = useI18n();
 const theme = useTheme();
@@ -59,6 +61,10 @@ const showPassword = ref(false);
 const loading = ref(false);
 const isValid = ref(false);
 const formRef = ref(null);
+
+const logoColorThemed = computed(() => {
+  return theme.global.name.value === 'dark' ? mosWhite : mosBlack;
+});
 
 const emit = defineEmits(['refresh-drawer', 'login-success']);
 

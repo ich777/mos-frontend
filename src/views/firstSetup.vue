@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-stepper :items="[$t('root password'), $t('web login')]" v-model="step" hide-actions>
+    <v-stepper :items="[$t('root password'), $t('web login & settings')]" v-model="step" hide-actions>
       <template v-slot:item.1>
         <v-card :title="$t('root password')" flat>
           <v-card-text>
@@ -25,7 +25,7 @@
       </template>
 
       <template v-slot:item.2>
-        <v-card :title="$t('web login')" flat>
+        <v-card :title="$t('web login & settings')" flat>
           <v-card-text>
             <v-text-field
               v-model="username"
@@ -51,10 +51,37 @@
               :error-messages="password2 === '' && step2Error ? [$t('this field is required')] : password2 !== password && step2Error ? [$t('password is not the same')] : []"
             ></v-text-field>
             <v-switch v-model="sambaUser" :label="$t('samba user')" inset color="green" />
+            <v-select
+              v-model="selectedLanguage"
+              :items="languages"
+              :item-title="(lang) => $t(lang)"
+              :item-value="(lang) => lang"
+              :label="$t('language')"
+              required
+              @update:modelValue="changeLanguage()"
+            />
+            <v-select
+              v-model="selectedByteFormat"
+              :items="byteFormats"
+              :item-title="(opt) => opt.title"
+              :item-value="(opt) => opt.value"
+              :label="$t('byte unit')"
+              required
+              @update:modelValue="changeByteUnit()"
+            />
+            <v-switch
+              v-model="darkMode"
+              :label="$t('dark mode')"
+              :true-value="'dark'"
+              :false-value="'light'"
+              inset color="green"
+              @update:modelValue="setDarkMode()"
+            />
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('uicolor') }}</span>
+            <v-color-picker v-model="color" show-swatches hide-canvas hide-sliders hide-inputs @update:modelValue="changePrimaryColor" />
           </v-card-text>
         </v-card>
       </template>
-
       <v-stepper-actions :disabled="false" :next-text="step > 1 ? 'finish' : 'next'" :prev-text="step > 1 ? 'back' : ''" @click:next="nextStep()" @click:prev="step = step - 1"></v-stepper-actions>
     </v-stepper>
   </v-container>
@@ -63,11 +90,13 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useTheme } from 'vuetify';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { t } = useI18n();
+const theme = useTheme();
 const overlay = ref(false);
 const emit = defineEmits(['setup-complete']);
 const props = defineProps({
@@ -79,9 +108,29 @@ const rootpwd2 = ref('');
 const password = ref('');
 const password2 = ref('');
 const sambaUser = ref(true);
-let step = ref(1);
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const darkMode = ref(prefersDark ? 'dark' : 'light');
+const languages = ['en', 'de'];
+const selectedLanguage = ref('en');
+const byteFormats = ref([
+  { value: 'binary', title: t('binary') },
+  { value: 'decimal', title: t('decimal') },
+]);
+const selectedByteFormat = ref('binary');
+const color = ref('#1976D2');
+let step = ref(2);
 const step1Error = ref(false);
 const step2Error = ref(false);
+
+const setDarkMode = async () => {
+  theme.change(darkMode.value);
+};
+
+const changePrimaryColor = async (newColor) => {
+  
+    color.value = newColor;
+    theme.themes.value[theme.global.name.value].colors.primary = newColor;
+};
 
 const addUser = async () => {
   const newUser = {
@@ -89,6 +138,9 @@ const addUser = async () => {
     password: password.value,
     samba_user: sambaUser.value,
     role: 'admin',
+    darkmode: darkMode.value,
+    language: selectedLanguage.value,
+    byte_format: selectedByteFormat.value,
   };
 
   try {

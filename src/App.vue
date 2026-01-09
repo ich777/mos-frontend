@@ -13,7 +13,7 @@
       <v-app-bar v-if="!$route.meta.hideAppBar" :color="appBarColor" app>
         <v-app-bar-nav-icon variant="text" @click.stop="toggleDrawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
-        <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
+        <v-toolbar-title>{{ hostname || $t('mos') }}</v-toolbar-title>
         <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" offset-x="25" offset-y="16">
           <v-btn icon variant="text" aria-label="Notifications" to="/notifications" class="mr-2">
             <v-icon>mdi-bell</v-icon>
@@ -131,6 +131,7 @@ const loginChecked = ref(false);
 const mosServices = ref({});
 const appBarColor = 'primary';
 const notificationsBadge = ref(false);
+const hostname = ref('');
 const RECONNECT_MAX_DELAY = 15000;
 const RECONNECT_BASE_DELAY = 1000;
 
@@ -151,6 +152,7 @@ onMounted(async () => {
     getNotificationsBadge();
     connectNotificationWS();
     await getMosServices();
+    await getHostname();
     getDrawerState();
   }
 });
@@ -295,6 +297,23 @@ const getMosServices = async () => {
     mosServices.value = await res.json();
   } catch (e) {
     showSnackbarError(e.message);
+  }
+};
+
+const getHostname = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/osinfo', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+    const result = await res.json();
+    hostname.value = result.hostname || '';
+  } catch (e) {
+    hostname.value = '';
   }
 };
 

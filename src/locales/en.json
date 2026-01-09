@@ -349,7 +349,7 @@
   "this field is required": "This field is required",
   "password is not the same": "Password is not the same",
   "username is required": "Username is required",
-  "web login": "Web Login",
+  "web login & settings": "Web Login & Settings",
   "first setup successfully completed": "First setup successfully completed",
   "failed to create web user": "Failed to create web user",
   "admin api tokens": "Admin API Tokens",
