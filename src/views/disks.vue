@@ -5,7 +5,13 @@
         <h2>{{ $t('disks') }}</h2>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid style="margin-bottom: 80px" class="pa-0">
+        <v-skeleton-loader v-if="!disksLoaded" type="list-item-avatar-two-line" :loading="!disksLoaded" class="mb-4" />
+        <v-card v-else-if="disksLoaded && disks.length === 0" fluid class="pa-4 mb-4">
+          <v-card-text class="pa-0">
+            {{ $t('no disks found') }}
+          </v-card-text>
+        </v-card>
+        <v-card v-else-if="disksLoaded && disks.length > 0" fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list class="bg-transparent">
               <template v-for="(disk, index) in disks" :key="disk.device">
@@ -110,6 +116,7 @@ const disks = ref([]);
 const { t } = useI18n();
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const overlay = ref(false);
+const disksLoaded = ref(false);
 const formatDialog = reactive({
   value: false,
   disk: null,
@@ -141,6 +148,8 @@ const getDisks = async () => {
     disks.value = (await res.json()) || [];
   } catch (e) {
     showSnackbarError(e.message);
+  } finally {
+    disksLoaded.value = true;
   }
 };
 

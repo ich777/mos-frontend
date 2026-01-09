@@ -914,5 +914,16 @@
   "no pools available": "Keine Pools vorhanden",
   "no os data available": "Keine OS Daten verfügbar",
   "no cpu data available": "Keine CPU Daten verfügbar",
-  "no shares have been created yet": "Es wurden noch keine Freigaben erstellt"
+  "no shares have been created yet": "Es wurden noch keine Freigaben erstellt",
+  "no disks found": "Keine Laufwerke vorhanden",
+  "swapfile": "Swapfile",
+  "enable swapfile": "Swapfile aktiviert",
+  "swapfile path": "Swapfile Pfad",
+  "swapfile size": "Swapfile Größe",
+  "swapfile priority": "Swapfile Priorität",
+  "zswap enabled": "Zswap aktiviert",
+  "shrinker enabled": "Shrinker aktiviert",
+  "zswap max pool percent": "Zswap Max Pool Prozentsatz",
+  "zswap compressor": "Zswap Kompressor",
+  "zswap accept threshold percent": "Zswap Akzeptanz Schwellenwert Prozentsatz"
 }

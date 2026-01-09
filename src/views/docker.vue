@@ -221,7 +221,7 @@
                           </v-list-item>
                           <v-list-item
                             v-if="
-                              dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'restarting'
+                              dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'restarting'
                             "
                             @click="stopDocker(containerName)"
                           >
@@ -238,7 +238,7 @@
                           </v-list-item>
                           <v-list-item
                             v-if="
-                              dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State !== 'restarting'
+                              dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'running' || dockers.find((d) => d.Names && d.Names[0] === containerName).State === 'restarting'
                             "
                             @click="killDocker(containerName)"
                           >
@@ -496,13 +496,13 @@
                           <v-list-item v-if="docker.State !== 'running'" @click="startDocker(docker.Names[0])">
                             <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                           </v-list-item>
-                          <v-list-item v-if="docker.State === 'running'" @click="stopDocker(docker.Names[0])">
+                          <v-list-item v-if="docker.State === 'running' || docker.State === 'restarting'" @click="stopDocker(docker.Names[0])">
                             <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                           </v-list-item>
-                          <v-list-item v-if="docker.State === 'running'" @click="restartDocker(docker.Names[0])">
+                          <v-list-item v-if="docker.State === 'running' || docker.State === 'restarting'" @click="restartDocker(docker.Names[0])">
                             <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                           </v-list-item>
-                          <v-list-item v-if="docker.State === 'running'" @click="killDocker(docker.Names[0])">
+                          <v-list-item v-if="docker.State === 'running' || docker.State === 'restarting'" @click="killDocker(docker.Names[0])">
                             <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                           </v-list-item>
                           <v-list-item :to="`/docker/change/${docker.Names[0]}`">

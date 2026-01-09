@@ -291,7 +291,7 @@
   "hostname": "Hostname",
   "keymap": "Keymap",
   "timezone": "Timezone",
-  "ntp enabled": "NTP enabled",
+  "ntp enabled": "NTP Enabled",
   "ntp mode": "NTP mode",
   "ntp servers": "NTP servers",
   "global spindown (min)": "Global spindown (min)",
@@ -915,5 +915,16 @@
   "no pools available": "No pools available",
   "no os data available": "No OS data available",
   "no cpu data available": "No CPU data available",
-  "no shares have been created yet": "No shares have been created yet"
+  "no shares have been created yet": "No shares have been created yet",
+  "no disks found": "No disks found",
+  "swapfile": "Swapfile",
+  "enable swapfile": "Enable Swapfile",
+  "swapfile path": "Swapfile Path",
+  "swapfile size": "Swapfile Size",
+  "swapfile priority": "Swapfile Priority",
+  "zswap enabled": "Zswap Enabled",
+  "shrinker enabled": "Shrinker Enabled",
+  "zswap max pool percentage": "Zswap Max Pool Percentage",
+  "zswap compressor": "Zswap Compressor",
+  "zswap accept threshold percentage": "Zswap Accept Threshold Percentage"  
 }

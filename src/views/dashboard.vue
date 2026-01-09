@@ -9,7 +9,7 @@
         <!-- Left Column -->
         <draggable v-model="left" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150">
           <template #item="{ element }">
-            <div class="card" v-if="widgetVisible(element.id)">
+            <div class="card" v-show="widgetVisible(element.id)">
               <div class="card-head">
                 <span class="drag-handle" aria-hidden>
                   <v-icon size="20">mdi-drag</v-icon>
@@ -24,7 +24,7 @@
         <!-- Right Column -->
         <draggable v-model="right" group="widgets" item-key="id" handle=".drag-handle" class="column" ghost-class="ghost" animation="150">
           <template #item="{ element }">
-            <div class="card" v-if="widgetVisible(element.id)">
+            <div class="card" v-show="widgetVisible(element.id)">
               <div class="card-head">
                 <span class="drag-handle" aria-hidden>
                   <v-icon size="20">mdi-drag</v-icon>
@@ -356,7 +356,7 @@ const widgetVisible = (id) => {
   if (id === 'pools') return !!visibility.value?.pools;
   if (id === 'disks') return !!visibility.value?.disks;
   if (id === 'fan') return !!visibility.value?.fan;
-  if (id === 'temperature') return !!visibility.value?.temperature && !!temperature.value;
+  if (id === 'temperature') return !!visibility.value?.temperature;
   if (id === 'power') return !!visibility.value?.power;
   if (id === 'voltage') return !!visibility.value?.voltage;
   if (id === 'psu') return !!visibility.value?.psu;
@@ -367,7 +367,7 @@ const widgetVisible = (id) => {
 const getData = async () => {
   try {
     const auth = localStorage.getItem('authToken');
-    const [res, resPools, resOs] = await Promise.all([
+    const [res, resPools, resOs, resSensors] = await Promise.all([
       fetch('/api/v1/system/load', {
         headers: { Authorization: 'Bearer ' + auth },
       }),
@@ -377,12 +377,10 @@ const getData = async () => {
       fetch('/api/v1/mos/osinfo', {
         headers: { Authorization: 'Bearer ' + auth },
       }),
+      fetch('/api/v1/mos/sensors', {
+        headers: { Authorization: 'Bearer ' + auth },
+      }),
     ]);
-    const resSensors = await fetch('/api/v1/mos/sensors', {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
-      },
-    });
 
     if (!res.ok) throw new Error('API-Error');
     const result = await res.json();
@@ -433,7 +431,7 @@ const getLoadWS = () => {
     if (data.memory) memory.value = data.memory;
     if (data.network) network.value = data.network;
     if (data.temperature) temperature.value = data.temperature;
-    if (data.pools) disks.value = data.pools;
+    if (data.pools) disks.value = pools.value = data.pools;
     if (data.sensors) sensors.value = data.sensors;
   };
   socket.on('get-load', apply);

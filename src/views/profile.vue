@@ -6,7 +6,7 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-card class="px-0" style="margin-bottom: 80px">
-          <v-card-text>
+          <v-card-text class="pt-0">
             <v-switch
               v-model="darkMode"
               :label="$t('dark mode')"

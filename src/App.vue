@@ -14,16 +14,16 @@
         <v-app-bar-nav-icon variant="text" @click.stop="toggleDrawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
         <v-toolbar-title>{{ $t('mos') }}</v-toolbar-title>
-        <v-btn icon variant="text" @click="changeDarkMode()">
-          <v-icon>
-            {{ theme.global.name.value === 'dark' ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
-          </v-icon>
-        </v-btn>
         <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" offset-x="25" offset-y="16">
           <v-btn icon variant="text" aria-label="Notifications" to="/notifications" class="mr-2">
             <v-icon>mdi-bell</v-icon>
           </v-btn>
         </v-badge>
+        <v-btn icon variant="text" to="/profile">
+          <v-icon>
+            mdi-account-circle
+          </v-icon>
+        </v-btn>
       </v-app-bar>
       <v-navigation-drawer v-if="!$route.meta.hideAppBar" v-model="drawer" :temporary="!display.mdAndUp.value">
         <v-list>
@@ -59,9 +59,6 @@
           </v-list-item>
           <v-list-item to="/webTerminal" prepend-icon="mdi-powershell">
             <v-list-item-title>{{ $t('webterminal') }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item to="/profile" prepend-icon="mdi-account-cog">
-            <v-list-item-title>{{ $t('user settings') }}</v-list-item-title>
           </v-list-item>
           <v-list-item to="/mosSettings" prepend-icon="mdi-tools">
             <v-list-item-title>{{ $t('settings') }}</v-list-item-title>
