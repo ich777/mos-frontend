@@ -31,6 +31,8 @@ import webterminal from '../views/webterminal.vue';
 import webterminalPopup from '../views/webterminalPopup.vue';
 import Notifications from '../views/notifications.vue';
 import RemoteMounting from '../views/remoteMounting.vue';
+import Plugins from '../views/plugins.vue';
+import PluginView from '../views/pluginView.vue';
 
 const routes = [
   { path: '/login', component: Login, meta: { hideAppBar: false, title: 'MOS Login', description: 'Login to your account' } },
@@ -94,6 +96,13 @@ const routes = [
     children: [{ path: '', component: webterminalPopup, meta: { hideAppBar: true, title: 'Web Terminal', description: 'Access the web terminal' } }],
   },
   { path: '/notifications', component: Notifications, meta: { hideAppBar: false, title: 'Notifications', description: 'View your notifications' } },
+  { path: '/plugins', component: Plugins, meta: { hideAppBar: false, title: 'Plugins', description: 'Manage installed plugins' } },
+  { 
+    path: '/plugin/:pluginName', 
+    component: PluginView, 
+    props: true,
+    meta: { hideAppBar: false, title: 'Plugin', description: 'Plugin view' } 
+  },
 ];
 
 const router = createRouter({

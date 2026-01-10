@@ -928,5 +928,20 @@
   "zswap accept threshold percent": "Zswap Akzeptanz Schwellenwert Prozentsatz",
   "available virtio iso versions": "Verfügbare VirtIO ISO Versionen",
   "installed virtio isos": "Installierte VirtIO ISOs",
-  "cleanup virtio isos": "VirtIO ISOs bereinigen"
+  "cleanup virtio isos": "VirtIO ISOs bereinigen",
+  "plugins": "Plugins",
+  "no plugins installed": "Keine Plugins installiert",
+  "plugins will appear here once installed": "Plugins werden hier angezeigt, sobald sie installiert sind",
+  "open": "Öffnen",
+  "loading plugin": "Plugin wird geladen",
+  "plugin error": "Plugin Fehler",
+  "back to plugins": "Zurück zu den Plugins",
+  "retry": "Erneut versuchen",
+  "plugin not found": "Plugin nicht gefunden",
+  "the requested plugin could not be found": "Das angeforderte Plugin wurde nicht gefunden",
+  "are you sure you want to delete this plugin?": "Möchtest du dieses Plugin wirklich löschen?",
+  "are you sure you want to delete": "Möchtest du wirklich löschen",
+  "plugin could not be deleted": "Plugin konnte nicht gelöscht werden",
+  "plugin deleted successfully": "Plugin erfolgreich gelöscht",
+  "error loading plugins": "Fehler beim Laden der Plugins"
 }

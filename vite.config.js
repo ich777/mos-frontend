@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
+import federation from '@originjs/vite-plugin-federation';
 
 export default defineConfig({
   plugins: [
@@ -11,6 +12,14 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
       },
+    }),
+    // Module Federation host application
+    federation({
+      name: 'mos-host',
+      // Plugins are loaded dynamically, no static remotes needed
+      remotes: {},
+      // Shared dependencies with plugins
+      shared: ['vue', 'vue-router', 'vuetify'],
     }),
   ],
   server: {
@@ -34,6 +43,11 @@ export default defineConfig({
         target: 'http://192.168.1.2',
         changeOrigin: true,
         ws: true,
+      },
+      '/_plugins': {
+        target: 'http://192.168.1.2',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/_plugins/, '/plugins'),
       },
     },
   },
