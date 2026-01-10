@@ -34,11 +34,23 @@
       <v-card-title>{{ $t('install to disk') }}</v-card-title>
       <v-card-text>
         <p class="mb-4">{{ $t('transfer usb data to disk device') }}</p>
-        <v-form>
-          <v-select v-model="installToDiskDialog.disk" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('device')" dense />
+          <v-select
+            v-model="installToDiskDialog.disk"
+            :items="
+              Array.isArray(unassignedDisks)
+                ? unassignedDisks.map((disk) => ({
+                    title: `${disk.device} (${disk.size_human})`,
+                    value: disk.device,
+                  }))
+                : []
+            "
+            item-title="title"
+            item-value="value"
+            :label="$t('device')"
+            dense
+          />
           <v-select v-model="installToDiskDialog.filesystem" :items="['ext4', 'btrfs', 'xfs', 'vfat']" :label="$t('filesystem')" required outlined></v-select>
           <v-switch v-model="installToDiskDialog.extra_partition" :label="$t('extra partition')" inset color="green" hide-details="auto"></v-switch>
-        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
