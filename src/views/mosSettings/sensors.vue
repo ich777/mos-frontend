@@ -400,28 +400,34 @@ const unmappedRawJSON = computed(() => {
 const unmappedOptions = computed(() => {
   const root = unmappedRaw.value;
   if (!root || typeof root !== 'object') return [];
-
   const out = [];
-  for (const [chip, chipObj] of Object.entries(root)) {
-    if (!chipObj || typeof chipObj !== 'object') continue;
 
-    for (const [group, groupObj] of Object.entries(chipObj)) {
-      if (!groupObj || typeof groupObj !== 'object') continue;
-      if (group === 'Adapter') continue;
+  // Recursively traverse the sensor tree structure to extract all leaf nodes
+  // Supports arbitrary nesting depth
+  const traverse = (obj, path = []) => {
+    for (const [key, val] of Object.entries(obj)) {
+      const currentPath = [...path, key];
 
-      for (const [key, val] of Object.entries(groupObj)) {
-        const value = `${chip}.${group}.${key}`;
+      // Skip "Adapter" keys as they don't contain sensor data
+      if (key === 'Adapter') continue;
 
+      // If value is an object, recurse deeper into the tree
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        traverse(val, currentPath);
+      } else {
+        // Leaf node found - create an option entry
+        const pathString = currentPath.join('.');
         const valTxt = typeof val === 'number' ? ` = ${Number(val).toFixed(2).replace(/\.00$/, '')}` : '';
 
         out.push({
-          value,
-          title: `${chip}.${group}.${key}${valTxt}`,
+          value: pathString,
+          title: `${pathString}${valTxt}`,
         });
       }
     }
-  }
+  };
 
+  traverse(root);
   return out.sort((a, b) => a.title.localeCompare(b.title));
 });
 
