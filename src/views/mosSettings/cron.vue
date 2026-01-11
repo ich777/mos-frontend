@@ -65,7 +65,7 @@
 
   <!-- Create Cron Job Dialog -->
   <v-dialog v-model="createCronJobDialog.value" max-width="600px">
-    <v-card>
+    <v-card class="pa-0">
       <v-card-title>{{ $t('create cron job') }}</v-card-title>
       <v-card-text>
         <v-form>
@@ -86,7 +86,7 @@
 
   <!-- Change Cron Job Dialog -->
   <v-dialog v-model="changeCronJobDialog.value" max-width="600px">
-    <v-card>
+    <v-card class="pa-0">
       <v-card-title>{{ $t('change cron job') }}</v-card-title>
       <v-card-text>
         <v-form>
@@ -106,7 +106,7 @@
 
   <!-- Delete Cron Job Dialog -->
   <v-dialog v-model="deleteCronJobDialog.value" max-width="600px">
-    <v-card>
+    <v-card class="pa-0">
       <v-card-title>{{ $t('delete cron job') }} - {{ deleteCronJobDialog.name }}</v-card-title>
       <v-card-text>
         <p>{{ $t('are you sure you want to delete the cron job') }}?</p>
@@ -121,7 +121,7 @@
 
   <!-- Change Script Dialog -->
   <v-dialog v-model="changeScriptDialog.value" max-width="800px">
-    <v-card>
+    <v-card class="pa-0">
       <v-card-title>{{ $t('change script') }} - {{ changeScriptDialog.name }}</v-card-title>
       <v-card-text>
         <v-form>

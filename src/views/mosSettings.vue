@@ -138,9 +138,13 @@
                   <v-icon start>mdi-usb-flash-drive</v-icon>
                   {{ $t('boot') }}
                 </v-btn>
-                <v-btn color="primary" block rounded to="/mosSettings/sensors">
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/sensors">
                   <v-icon start>mdi-thermometer</v-icon>
                   {{ $t('sensors') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/zram">
+                  <v-icon start>mdi-memory</v-icon>
+                  {{ $t('zram') }}
                 </v-btn>
               </v-card-text>
             </v-card>
