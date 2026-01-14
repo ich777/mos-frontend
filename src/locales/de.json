@@ -973,5 +973,9 @@
   "dockerhub token": "DockerHub Token",
   "client token could not be loaded": "Client Token konnten nicht geladen werden",
   "client token could not be saved": "Client Token konnten nicht festgelegt werden",
-  "client token set successfully": "Client Token erfolgreich festgelegt"
+  "client token set successfully": "Client Token erfolgreich festgelegt",
+  "plugin releases could not be loaded": "Plugin Releases konnten nicht geladen werden",
+  "plugin": "Plugin",
+  "plugin installation started successfully": "Plugin Installation erfolgreich gestartet",
+  "plugin installation could not be started": "Plugin Installation konnte nicht gestartet werden"
 }

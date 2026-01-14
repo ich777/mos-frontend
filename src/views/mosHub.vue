@@ -103,6 +103,9 @@
                       >
                         {{ $t('install') }}
                       </v-btn>
+                      <v-btn v-else-if="tpl.type == 'plugin'" color="secondary" prepend-icon="mdi-puzzle" size="small" @click="openPluginInstallDialog(tpl)">
+                        {{ $t('install') }}
+                      </v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-col>
@@ -180,29 +183,6 @@
     </v-card>
   </v-dialog>
 
-  <!-- Floating Action Button with Menu -->
-  <v-menu location="top">
-    <template v-slot:activator="{ props }">
-      <v-fab v-bind="props" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
-        <v-icon color="onPrimary">mdi-dots-vertical</v-icon>
-      </v-fab>
-    </template>
-    <v-list>
-      <v-list-item @click="openHubRepositoriesDialog()">
-        <template v-slot:prepend>
-          <v-icon>mdi-plus</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('repositories') }}</v-list-item-title>
-      </v-list-item>
-      <v-list-item @click="refreshRepositories()">
-        <template v-slot:prepend>
-          <v-icon>mdi-refresh</v-icon>
-        </template>
-        <v-list-item-title>{{ $t('refresh repositories') }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-menu>
-
   <!-- Install/Details Dialog -->
   <v-dialog v-model="installDialog.value" max-width="760" scrollable>
     <v-card rounded="lg" class="pa-0">
@@ -257,6 +237,9 @@
                   {{ installDialog.tpl.repository }}
                 </v-list-item-title>
               </v-list-item>
+              <v-list-item v-if="installDialog.tpl?.type === 'plugin'">
+                <v-select v-model="installDialog.release" :items="releasesItems" density="compact" :loading="releasesLoading" label="Release" class="mt-2" clearable></v-select>
+              </v-list-item>
             </v-list>
           </v-col>
           <v-col cols="12" md="4">
@@ -287,40 +270,44 @@
                 </div>
               </div>
             </v-card>
-            <v-alert v-if="mosServices?.docker && !mosServices.docker.running" class="mt-4" type="warning" variant="tonal" density="compact">
-              {{ $t('service not available') }}
-            </v-alert>
           </v-col>
         </v-row>
       </v-card-text>
       <v-divider />
-      <v-card-actions class="px-6 py-4">
+      <v-card-actions class="px-6 py-2">
         <v-spacer />
         <v-btn color="onPrimary" variant="text" @click="installDialog.value = false">
           {{ $t('cancel') }}
         </v-btn>
-        <v-btn
-          color="onPrimary"
-          :disabled="!mosServices?.docker?.running"
-          :prepend-icon="installDialog.type === 'docker' ? 'mdi-docker' : 'mdi-toy-brick-plus'"
-          @click="
-            installDialog.type === 'docker'
-              ? $router.push({ path: '/docker/create', query: { template: installDialog.tpl.files.template } })
-              : $router.push({
-                  path: '/docker/compose',
-                  query: {
-                    template: encodeURIComponent(installDialog.tpl.files?.template ?? ''),
-                    yaml: encodeURIComponent(installDialog.tpl.files?.yaml ?? ''),
-                    env: encodeURIComponent(installDialog.tpl.files?.env ?? ''),
-                  },
-                })
-          "
-        >
+        <v-btn color="onPrimary" :disabled="installDialog.type === 'plugin' ? !installDialog.release : !mosServices?.docker?.running" :prepend-icon="getInstallDialogIcon()" @click="doDialogInstall()">
           {{ $t('install') }}
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Floating Action Button with Menu -->
+  <v-menu location="top">
+    <template v-slot:activator="{ props }">
+      <v-fab v-bind="props" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
+        <v-icon color="onPrimary">mdi-dots-vertical</v-icon>
+      </v-fab>
+    </template>
+    <v-list>
+      <v-list-item @click="openHubRepositoriesDialog()">
+        <template v-slot:prepend>
+          <v-icon>mdi-plus</v-icon>
+        </template>
+        <v-list-item-title>{{ $t('repositories') }}</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="refreshRepositories()">
+        <template v-slot:prepend>
+          <v-icon>mdi-refresh</v-icon>
+        </template>
+        <v-list-item-title>{{ $t('refresh repositories') }}</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-menu>
 
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
@@ -331,20 +318,24 @@
 import { onMounted, ref, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
+import { useRouter } from 'vue-router';
 
+const $router = useRouter();
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const { t } = useI18n();
 const overlay = ref(false);
 const mosServices = ref({});
 const searchOnlineTemplate = ref('');
 const hubLoading = ref(true);
+const releasesLoading = ref(false);
 const installDialog = reactive({
   value: false,
   tpl: null,
   type: '',
+  release: null,
 });
 const errorMsg = ref('');
-
+const releasesItems = ref([]);
 const mosHub = ref([]);
 const mosHubCount = ref(0);
 
@@ -480,8 +471,106 @@ const getMosServices = async () => {
   }
 };
 
+const getPluginReleases = async (repository) => {
+  releasesLoading.value = true;
+  const payload = {
+    repository: repository,
+    refresh: false,
+  };
+
+  try {
+    const res = await fetch('/api/v1/mos/plugins/releases', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('plugin releases could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const data = await res.json();
+    releasesItems.value = (data.releases || []).map((r) => r.tag);
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+    return [];
+  } finally {
+    releasesLoading.value = false;
+  }
+};
+
+const installPlugin = async (templatepath, release) => {
+  overlay.value = true;
+  const payload = {
+    template: templatepath,
+    tag: release,
+  };
+  try {
+    const res = await fetch('/api/v1/mos/plugins/install', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('plugin installation could not be started')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('plugin installation started successfully'));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const getInstallDialogIcon = () => {
+  if (installDialog.type === 'docker') return 'mdi-docker';
+  if (installDialog.type === 'compose') return 'mdi-toy-brick-plus';
+  if (installDialog.type === 'plugin') return 'mdi-puzzle';
+  return 'mdi-package-variant';
+};
+
+const doDialogInstall = () => {
+  if (installDialog.type === 'plugin') {
+    installDialog.value = false;
+    installPlugin(installDialog.tpl.files.template, installDialog.release);
+  } else if (installDialog.type === 'docker') {
+    installDialog.value = false;
+    $router.push({ path: '/docker/create', query: { template: installDialog.tpl.files.template } });
+  } else if (installDialog.type === 'compose') {
+    installDialog.value = false;
+    $router.push({
+      path: '/docker/compose',
+      query: {
+        template: encodeURIComponent(installDialog.tpl.files?.template ?? ''),
+        yaml: encodeURIComponent(installDialog.tpl.files?.yaml ?? ''),
+        env: encodeURIComponent(installDialog.tpl.files?.env ?? ''),
+      },
+    });
+  }
+};
+
 const openHubRepositoriesDialog = async () => {
   mosHubRepositoriesDialog.value = true;
   mosHubRepositoriesDialog.repositories = await getHubRepositories();
+};
+const openPluginInstallDialog = (tpl) => {
+  installDialog.tpl = tpl;
+  installDialog.type = 'plugin';
+  installDialog.value = true;
+  releasesItems.value = [];
+  installDialog.release = null;
+  getPluginReleases(tpl?.repository);
 };
 </script>
