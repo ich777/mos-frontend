@@ -138,7 +138,7 @@ const addUser = async () => {
     password: password.value,
     samba_user: sambaUser.value,
     role: 'admin',
-    darkmode: darkMode.value,
+    darkmode: darkMode.value === 'dark',
     language: selectedLanguage.value,
     byte_format: selectedByteFormat.value,
   };
