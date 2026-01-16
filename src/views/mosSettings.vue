@@ -134,10 +134,10 @@
                 {{ $t('hardware') }}
               </v-card-title>
               <v-card-text>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/drivers">
+                <!--<v-btn color="primary" block class="mb-2" rounded to="/mosSettings/drivers">
                   <v-icon start>mdi-expansion-card</v-icon>
                   {{ $t('drivers') }}
-                </v-btn>
+                </v-btn>-->
                 <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/boot">
                   <v-icon start>mdi-usb-flash-drive</v-icon>
                   {{ $t('boot') }}
