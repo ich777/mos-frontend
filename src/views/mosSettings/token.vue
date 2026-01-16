@@ -74,18 +74,18 @@
             </v-row>
                 <v-text-field
                   v-model="clientToken.github"
-                  :type="showPassword ? 'text' : 'password'"
+                  :type="showPasswortGithub ? 'text' : 'password'"
                   :label="$t('github token')"
-                  :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                  @click:append-inner="showPassword = !showPassword"
+                  :append-inner-icon="showPasswortGithub ? 'mdi-eye-off' : 'mdi-eye'"
+                  @click:append-inner="showPasswortGithub = !showPasswortGithub"
                 />
                 <v-text-field
                   v-model="clientToken.dockerhub"
-                  :type="showPassword ? 'text' : 'password'"
+                  :type="showPasswortDockerhub ? 'text' : 'password'"
                   :label="$t('dockerhub token')"
                   hide-details="auto"
-                  :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                  @click:append-inner="showPassword = !showPassword"
+                  :append-inner-icon="showPasswortDockerhub ? 'mdi-eye-off' : 'mdi-eye'"
+                  @click:append-inner="showPasswortDockerhub = !showPasswortDockerhub"
                 />
           </v-card-text>
         </v-card>
@@ -129,6 +129,8 @@ const { t } = useI18n();
 const adminToken = ref([]);
 const overlay = ref(false);
 const showPassword = ref(false);
+const showPasswortGithub = ref(false);
+const showPasswortDockerhub = ref(false);
 const createAdminTokenDialog = reactive({
   value: false,
   name: '',
