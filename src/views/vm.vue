@@ -357,7 +357,7 @@
         <!-- Networks Configuration -->
         <div class="mb-4">
           <div class="d-flex align-items-center mb-2">
-            <h3 class="text-h6">{{ $t('networks') }}</h3>
+            <h3 class="text-h6">{{ $t('network adapter') }}</h3>
             <v-spacer />
             <v-btn
               size="small"
@@ -365,7 +365,7 @@
               prepend-icon="mdi-plus"
               @click="addNetwork"
             >
-              {{ $t('Add Network') }}
+              {{ $t('Add adapter') }}
             </v-btn>
           </div>
           <v-card
