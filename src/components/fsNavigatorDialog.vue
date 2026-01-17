@@ -150,6 +150,10 @@ const loadPath = async (path = '/') => {
     if (path && path !== '/') {
       url.searchParams.set('path', path);
     }
+
+    const typeParam = props.selectType === 'directory' ? 'directories' : 'all';
+    url.searchParams.set('type', typeParam);
+
     if (props.roots !== '' && props.roots !== '/') {
       url.searchParams.set('roots', props.roots);
     }
