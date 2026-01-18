@@ -5,6 +5,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 import federation from '@originjs/vite-plugin-federation';
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vue: ['vue', 'vue-router'],
+          vuetify: ['vuetify'],
+        },
+      },
+    },
+  },
   plugins: [
     vue(),
     VitePWA({
@@ -13,12 +23,9 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
       },
     }),
-    // Module Federation host application
     federation({
       name: 'mos-host',
-      // Plugins are loaded dynamically, no static remotes needed
       remotes: {},
-      // Shared dependencies with plugins
       shared: ['vue', 'vue-router', 'vuetify'],
     }),
   ],
