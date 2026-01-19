@@ -1032,5 +1032,7 @@
   "PCI Address": "PCI Address",
   "USB Device": "USB Device",
   "MAC Address": "MAC Address",
-  "Host Device": "Host Device"
+  "Host Device": "Host Device",
+  "all": "All",
+  "no cron jobs have been created yet": "No cron jobs have been created yet"
 }

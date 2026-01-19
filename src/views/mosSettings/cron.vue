@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="d-flex justify-center">
-    <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
+    <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
         <v-row>
           <v-col cols="auto" class="d-flex align-center">
@@ -12,14 +12,17 @@
         </v-row>
       </v-container>
       <v-container fluid class="pa-0">
-        <v-card fluid style="margin-bottom: 80px" class="pa-0">
+        <v-card v-if="cronJobs.length === 0" fluid class="mb-4 ml-0 mr-0 pa-0">
+          <v-card-text class="pa-4">
+            {{ $t('no cron jobs have been created yet') }}
+          </v-card-text>
+        </v-card>
+        <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item v-for="(cronJob, index) in cronJobs" :key="index">
                 <template v-slot:prepend>
-                  <v-icon class="cursor-pointer" :color="cronJob.enabled ? 'green' : 'blue'">
-                    mdi-calendar-clock
-                  </v-icon>
+                  <v-icon class="cursor-pointer" :color="cronJob.enabled ? 'green' : 'blue'">mdi-calendar-clock</v-icon>
                 </template>
                 <v-list-item-title class="d-flex align-center">
                   {{ cronJob.name }}
@@ -28,33 +31,33 @@
                   </v-chip>
                 </v-list-item-title>
                 <v-list-item-subtitle>{{ cronJob.schedule }} - {{ cronJob.command }}</v-list-item-subtitle>
-                    <template v-slot:append>
-                      <v-menu>
-                        <template #activator="{ props }">
-                          <v-btn variant="text" icon v-bind="props" color="onPrimary">
-                            <v-icon>mdi-dots-vertical</v-icon>
-                          </v-btn>
-                        </template>
-                        <v-list>
-                          <v-list-item @click="openChangeCronJobDialog(cronJob)">
-                            <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item @click="openDeleteCronJobDialog(cronJob)">
-                            <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-divider></v-divider>
-                          <v-list-item @click="openChangeScriptDialog(cronJob)">
-                            <v-list-item-title>{{ $t('change script') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item @click="startScript(cronJob.id)">
-                            <v-list-item-title>{{ $t('start script') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item @click="stopScript(cronJob.id)">
-                            <v-list-item-title>{{ $t('stop script') }}</v-list-item-title>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
+                <template v-slot:append>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn variant="text" icon v-bind="props" color="onPrimary">
+                        <v-icon>mdi-dots-vertical</v-icon>
+                      </v-btn>
                     </template>
+                    <v-list>
+                      <v-list-item @click="openChangeCronJobDialog(cronJob)">
+                        <v-list-item-title>{{ $t('edit') }}</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="openDeleteCronJobDialog(cronJob)">
+                        <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                      <v-list-item @click="openChangeScriptDialog(cronJob)">
+                        <v-list-item-title>{{ $t('change script') }}</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="startScript(cronJob.id)">
+                        <v-list-item-title>{{ $t('start script') }}</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="stopScript(cronJob.id)">
+                        <v-list-item-title>{{ $t('stop script') }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </template>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -138,8 +141,7 @@
   </v-dialog>
 
   <!-- Floating Action Button -->
-  <v-fab @click="openCreateCronJobDialog()" color="primary"
-    style="position: fixed; bottom: 32px; right: 32px; z-index: 1000;" size="large" icon>
+  <v-fab @click="openCreateCronJobDialog()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-plus</v-icon>
   </v-fab>
 
@@ -163,7 +165,7 @@ const createCronJobDialog = reactive({
   name: '',
   schedule: '',
   command: '',
-  script: ''
+  script: '',
 });
 const changeCronJobDialog = reactive({
   value: false,
@@ -171,12 +173,12 @@ const changeCronJobDialog = reactive({
   id: '',
   name: '',
   schedule: '',
-  command: ''
+  command: '',
 });
 const deleteCronJobDialog = reactive({
   value: false,
   id: '',
-  name: ''
+  name: '',
 });
 const changeScriptDialog = reactive({
   value: false,
@@ -186,7 +188,7 @@ const changeScriptDialog = reactive({
   size: 0,
   created: '',
   modified: '',
-  content: ''
+  content: '',
 });
 
 onMounted(() => {
@@ -197,8 +199,8 @@ const getCron = async () => {
   try {
     const res = await fetch('/api/v1/cron', {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) {
@@ -206,7 +208,6 @@ const getCron = async () => {
       throw new Error(error.error || t('cron jobs could not be loaded'));
     }
     cronJobs.value = await res.json();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -218,23 +219,22 @@ const createCronJob = async () => {
     schedule: createCronJobDialog.schedule,
     command: createCronJobDialog.command,
     enabled: createCronJobDialog.enabled,
-    script: createCronJobDialog.script
+    script: createCronJobDialog.script,
   };
   try {
     const res = await fetch('/api/v1/cron', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newCronJob)
+      body: JSON.stringify(newCronJob),
     });
 
     if (!res.ok) throw new Error(t('cron job could not be created'));
     showSnackbarSuccess(t('cron job created successfully'));
     createCronJobDialog.value = false;
     getCron();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -245,23 +245,22 @@ const changeCronJob = async () => {
     name: changeCronJobDialog.name,
     schedule: changeCronJobDialog.schedule,
     command: changeCronJobDialog.command,
-    enabled: changeCronJobDialog.enabled
+    enabled: changeCronJobDialog.enabled,
   };
   try {
     const res = await fetch('/api/v1/cron/' + changeCronJobDialog.id, {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(changeCronJob)
+      body: JSON.stringify(changeCronJob),
     });
 
     if (!res.ok) throw new Error(t('cron job could not be changed'));
     showSnackbarSuccess(t('cron job changed successfully'));
     changeCronJobDialog.value = false;
     getCron();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -272,15 +271,14 @@ const deleteCronJob = async () => {
     const res = await fetch('/api/v1/cron/' + deleteCronJobDialog.id, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
 
     if (!res.ok) throw new Error(t('cron jobs could not be deleted'));
     showSnackbarSuccess(t('cron job deleted successfully'));
     deleteCronJobDialog.value = false;
     getCron();
-
   } catch (e) {
     showSnackbarError(e.message);
   }
@@ -291,8 +289,8 @@ const getScript = async (cronId) => {
     overlay.value = true;
     const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(cronId), {
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-      }
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
     });
     overlay.value = false;
     if (!res.ok) {
@@ -307,16 +305,16 @@ const getScript = async (cronId) => {
   }
 };
 
-const changeScript = async ( cronId ) => {
+const changeScript = async (cronId) => {
   try {
     overlay.value = true;
     const res = await fetch('/api/v1/cron/scripts/' + encodeURIComponent(cronId), {
       method: 'PUT',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
-        'Content-Type': 'application/json'
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ content: changeScriptDialog.content })
+      body: JSON.stringify({ content: changeScriptDialog.content }),
     });
     overlay.value = false;
     if (!res.ok) {
@@ -337,7 +335,7 @@ const startScript = async (cronId) => {
     const res = await fetch('/api/v1/cron/' + encodeURIComponent(cronId) + '/start', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
 
@@ -360,7 +358,7 @@ const stopScript = async (cronId) => {
     const res = await fetch('/api/v1/cron/' + encodeURIComponent(cronId) + '/stop', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
 
@@ -416,5 +414,4 @@ const openChangeScriptDialog = async (cronJob) => {
     showSnackbarError(e.message);
   }
 };
-
 </script>

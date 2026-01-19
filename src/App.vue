@@ -14,11 +14,11 @@
         <v-app-bar-nav-icon variant="text" @click.stop="toggleDrawer"></v-app-bar-nav-icon>
         <v-img :src="logoSrc" alt="MOS Logo" max-width="50" class="ml-3 mr-3" contain />
         <v-toolbar-title>{{ hostname || $t('mos') }}</v-toolbar-title>
-        <v-btn icon variant="text" href="https://github.com/ich777/mos-docs/" target="_blank" rel="noopener" aria-label="Help" title="Help" class="mr-2">
+        <v-btn icon variant="text" href="https://github.com/ich777/mos-docs/" target="_blank" rel="noopener" :aria-label="$t('help')" :title="$t('help')">
           <v-icon>mdi-help-circle-outline</v-icon>
         </v-btn>
-        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" offset-x="25" offset-y="16">
-          <v-btn icon variant="text" aria-label="Notifications" to="/notifications" class="mr-2">
+        <v-badge :model-value="notificationsBadge" color="green" dot floating bordered location="bottom end" offset-x="18" offset-y="18">
+          <v-btn icon variant="text" :aria-label="$t('notifications')" to="/notifications">
             <v-icon>mdi-bell</v-icon>
           </v-btn>
         </v-badge>
