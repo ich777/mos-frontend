@@ -694,7 +694,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, watch } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import draggable from 'vuedraggable';
@@ -834,6 +834,29 @@ onMounted(async () => {
   getUnassignedDisks();
   getPoolTypes();
 });
+
+// Watcher to ensure mutual exclusion between devices and snapraidDevice
+watch(
+  () => createPoolDialog.devices,
+  (newDevices) => {
+    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newDevices)) {
+      createPoolDialog.snapraidDevice = createPoolDialog.snapraidDevice.filter(
+        (device) => !newDevices.includes(device)
+      );
+    }
+  }
+);
+
+watch(
+  () => createPoolDialog.snapraidDevice,
+  (newSnapraidDevices) => {
+    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newSnapraidDevices)) {
+      createPoolDialog.devices = createPoolDialog.devices.filter(
+        (device) => !newSnapraidDevices.includes(device)
+      );
+    }
+  }
+);
 const openAddMergerfsDevicesDialog = (pool) => {
   addMergerfsDevicesDialog.value = true;
   addMergerfsDevicesDialog.pool = pool;
@@ -1475,6 +1498,11 @@ const removeMergerfsParityDevice = async (poolId, devices, unmount) => {
 };
 
 const switchPoolType = async () => {
+  // Reset device selections when switching pool type to prevent conflicts
+  createPoolDialog.devices = [];
+  createPoolDialog.snapraidDevice = [];
+  createPoolDialog.parity = [];
+  
   createPoolDialog.filesystems = await getFilesystems(createPoolDialog.type);
   if (createPoolDialog.type === 'single' || createPoolDialog.type === 'mergerfs') {
     createPoolDialog.filesystem = 'xfs';
