@@ -329,10 +329,12 @@
             v-model="createPoolDialog.devices"
             :items="
               Array.isArray(unassignedDisks)
-                ? unassignedDisks.map((disk) => ({
-                    title: `${disk.device} (${disk.size_human})`,
-                    value: disk.device,
-                  }))
+                ? unassignedDisks
+                    .filter((disk) => createPoolDialog.type !== 'mergerfs' || !createPoolDialog.snapraidDevice.includes(disk.device))
+                    .map((disk) => ({
+                      title: `${disk.device} (${disk.size_human})`,
+                      value: disk.device,
+                    }))
                 : []
             "
             item-title="title"
@@ -346,10 +348,12 @@
             v-model="createPoolDialog.snapraidDevice"
             :items="
               Array.isArray(unassignedDisks)
-                ? unassignedDisks.map((disk) => ({
-                    title: `${disk.device} (${disk.size_human})`,
-                    value: disk.device,
-                  }))
+                ? unassignedDisks
+                    .filter((disk) => !createPoolDialog.devices.includes(disk.device))
+                    .map((disk) => ({
+                      title: `${disk.device} (${disk.size_human})`,
+                      value: disk.device,
+                    }))
                 : []
             "
             item-title="title"
