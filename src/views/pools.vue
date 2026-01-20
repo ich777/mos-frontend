@@ -839,10 +839,13 @@ onMounted(async () => {
 watch(
   () => createPoolDialog.devices,
   (newDevices) => {
-    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newDevices)) {
-      createPoolDialog.snapraidDevice = createPoolDialog.snapraidDevice.filter(
+    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newDevices) && newDevices.length > 0) {
+      const filtered = createPoolDialog.snapraidDevice.filter(
         (device) => !newDevices.includes(device)
       );
+      if (filtered.length !== createPoolDialog.snapraidDevice.length) {
+        createPoolDialog.snapraidDevice = filtered;
+      }
     }
   }
 );
@@ -850,10 +853,13 @@ watch(
 watch(
   () => createPoolDialog.snapraidDevice,
   (newSnapraidDevices) => {
-    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newSnapraidDevices)) {
-      createPoolDialog.devices = createPoolDialog.devices.filter(
+    if (createPoolDialog.type === 'mergerfs' && Array.isArray(newSnapraidDevices) && newSnapraidDevices.length > 0) {
+      const filtered = createPoolDialog.devices.filter(
         (device) => !newSnapraidDevices.includes(device)
       );
+      if (filtered.length !== createPoolDialog.devices.length) {
+        createPoolDialog.devices = filtered;
+      }
     }
   }
 );
