@@ -8,75 +8,108 @@
         <v-skeleton-loader v-if="vmsloading" :loading="true" type="card" :width="'100%'" :height="'60px'" class="mb-2" />
         <v-card v-else fluid style="margin-bottom: 80px" class="pa-0">
           <v-card-text class="pa-0">
-            <v-list class="bg-transparent">
-            <draggable v-model="vms" item-key="Id">
-              <template #item="{ element: vm, index }">
-                <div>
-                  <v-list-item :id="vm.Id">
-                    <template v-slot:prepend>
-                      <v-menu>
-                        <template #activator="{ props }">
-                          <v-icon v-bind="props">mdi-server-outline</v-icon>
+            <v-table class="bg-transparent">
+              <thead>
+                <tr style="background-color: rgba(0, 0, 0, 0.04)">
+                  <th style="width: 42px; padding: 4px 8px; vertical-align: middle"></th>
+                  <th style="min-width: 150px; padding: 4px 8px; vertical-align: middle">{{ $t('name') }}</th>
+                  <th style="min-width: 200px; padding: 4px 8px; vertical-align: middle">{{ $t('description') }}</th>
+                  <th style="padding: 4px 8px; vertical-align: middle">{{ $t('cpu load') }}</th>
+                  <th style="padding: 4px 8px; vertical-align: middle">{{ $t('disks') }}</th>
+                  <th style="padding: 4px 8px; vertical-align: middle">{{ $t('port') }}</th>
+                  <th style="width: 90px; padding: 4px 8px; vertical-align: middle">{{ $t('autostart') }}</th>
+                  <th style="width: 42px; padding: 4px 8px; vertical-align: middle">{{ $t('info') }}</th>
+                  <th style="width: 42px; padding: 4px 8px; vertical-align: middle"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="vm in vms" :key="vm.name">
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <v-menu>
+                      <template #activator="{ props }">
+                          <v-img class="drag-handle" v-bind="props" :src="getVmIconSrc(vm)" alt="vm image" width="24" height="24" style="cursor: pointer">
+                            <template #error>
+                              <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
+                                <v-icon color="grey-darken-1">mdi-image-off</v-icon>
+                              </v-sheet>
+                            </template>
+                          </v-img>
                         </template>
-                        <v-list>
-                          <v-list-item v-if="vm.state !== 'running'" @click="startVM(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-play-circle</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('start') }}</v-list-item-title>
-                          </v-list-item>
-                                                    <v-list-item v-if="vm.state === 'running'" @click="stopVM(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-stop-circle</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item v-if="vm.state === 'running'" @click="killVM(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-close-octagon</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item v-if="vm.state === 'running'" @click="restartVM(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-restart</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item v-if="vm.state === 'running'" @click="resetVM(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-cached</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('reset') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item v-if="vm.state !== 'running'" @click="openEditXmlDialog(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-text-box-edit</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('edit xml') }}</v-list-item-title>
-                          </v-list-item>
-                          <v-list-item v-if="vm.state !== 'running'" @click="openDeleteVmDialog(vm.name)">
-                            <template #prepend>
-                              <v-icon>mdi-delete-forever</v-icon>
-                            </template>
-                            <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </template>
-                    <v-list-item-title>{{ vm.name }}</v-list-item-title>
-                    <v-list-item-subtitle :style="{ color: vm.state === 'running' ? 'green' : 'red' }">
-                      {{ vm.state }}
-                    </v-list-item-subtitle>
-                    <template v-slot:append>
-                      <v-switch v-model="vm.autostart" color="green" hide-details inset density="compact" @change="switchAutostart(vm)" />
-                    </template>
-                  </v-list-item>
-                  <v-divider v-if="index < vms.length - 1" />
-                </div>
-              </template>
-            </draggable>
-            </v-list>
+                      <v-list>
+                        <v-list-item v-if="vm.state !== 'running'" @click="startVM(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-play-circle</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('start') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item v-if="vm.state === 'running'" @click="stopVM(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-stop-circle</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item v-if="vm.state === 'running'" @click="killVM(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-close-octagon</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item v-if="vm.state === 'running'" @click="restartVM(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-restart</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item v-if="vm.state === 'running'" @click="resetVM(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-cached</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('reset') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-divider />
+                        <v-list-item v-if="vm.state !== 'running'" @click="openEditXmlDialog(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-text-box-edit</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('edit xml') }}</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item v-if="vm.state !== 'running'" @click="openDeleteVmDialog(vm.name)">
+                          <template #prepend>
+                            <v-icon>mdi-delete-forever</v-icon>
+                          </template>
+                          <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </td>
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <div style="font-size: 0.9rem">{{ vm.name }}</div>
+                    <div class="text-caption" :style="{ color: vm.state === 'running' ? 'green' : 'red' }">{{ vm.state ?? '' }}</div>
+                  </td>
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <div style="font-size: 0.9rem">{{ vm.description ?? '-' }}</div>
+                  </td>
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <span v-if="vm.state === 'running'">{{ vm.cpu?.usage ?? '-' }}{{ vm.cpu?.unit }}</span>
+                    <span v-else>-</span>
+                  </td>
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <div v-if="vm.disks && vm.disks.length > 0">
+                      <div v-for="(disk, index) in vm.disks" :key="index" class="text-caption">{{ disk.source }}</div>
+                    </div>
+                    <span v-else>-</span>
+                  </td>
+                  <td style="padding: 4px 8px; vertical-align: middle">{{ vm.vncPort || '-' }}</td>
+                  <td style="padding: 4px 8px; vertical-align: middle">
+                    <v-switch v-model="vm.autostart" color="green" hide-details density="compact" @change="switchAutostart(vm)" />
+                  </td>
+                  <td>
+                      <v-icon @click="openInfoDialog(vm.name)" color="grey-darken-1" style="cursor: pointer">mdi-information-outline</v-icon>
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </v-table>
           </v-card-text>
         </v-card>
       </v-container>
@@ -166,6 +199,7 @@
           class="mt-8 mb-3"
         />
         <v-select
+          v-if="newVm.machineTypeArchitecture"
           v-model="newVm.machineType"
           :items="selectedMachineTypeVersions"
           item-title="title"
@@ -214,7 +248,7 @@
               />
             </div>
             <v-row dense>
-              <v-col cols="12" md="8">
+              <v-col cols="12" md="12">
                 <v-text-field
                   v-model="disk.source"
                   :label="$t('source')"
@@ -225,14 +259,14 @@
                   placeholder="/path/to/disk.qcow2"
                   @click:append-inner="
                     fsDialogDisk = true;
-                    fsDialogInitialPath = '/';
+                    fsDialogInitialPath = vmCapabilities.vdisk_directory || '/';
                     fsDialogCallback = (item) => {
                       disk.source = item.path;
                     };
                   "
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   v-model="disk.size"
                   :label="$t('size')"
@@ -243,7 +277,7 @@
                 />
               </v-col>
               
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-select
                   v-model="disk.bus"
                   :items="vmCapabilities.diskBuses"
@@ -253,7 +287,7 @@
                   hide-details
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-select
                   v-model="disk.format"
                   :items="vmCapabilities.diskFormats"
@@ -263,7 +297,7 @@
                   hide-details
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   v-model="disk.boot_order"
                   :label="$t('boot order')"
@@ -351,6 +385,25 @@
               </v-col>
             </v-row>
           </v-card>
+        </div>
+        <v-divider class="my-4" />
+
+        <!-- VirtIO ISO Configuration -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center mb-2">
+            <h3 class="text-h6">{{ $t('VirtIO Drivers') }}</h3>
+          </div>
+          <v-select
+            v-model="newVm.virtioIso"
+            :items="virtioIsoOptions"
+            item-title="title"
+            item-value="value"
+            :label="$t('VirtIO ISO')"
+            variant="outlined"
+            density="compact"
+            clearable
+            hide-details
+          />
         </div>
         <v-divider class="my-4" />
 
@@ -453,8 +506,7 @@
                   variant="outlined"
                   density="compact"
                   hide-details
-                  type="number"
-                  placeholder="5900"
+                  placeholder="leave empty for auto"
                 />
               </v-col>
               <v-col cols="12" md="4">
@@ -615,6 +667,164 @@
     </v-card>
   </v-dialog>
 
+  <!-- VM Info Dialog -->
+  <v-dialog v-model="infoDialog" max-width="700">
+    <v-card>
+      <v-card-title>{{ infoDialogData.name }}</v-card-title>
+      <v-card-text>
+        <v-skeleton-loader v-if="infoDialogLoading"/>
+        <template v-else>
+          <h3 class="text-h6">{{ $t('general') }}</h3>
+          <v-table density="compact" class="mb-4">
+            <tbody>
+              <tr>
+                <td class="font-weight-medium" style="width: 150px">UUID</td>
+                <td>{{ infoDialogData.uuid }}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-medium">{{ $t('memory') }}</td>
+                <td>{{ infoDialogData.memoryHuman }}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-medium">{{ $t('cores') }}</td>
+                <td>{{ infoDialogData.cpus }}</td>
+              </tr>
+              <tr v-if="infoDialogData.cpuPins?.length">
+                <td class="font-weight-medium">{{ $t('pinned cores') }}</td>
+                <td>{{ infoDialogData.cpuPins?.join(', ') }}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-medium">{{ $t('platform') }}</td>
+                <td>{{ infoDialogData.platform }}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-medium">{{ $t('bios') }}</td>
+                <td>{{ infoDialogData.bios }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+          <template v-if="infoDialogData.disks?.length">
+            <h3 class="text-h6">{{ $t('disks') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <thead>
+                <tr>
+                  <th>{{ $t('source') }}</th>
+                  <th>{{ $t('format') }}</th>
+                  <th>{{ $t('bus') }}</th>
+                  <th>{{ $t('target') }}</th>
+                  <th>{{ $t('boot order') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(disk, i) in infoDialogData.disks" :key="i">
+                  <td class="text-caption">{{ disk.source }}</td>
+                  <td>{{ disk.format }}</td>
+                  <td>{{ disk.bus }}</td>
+                  <td>{{ disk.target }}</td>
+                  <td>{{ disk.boot_order || '-' }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+          <template v-if="infoDialogData.cdroms?.length">
+            <h3 class="text-h6">{{ $t('CD-ROM') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <thead>
+                <tr>
+                  <th>{{ $t('source') }}</th>
+                  <th>{{ $t('bus') }}</th>
+                  <th>{{ $t('boot order') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(cdrom, i) in infoDialogData.cdroms" :key="i">
+                  <td class="text-caption">{{ cdrom.source }}</td>
+                  <td>{{ cdrom.bus }}</td>
+                  <td>{{ cdrom.boot_order || '-' }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+          <template v-if="infoDialogData.networks?.length">
+            <h3 class="text-h6">{{ $t('network adapter') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <thead>
+                <tr>
+                  <th>{{ $t('type') }}</th>
+                  <th>{{ $t('source') }}</th>
+                  <th>{{ $t('model') }}</th>
+                  <th>{{ $t('MAC Address') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(net, i) in infoDialogData.networks" :key="i">
+                  <td>{{ net.type }}</td>
+                  <td>{{ net.source }}</td>
+                  <td>{{ net.model }}</td>
+                  <td>{{ net.mac }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+          <template v-if="infoDialogData.graphics">
+            <h3 class="text-h6">{{ $t('graphics') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <tbody>
+                <tr>
+                  <td class="font-weight-medium" style="width: 150px">{{ $t('type') }}</td>
+                  <td>{{ infoDialogData.graphics.type }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">{{ $t('port') }}</td>
+                  <td>{{ infoDialogData.graphics.port || 'auto' }}</td>
+                </tr>
+                <tr>
+                  <td class="font-weight-medium">{{ $t('listen') }}</td>
+                  <td>{{ infoDialogData.graphics.listen }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+          <template v-if="infoDialogData.pciDevices?.length">
+            <h3 class="text-h6">{{ $t('Host Devices') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <thead>
+                <tr>
+                  <th>{{ $t('address') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(pci, i) in infoDialogData.pciDevices" :key="i">
+                  <td>{{ pci.address }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+          <template v-if="infoDialogData.usbDevices?.length">
+            <h3 class="text-h6">{{ $t('USB Devices') }}</h3>
+            <v-table density="compact" class="mb-4">
+              <thead>
+                <tr>
+                  <th>{{ $t('vendor') }}</th>
+                  <th>{{ $t('product') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(usb, i) in infoDialogData.usbDevices" :key="i">
+                  <td>{{ usb.vendor }}</td>
+                  <td>{{ usb.product }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </template>
+        </template>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="infoDialog = false">{{ $t('close') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- File System Navigator Dialog for Disks -->
   <fsNavigatorDialog
     v-model="fsDialogDisk"
@@ -634,25 +844,30 @@
     :title="$t('select ISO file')"
     @selected="handleFsSelected"
   />
-
+ 
   <v-overlay :model-value="overlay" class="align-center justify-center">
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
-import draggable from 'vuedraggable';
 import { useI18n } from 'vue-i18n';
+import { io } from 'socket.io-client';
 import fsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
 import xmlEditor from '@/components/xmlEditor.vue';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const vms = ref([]);
+const vmUsage = ref([]);
 const overlay = ref(false);
 const { t } = useI18n();
 const vmsloading = ref(true);
+const isConnected = ref(false);
+const error = ref(null);
+
+let socket = null;
 
 const vmCapabilities = ref({
   vdisk_directory: '',
@@ -685,6 +900,9 @@ const deleteVmData = ref({
   removeDisks: false,
   removeNvram: false
 });
+const infoDialog = ref(false);
+const infoDialogLoading = ref(false);
+const infoDialogData = ref({});
 const fsDialogDisk = ref(false);
 const fsDialogCdRom = ref(false);
 const fsDialogCallback = ref(null);
@@ -718,12 +936,22 @@ const usbDevices = ref({});
 const availableSystemMemory = ref(0);
 const cpu = ref({});
 
+
 onMounted(() => {
   getVMs();
+  getVmUsage();
+  getLoadWS();
   getSystemInfo();
   getPCIeDevices();
   getUSBDevices();
   getVmCapabilities();
+});
+
+onUnmounted(() => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
 });
 
 const getVMs = async () => {
@@ -741,6 +969,81 @@ const getVMs = async () => {
   } finally {
     vmsloading.value = false;
   }
+};
+
+const getVmUsage = async () => {
+  try {
+    const res = await fetch('/api/v1/vm/machines/usage', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+    vmUsage.value = await res.json();
+  } catch (e) {
+    showSnackbarError(t('Could not fetch VM usage'));
+  }
+};
+
+const getVmUsageByName = (name) => {
+  return vmUsage.value.find(u => u.name === name);
+};
+
+watch(vmUsage, (newUsage) => {
+  if (!newUsage || !vms.value) return;
+
+  vms.value.forEach(vm => {
+    const usage = getVmUsageByName(vm.name);
+    if (usage) {
+      vm.cpu = usage.cpu;
+      vm.memory = usage.memory;
+      vm.state = usage.state;
+    }
+  });
+}, { deep: true });
+
+const getVmIconSrc = (vms) => {
+  if (vms.customIcon) {
+    return `/vm_custom/${vms.name}.png`;
+  } else {
+    return `/os_icons/${vms.icon}.png`;
+  }
+};
+
+const getLoadWS = () => {
+  const authToken = localStorage.getItem('authToken');
+  if (!authToken) {
+    error.value = 'No auth token found';
+    return;
+  }
+
+  socket = io('/vm', { 
+    path: '/api/v1/socket.io/', 
+    transports: ['websocket'], 
+    upgrade: false,
+   });
+
+  socket.on('connect', () => {
+    isConnected.value = true;
+    error.value = null;
+    socket.emit('subscribe-vm-usage', { token: authToken });
+  });
+
+  socket.on('connect_error', (err) => {
+    error.value = `Connection error: ${err.message}`;
+    isConnected.value = false;
+  });
+  socket.on('disconnect', () => {
+    isConnected.value = false;
+  });
+
+  socket.on('vm-usage-update', (data) => {
+    vmUsage.value = data.vms;
+  });
+  socket.on('error', (err) => {
+    error.value = `Socket error: ${err}`;
+  });
 };
 
 const stopVM = async (name) => {
@@ -944,6 +1247,28 @@ const changeXml = async () => {
 };
 
   
+
+const openInfoDialog = async (name) => {
+  infoDialogData.value = { name };
+  infoDialogLoading.value = true;
+  infoDialog.value = true;
+
+  try {
+    const res = await fetch(`/api/v1/vm/machines/${name}/config`, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) throw new Error('API-Error');
+    infoDialogData.value = await res.json();
+  } catch (e) {
+    showSnackbarError(t('Could not fetch VM config'));
+    infoDialog.value = false;
+  } finally {
+    infoDialogLoading.value = false;
+  }
+};
 
 const openDeleteVmDialog = (name) => {
   deleteVmData.value = {
@@ -1159,6 +1484,14 @@ const selectedMachineTypeVersions = computed(() => {
   return [];
 });
 
+const virtioIsoOptions = computed(() => {
+  if (!vmCapabilities.value?.virtioIsos) return [];
+  return vmCapabilities.value.virtioIsos.map(iso => ({
+    title: `VirtIO ${iso.version}`,
+    value: iso.path
+  }));
+});
+
 const openCreateVmDialog = async () => {
   newVm.value = {
     name: '',
@@ -1196,11 +1529,17 @@ const recalculateBootOrder = () => {
 
 const addDisk = () => {
   const totalDevices = newVm.value.disks.length + newVm.value.cdroms.length;
+  const diskIndex = newVm.value.disks.length;
+  const format = 'qcow2';
+  const vdiskDir = vmCapabilities.value.vdisk_directory || '/';
+  const vmName = newVm.value.name || 'unnamed';
+  const source = `${vdiskDir}/${vmName}/vdisk${diskIndex+1}.${format}`;
+
   newVm.value.disks.push({
     type: 'file',
-    source: '',
+    source: source,
     size: '',
-    format: 'qcow2',
+    format: format,
     boot_order: totalDevices + 1
   });
 };
@@ -1303,11 +1642,18 @@ const createVM = async () => {
       format: disk.format,
       boot_order: parseInt(disk.boot_order) || 0
     })),
-    cdroms: newVm.value.cdroms.map(cdrom => ({
-      source: cdrom.source,
-      bus: cdrom.bus,
-      boot_order: parseInt(cdrom.boot_order) || 0
-    })),
+    cdroms: [
+      ...newVm.value.cdroms.map(cdrom => ({
+        source: cdrom.source,
+        bus: cdrom.bus,
+        boot_order: parseInt(cdrom.boot_order) || 0
+      })),
+      ...(newVm.value.virtioIso ? [{
+        source: newVm.value.virtioIso,
+        bus: 'sata',
+        boot_order: 99
+      }] : [])
+    ],
     networks: newVm.value.networks,
     graphics: newVm.value.graphics,
     hostdevices: newVm.value.hostdevices,

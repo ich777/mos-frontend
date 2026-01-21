@@ -1035,5 +1035,13 @@
   "Host Device": "Host-Gerät",
   "all": "Alle",
   "no cron jobs have been created yet": "Es wurden noch keine Cron-Jobs erstellt",
-  "iommu active": "IOMMU aktiv"
+  "iommu active": "IOMMU aktiv",
+  "cpu load": "CPU Last",
+  "VirtIO Drivers": "VirtIO Treiber",
+  "VirtIO ISO": "VirtIO ISO",
+  "general": "Allgemein",
+  "pinned cores": "Festgelegte Kerne",
+  "bios": "BIOS",
+  "target": "Ziel",
+  "address": "Adresse"
 }
