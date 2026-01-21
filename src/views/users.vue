@@ -50,6 +50,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete this user?') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-row class="d-flex justify-end">
           <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -109,6 +110,7 @@
           <v-switch v-model="addDialog.samba_user" :label="$t('samba user')" inset color="green" />
         </form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-row class="d-flex justify-end">
           <v-btn color="onPrimary" @click="addDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -139,6 +141,7 @@
           <v-switch v-model="changeDialog.samba_user" :label="$t('samba user')" inset color="green" />
         </form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-row class="d-flex justify-end">
           <v-btn color="onPrimary" @click="changeDialog.value = false">{{ $t('cancel') }}</v-btn>

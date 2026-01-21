@@ -90,6 +90,7 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="formatDialog.value = false">

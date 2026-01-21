@@ -614,6 +614,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete this docker container?') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -633,6 +634,7 @@
         <v-text-field v-model="createGroupDialog.icon" :label="$t('icon')"></v-text-field>
         <v-select v-model="createGroupDialog.containers" :items="dockers.map((d) => d.Names[0])" :label="$t('select containers')" multiple chips></v-select>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="clearCreateGroupDialog()">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="createDockerGroup()">
@@ -659,6 +661,7 @@
           </template>
         </draggable>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="clearChangeGroupDialog()">{{ $t('cancel') }}</v-btn>
@@ -676,6 +679,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete this docker group?') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="deleteGroupDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -707,6 +711,7 @@
           </template>
         </v-list>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" text @click="unusedImagesDialog.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
@@ -746,6 +751,7 @@
           </div>
         </div>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" text @click="closeWsDialog()">
           {{ $t('close') }}
@@ -765,6 +771,7 @@
         <v-text-field v-model="createComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
         <v-text-field v-model="createComposeStackDialog.webui" :label="$t('web ui url')"></v-text-field>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="createComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="createComposeStack()">
@@ -778,13 +785,16 @@
   <v-dialog v-model="editComposeStackDialog.value" max-width="800">
     <v-card class="pa-0">
       <v-card-title class="text-h6">{{ $t('edit docker compose stack') }} - {{ editComposeStackDialog.name }}</v-card-title>
-      <v-card-text>
-        <v-text-field v-model="editComposeStackDialog.name" :label="$t('stack name')" readonly></v-text-field>
-        <v-textarea v-model="editComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
-        <v-textarea v-model="editComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
-        <v-text-field v-model="editComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
-        <v-text-field v-model="editComposeStackDialog.webui" :label="$t('web ui url')"></v-text-field>
+      <v-card-text class="pa-0">
+        <div style="max-height: 60vh; overflow-y: auto; padding: 16px; padding-bottom: 32px">
+          <v-text-field v-model="editComposeStackDialog.name" :label="$t('stack name')" readonly></v-text-field>
+          <v-textarea v-model="editComposeStackDialog.yaml" :label="$t('compose yaml')" rows="10" required></v-textarea>
+          <v-textarea v-model="editComposeStackDialog.env" :label="$t('environment variables')" rows="5"></v-textarea>
+          <v-text-field v-model="editComposeStackDialog.icon" :label="$t('icon url')"></v-text-field>
+          <v-text-field v-model="editComposeStackDialog.webui" :label="$t('web ui url')"></v-text-field>
+        </div>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="editComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="editComposeStack()">
@@ -801,6 +811,7 @@
       <v-card-text>
         {{ $t('are you sure you want to remove this docker compose stack? all containers in this stack will be removed.') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="removeComposeStackDialog.value = false">{{ $t('cancel') }}</v-btn>

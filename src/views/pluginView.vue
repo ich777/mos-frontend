@@ -19,6 +19,7 @@
         <v-card-text class="text-grey">
           {{ errorMessage }}
         </v-card-text>
+        <v-divider />
         <v-card-actions class="justify-center">
           <v-btn color="primary" variant="tonal" to="/plugins">
             <v-icon start>mdi-arrow-left</v-icon>
@@ -37,6 +38,7 @@
         <v-card-text class="text-grey">
           {{ $t('the requested plugin could not be found') }}
         </v-card-text>
+        <v-divider />
         <v-card-actions class="justify-center">
           <v-btn color="primary" variant="tonal" to="/plugins">
             <v-icon start>mdi-arrow-left</v-icon>

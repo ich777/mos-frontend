@@ -78,6 +78,7 @@
         ></v-select>
         <v-select v-model="updateDriversDialog.version" :items="getVersionOfName()" :label="t('version')"></v-select>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="updateDriversDialog.value = false"></v-btn>
         <v-btn color="onPrimary" :text="t('ok')" @click="updateDrivers()"></v-btn>

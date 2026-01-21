@@ -68,6 +68,7 @@
         <v-text-field v-model="createZramDeviceDialog.config.uuid" :label="$t('uuid')" readonly></v-text-field>
         <v-select v-if="createZramDeviceDialog.type === 'ramdisk'" v-model="createZramDeviceDialog.config.filesystem" :label="$t('filesystem')" :items="['ext4', 'xfs', 'btrfs']"></v-select>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="createZramDeviceDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -90,6 +91,7 @@
         <v-text-field v-model="changeZramDeviceDialog.config.uuid" :label="$t('uuid')" readonly></v-text-field>
         <v-select v-if="changeZramDeviceDialog.type === 'ramdisk'" v-model="changeZramDeviceDialog.config.filesystem" :label="$t('filesystem')" :items="['ext4', 'xfs', 'btrfs']"></v-select>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="changeZramDeviceDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -105,6 +107,7 @@
       <v-card-text>
         <p>{{ $t('are you sure you want to delete the zram device') }}?</p>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="deleteZramDeviceDialog.value = false">{{ $t('cancel') }}</v-btn>

@@ -79,6 +79,7 @@
           <v-textarea v-model="createCronJobDialog.script" :label="$t('script')" rows="5" required></v-textarea>
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="createCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -99,6 +100,7 @@
           <v-text-field v-model="changeCronJobDialog.command" :label="$t('command')" required></v-text-field>
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="changeCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -114,6 +116,7 @@
       <v-card-text>
         <p>{{ $t('are you sure you want to delete the cron job') }}?</p>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" @click="deleteCronJobDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -133,6 +136,7 @@
           <v-textarea v-model="changeScriptDialog.content" :label="$t('script')" rows="10"></v-textarea>
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="changeScriptDialog.value = false">{{ $t('close') }}</v-btn>
         <v-btn color="onPrimary" @click="changeScript(changeScriptDialog.id)">{{ $t('save') }}</v-btn>

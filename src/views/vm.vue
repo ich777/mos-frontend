@@ -634,6 +634,7 @@
       <v-card-text>
         <xmlEditor v-model="editXmlVmData.xml" />
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="editXmlDialog = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="primary" @click="changeXml()">{{ $t('save changes') }}</v-btn>
@@ -660,6 +661,7 @@
           density="compact"
         />
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="deleteVmDialog = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="error" @click="deleteVM()">{{ $t('delete') }}</v-btn>
@@ -819,6 +821,7 @@
           </template>
         </template>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="infoDialog = false">{{ $t('close') }}</v-btn>
       </v-card-actions>

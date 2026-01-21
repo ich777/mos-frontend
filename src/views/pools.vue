@@ -291,8 +291,9 @@
             <v-switch v-model="formatDialog.wipeExisting" :label="$t('wipe existing data')" inset hide-details density="compact" color="red" />
           </v-col>
         </v-row>
-      </v-card-text>
-      <v-card-actions>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions>
         <v-btn color="onPrimary" text @click="formatDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" :disabled="!formatDialog.filesystem" @click="formatDisk()">
           {{ $t('format') }}
@@ -308,6 +309,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete this pool?') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="deletePoolDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deletePool(deletePoolDialog.pool.id)">
@@ -401,6 +403,7 @@
           <v-switch v-if="createPoolDialog.encrypted" v-model="createPoolDialog.create_keyfile" :label="$t('create keyfile')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="createPoolDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="createPool()" color="onPrimary">
@@ -419,6 +422,7 @@
           <v-text-field v-model="passphraseDialog.passphrase" :label="$t('passphrase')" type="password" :rules="[(v) => !!v || $t('passphrase is required')]" />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="passphraseDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="mountPoolWithPassphrase(passphraseDialog.pool, passphraseDialog.passphrase)" color="onPrimary">
@@ -446,6 +450,7 @@
           <v-switch v-model="addMergerfsDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="addMergerfsDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="addMergerfsDevices(addMergerfsDevicesDialog.pool.id, addMergerfsDevicesDialog.devices, addMergerfsDevicesDialog.format, addMergerfsDevicesDialog.passphrase)" color="onPrimary">
@@ -472,6 +477,7 @@
           <v-switch v-model="removeMergerfsDevicesDialog.unmount" :label="$t('unmount')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="removeMergerfsDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="removeMergerfsDevice(removeMergerfsDevicesDialog.pool.id, removeMergerfsDevicesDialog.devices, removeMergerfsDevicesDialog.unmount)" color="red">
@@ -497,6 +503,7 @@
           <v-switch v-model="replaceMergerfsDeviceDialog.format" :label="$t('format')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="replaceMergerfsDeviceDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn
@@ -520,6 +527,7 @@
           <v-switch v-model="addParityDevicesDialog.format" :label="$t('format')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="addParityDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="addMergerfsParityDevice(addParityDevicesDialog.pool.id, addParityDevicesDialog.devices, addParityDevicesDialog.format)" color="onPrimary">
@@ -546,6 +554,7 @@
           <v-switch v-model="removeParityDevicesDialog.unmount" :label="$t('unmount')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="removeParityDevicesDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="removeMergerfsParityDevice(removeParityDevicesDialog.pool.id, removeParityDevicesDialog.devices, removeParityDevicesDialog.unmount)" color="onPrimary">
@@ -571,6 +580,7 @@
           <v-switch v-model="replaceParityDeviceDialog.format" :label="$t('format')" hide-details density="compact" color="red" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="replaceParityDeviceDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn
@@ -602,6 +612,7 @@
           />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="snapraidOperationDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="performSnapraidOperation(snapraidOperationDialog.pool.id, snapraidOperationDialog.operation)" color="onPrimary">
@@ -625,6 +636,7 @@
           <v-text-field v-model="snapraidSchedulesDialog.sync.scrub.schedule" :label="$t('scrub schedule (cron)')" hide-details="auto" class="mt-2" />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="snapraidSchedulesDialog.value = false" color="onPrimary">
           {{ $t('cancel') }}
@@ -650,6 +662,7 @@
           <v-switch v-model="addNonRaidDeviceDialog.parity_valid" :label="$t('parity valid')" hide-details="auto" density="compact" color="green" inset />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="addNonRaidDeviceDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn
@@ -674,6 +687,7 @@
           <v-select v-model="addNonRaidParityDialog.device" :items="Array.isArray(unassignedDisks) ? unassignedDisks.map((disk) => disk.device) : []" :label="$t('device')" dense />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn @click="addNonRaidParityDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="addNonRaidParity(addNonRaidParityDialog.pool.id, addNonRaidParityDialog.device)" color="onPrimary">

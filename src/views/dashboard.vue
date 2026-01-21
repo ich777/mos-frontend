@@ -50,6 +50,7 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" text @click="settingsDialog = false">{{ t('close') || 'Close' }}</v-btn>
         <v-btn

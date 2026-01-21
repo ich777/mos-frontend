@@ -100,6 +100,7 @@
         <v-text-field v-model="createAdminTokenDialog.name" :label="$t('name')" required></v-text-field>
         <v-text-field v-model="createAdminTokenDialog.description" :label="$t('description')"></v-text-field>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" variant="text" @click="createAdminTokenDialog.value = false">{{ $t('cancel') }}</v-btn>

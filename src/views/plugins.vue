@@ -87,6 +87,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete') }} <strong>{{ deleteDialog.plugin?.displayName || deleteDialog.plugin?.name }}</strong>?
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="deleteDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>

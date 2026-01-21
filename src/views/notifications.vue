@@ -57,6 +57,7 @@
         <p>{{ notificationDialog.notification.message }}</p>
         <p class="text-caption text-grey">{{ new Date(notificationDialog.notification.timestamp).toLocaleString() }}</p>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="notificationDialog.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
@@ -70,6 +71,7 @@
       <v-card-text>
         <p>{{ $t('are you sure you want to mark all notifications as read?') }}</p>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" text @click="readAllDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="markAllAsRead()">{{ $t('confirm') }}</v-btn>

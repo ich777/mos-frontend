@@ -156,6 +156,7 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <v-divider />
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="createSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="createSensor()" color="onPrimary">{{ $t('create') }}</v-btn>
@@ -227,6 +228,7 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <v-divider />
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="editSensorDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="updateSensor()" color="onPrimary">{{ $t('save') }}</v-btn>
@@ -251,6 +253,7 @@
             <v-checkbox v-model="viewSettings.actions" :label="$t('actions')" disabled hide-details />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff);">
         <v-btn @click="viewSettingsDialog = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn @click="saveViewSettings()" color="onPrimary">{{ $t('save') }}</v-btn>

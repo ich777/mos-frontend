@@ -74,6 +74,7 @@
           <v-switch v-model="newRemoteDialog.auto_mount" :label="$t('automount')" inset color="green"></v-switch>
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :disabled="!newRemoteDialog.type || !newRemoteDialog.server || !newRemoteDialog.share" @click="testConnection(newRemoteDialog)">{{ $t('test connection') }}</v-btn>
         <v-btn color="onPrimary" @click="newRemoteDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -108,6 +109,7 @@
           <v-switch v-model="changeDialog.auto_mount" :label="$t('automount')" inset color="green"></v-switch>
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :disabled="!changeDialog.type || !changeDialog.server || !changeDialog.share" @click="testConnection(changeDialog)">{{ $t('test connection') }}</v-btn>
         <v-btn color="onPrimary" @click="changeDialog.value = false">{{ $t('close') }}</v-btn>
@@ -123,6 +125,7 @@
       <v-card-text>
         {{ $t('are you sure you want to delete this remote mount?') }}
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deleteRemote(deleteDialog.remote)">
@@ -150,6 +153,7 @@
           </v-list-item>
         </v-list>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="onPrimary" text @click="sharesDialog = false">{{ $t('close') }}</v-btn>

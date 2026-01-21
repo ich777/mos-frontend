@@ -103,6 +103,7 @@
           <v-switch v-model="createDialog.guest_ok" :label="$t('guest ok')" inset hide-details density="compact" class="ml-4" color="green" />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="createDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="createShare()">
@@ -120,6 +121,7 @@
         {{ $t('are you sure you want to delete this share?') }}
         <v-checkbox v-model="deleteDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" />
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" @click="deleteDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deleteShare(deleteDialog.share, deleteDialog.deleteDirectory)">
@@ -151,6 +153,7 @@
           <v-switch v-model="editDialog.case_sensitive" :label="$t('case sensitive')" inset hide-details density="compact" class="ml-4" color="green" />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="editDialog.value = false">{{ $t('cancel') }}</v-btn>
@@ -178,6 +181,7 @@
           dense
         />
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="targetDevicesDialog.value = false">{{ $t('close') }}</v-btn>

@@ -149,6 +149,7 @@
           <v-switch v-model="createDialog.start_after_creation" :label="$t('start after creation')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
         </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="createDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>

@@ -52,6 +52,7 @@
         <v-select v-model="installToDiskDialog.filesystem" :items="['ext4', 'btrfs', 'xfs', 'vfat']" :label="$t('filesystem')" required outlined></v-select>
         <v-switch v-model="installToDiskDialog.extra_partition" :label="$t('extra partition')" inset color="green" hide-details="auto"></v-switch>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn text @click="installToDiskDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>

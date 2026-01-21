@@ -201,24 +201,27 @@
   <!-- Update OS Dialog -->
   <v-dialog v-model="updateOsDialog.value" max-width="600">
     <v-card max-width="600" prepend-icon="mdi-update" :title="t('update system')" class="pa-0">
-      <v-card-text>
-        <p class="mb-4">{{ t('please select your target firmware!') }}</p>
-        <p v-if="osInfo && osInfo.mos">
-          <b>{{ $t('mos version') }}:</b>
-          {{ osInfo.mos.version }}
-        </p>
-        <p v-if="osInfo && osInfo.mos">
-          <b>{{ $t('mos channel') }}:</b>
-          {{ osInfo.mos.channel }}
-        </p>
-        <p v-if="osInfo && osInfo.mos" class="mb-4">
-          <b>{{ $t('mos kernel') }}:</b>
-          {{ osInfo.mos.running_kernel }}
-        </p>
-        <v-select v-model="updateOsDialog.channel" :items="getMosChannels()" :label="t('channel')"></v-select>
-        <v-select v-model="updateOsDialog.release" :items="getMosReleasesOfChannel()" :label="t('release')"></v-select>
-        <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact" color="green" hide-details="auto" />
+      <v-card-text class="pa-0">
+        <div style="max-height: 60vh; overflow-y: auto; padding: 16px; padding-bottom: 32px">
+          <p class="mb-4">{{ t('please select your target firmware!') }}</p>
+          <p v-if="osInfo && osInfo.mos">
+            <b>{{ $t('mos version') }}:</b>
+            {{ osInfo.mos.version }}
+          </p>
+          <p v-if="osInfo && osInfo.mos">
+            <b>{{ $t('mos channel') }}:</b>
+            {{ osInfo.mos.channel }}
+          </p>
+          <p v-if="osInfo && osInfo.mos" class="mb-4">
+            <b>{{ $t('mos kernel') }}:</b>
+            {{ osInfo.mos.running_kernel }}
+          </p>
+          <v-select v-model="updateOsDialog.channel" :items="getMosChannels()" :label="t('channel')"></v-select>
+          <v-select v-model="updateOsDialog.release" :items="getMosReleasesOfChannel()" :label="t('release')"></v-select>
+          <v-switch v-model="updateOsDialog.update_kernel" :label="t('update kernel')" inset density="compact" color="green" hide-details="auto" />
+        </div>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="updateOsDialog.value = false"></v-btn>
         <v-btn color="onPrimary" :text="t('ok')" @click="updateOS"></v-btn>
@@ -229,10 +232,13 @@
   <!-- Update Kernel Dialog -->
   <v-dialog v-model="updateKernelDialog.value" max-width="600">
     <v-card max-width="600" prepend-icon="mdi-engine" :title="t('update kernel')" class="pa-0">
-      <v-card-text>
-        <p class="mb-4">{{ t('please select your target kernel release!') }}</p>
-        <v-select v-model="updateKernelDialog.version" :items="['recommended', ...mosKernel.map((k) => k.tag_name)]" :label="t('kernel release')" hide-details="auto" />
+      <v-card-text class="pa-0">
+        <div style="max-height: 60vh; overflow-y: auto; padding: 16px; padding-bottom: 32px">
+          <p class="mb-4">{{ t('please select your target kernel release!') }}</p>
+          <v-select v-model="updateKernelDialog.version" :items="['recommended', ...mosKernel.map((k) => k.tag_name)]" :label="t('kernel release')" hide-details="auto" />
+        </div>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="updateKernelDialog.value = false"></v-btn>
         <v-btn color="onPrimary" :text="t('ok')" @click="updateKernel(updateKernelDialog.version)"></v-btn>
@@ -246,6 +252,7 @@
       <v-card-text>
         <p class="mb-4">{{ t('are you sure you want to rollback to the previous kernel version?') }}</p>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="rollbackKernelDialog = false"></v-btn>
         <v-btn color="red" :text="t('ok')" @click="rollbackKernel()"></v-btn>
@@ -256,6 +263,7 @@
   <!-- Reboot Dialog -->
   <v-dialog v-model="rebootDialog" max-width="600">
     <v-card max-width="400" prepend-icon="mdi-update" :text="t('do you want to reboot your system?')" :title="t('reboot')" class="pa-0">
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="rebootDialog = false"></v-btn>
         <v-btn color="onPrimary" :text="t('ok')" @click="rebootOS"></v-btn>
@@ -266,6 +274,7 @@
   <!-- Shutdown Dialog -->
   <v-dialog v-model="shutdownDialog" max-width="600">
     <v-card max-width="400" prepend-icon="mdi-update" :text="t('do you want to shutdown your system?')" :title="t('shutdown')" class="pa-0">
+      <v-divider />
       <v-card-actions>
         <v-btn color="onPrimary" :text="t('cancel')" @click="shutdownDialog = false"></v-btn>
         <v-btn color="onPrimary" :text="t('ok')" @click="shutdownOS"></v-btn>
@@ -281,22 +290,24 @@
         <p>{{ t('thanks you for your use and feedback') }}!</p>
       </v-card-text>
       <v-card-text class="font-weight-bold py-0 pt-2 pb-2">{{ t('used software and packages') }}:</v-card-text>
-      <v-card-text style="overflow-y: auto; flex: 1 1 auto; padding-right: 16px" class="py-0">
-        <v-container v-if="osInfo && osInfo.base && osInfo.base.length" v-for="(baseItem, i) in osInfo.base" :key="i" class="pa-0">
-          <div class="text-subtitle-1 font-weight-medium">
-            {{ baseItem.os_name }}
-            <span v-if="baseItem.os_version">({{ baseItem.os_version }})</span>
+      <div style="overflow-y: auto; flex: 1 1 auto; padding-right: 16px; padding-left: 16px">
+        <v-container v-if="osInfo && osInfo.base && osInfo.base.length" class="pa-0">
+          <div v-for="(baseItem, i) in osInfo.base" :key="i" class="pa-0 mb-4">
+            <div class="text-subtitle-1 font-weight-medium">
+              {{ baseItem.os_name }}
+              <span v-if="baseItem.os_version">({{ baseItem.os_version }})</span>
+            </div>
+            <v-list class="pa-0">
+              <v-list-item v-for="pkg in baseItem.packages" :key="pkg.name">
+                <div class="v-list-item-content">
+                  <v-list-item-title class="text-body-1">{{ pkg.name }}</v-list-item-title>
+                  <v-list-item-subtitle class="text--secondary">{{ pkg.version }}</v-list-item-subtitle>
+                </div>
+              </v-list-item>
+            </v-list>
           </div>
-          <v-list class="pa-0">
-            <v-list-item v-for="pkg in baseItem.packages" :key="pkg.name">
-              <div class="v-list-item-content">
-                <v-list-item-title class="text-body-1">{{ pkg.name }}</v-list-item-title>
-                <v-list-item-subtitle class="text--secondary">{{ pkg.version }}</v-list-item-subtitle>
-              </div>
-            </v-list-item>
-          </v-list>
         </v-container>
-      </v-card-text>
+      </div>
       <v-divider />
       <v-card-actions style="position: sticky; bottom: 0; z-index: 2; background: var(--v-theme-surface, #fff)">
         <v-btn color="onPrimary" :text="t('close')" @click="thanksDialog = false"></v-btn>
@@ -363,11 +374,6 @@
                 <v-icon color="#1DA1F2">mdi-twitter</v-icon>
               </v-btn>
             </v-col>
-            <!--<v-col cols="auto">
-              <v-btn variant="text" icon size="small" href="mailto:info@example.com" :aria-label="'Mail'" title="Mail">
-                <v-icon color="#D44638">mdi-email</v-icon>
-              </v-btn>
-            </v-col>-->
           </v-row>
         </v-card-text>
         <v-divider />
