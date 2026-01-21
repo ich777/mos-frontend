@@ -1043,5 +1043,6 @@
   "pinned cores": "Pinned Cores",
   "bios": "BIOS",
   "target": "Target",
-  "address": "Address"
+  "address": "Address",
+  "backing storage": "Backing Storage"
 }

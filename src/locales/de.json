@@ -1043,5 +1043,6 @@
   "pinned cores": "Festgelegte Kerne",
   "bios": "BIOS",
   "target": "Ziel",
-  "address": "Adresse"
+  "address": "Adresse",
+  "backing storage": "Unterstützender Speicher"
 }
