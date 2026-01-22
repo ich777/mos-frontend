@@ -22,6 +22,34 @@ jobs:
       with:
         node-version: '22.19.0'
 
+    - name: Get latest noVNC and add it to public
+      id: version
+      run: |
+        wget https://github.com/novnc/noVNC/archive/refs/heads/master.tar.gz -O novnc.tar.gz
+        mkdir -p public/novnc
+        tar -C public/novnc/ --strip-components=1 -xf novnc.tar.gz
+        rm -rf public/novnc/{docs,eslint.config.mjs,karma.conf.cjs,po,README.md,snap,tests,utils}
+        awk '/EMBEDDING.md/ {
+            print;
+            print ""
+            print "        // MOS Custom: Set VM icon as favicon and title from URL params";
+            print "        const urlParams = new URLSearchParams(window.location.search);";
+            print "        const iconParam = urlParams.get('\''icon'\'');";
+            print "        const titleParam = urlParams.get('\''title'\'');";
+            print "        if (iconParam) {";
+            print "            const link = document.querySelector(\"link[rel='\''icon'\'']\") || document.createElement('\''link'\'');";
+            print "            link.type = '\''image/png'\'';";
+            print "            link.rel = '\''icon'\'';";
+            print "            link.href = iconParam;";
+            print "            document.head.appendChild(link);";
+            print "        }";
+            print "        if (titleParam) {";
+            print "            document.title = `VNC - ${titleParam}`;";
+            print "        }";
+            next;
+        }
+        {print}' public/novnc/vnc.html > temp && mv temp public/novnc/vnc.html
+
     - name: Install dependencies
       run: npm install
 
