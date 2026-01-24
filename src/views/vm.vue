@@ -1073,17 +1073,30 @@ const openVnc = async (vmName) => {
     }
 
     const { wsPath, token } = await res.json();
+
+    const vm = vms.value.find(v => v.name === vmName);
+    let iconUrl = '';
+    if (vm?.customIcon) {
+      iconUrl = `/vm_custom/${vmName}.png`;
+    } else if (vm?.icon) {
+      iconUrl = `/os_icons/${vm.icon}.png`;
+    }
+
     const width = 1280;
     const height = 1024;
     const left = (screen.width - width) / 2;
     const top = (screen.height - height) / 2;
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const host = window.location.hostname;
     const port = window.location.port || (window.location.protocol === 'https:' ? '443' : '80');
     const path = wsPath.substring(1); 
 
+    let url = `/novnc/vnc.html?host=${host}&port=${port}&path=${encodeURIComponent(path)}&autoconnect=true&resize=scale&title=${encodeURIComponent(vmName)}`;
+    if (iconUrl) {
+      url += `&icon=${encodeURIComponent(iconUrl)}`;
+    }
+
     window.open(
-      `/novnc/vnc.html?host=${host}&port=${port}&path=${encodeURIComponent(path)}&autoconnect=true&resize=scale`,
+      url,
       `vnc-${vmName}`,
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no`
     );
