@@ -70,7 +70,7 @@
                 </v-btn>
               </v-col>
             </v-row>
-            <div v-for="(path, i) in form.paths" :key="i" class="mb-2">
+            <div v-for="(path, i) in form.paths" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -95,13 +95,13 @@
                 <v-col cols="11">
                   <v-row>
                     <v-col cols="6">
-                      <v-text-field :label="$t('name')" v-model="path.name" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('name')" v-model="path.name" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field :label="$t('mode')" v-model="path.mode" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('mode')" v-model="path.mode" density="compact" hide-details></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row class="mt-n8">
+                  <v-row class="mt-n4">
                     <v-col cols="6">
                       <v-text-field
                         :label="$t('host')"
@@ -120,6 +120,16 @@
                       <v-text-field :label="$t('container')" v-model="path.container" density="compact" hide-details></v-text-field>
                     </v-col>
                   </v-row>
+                  <v-row class="mt-n4">
+                    <v-col cols="12">
+                      <v-text-field
+                        :label="$t('description')"
+                        v-model="path.description"
+                        density="compact"
+                        hide-details
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>                  
                 </v-col>
               </v-row>
             </div>
@@ -142,7 +152,7 @@
                 </v-btn>
               </v-col>
             </v-row>
-            <div v-for="(port, i) in form.ports" :key="i" class="mb-2">
+            <div v-for="(port, i) in form.ports" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -167,18 +177,28 @@
                 <v-col cols="11">
                   <v-row>
                     <v-col cols="6">
-                      <v-text-field :label="$t('name')" v-model="port.name" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('name')" v-model="port.name" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field :label="$t('protocol')" v-model="port.protocol" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('protocol')" v-model="port.protocol" density="compact" hide-details></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row class="mt-n8">
+                  <v-row class="mt-n4">
                     <v-col cols="6">
                       <v-text-field :label="$t('host')" v-model="port.host" type="number" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
                       <v-text-field :label="$t('container')" v-model="port.container" type="number" density="compact" hide-details></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row class="mt-n4">
+                    <v-col cols="12">
+                      <v-text-field
+                        :label="$t('description')"
+                        v-model="port.description"
+                        density="compact"
+                        hide-details
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -203,7 +223,7 @@
                 </v-btn>
               </v-col>
             </v-row>
-            <div v-for="(device, i) in form.devices" :key="i" class="mb-2">
+            <div v-for="(device, i) in form.devices" :key="i">
               <v-divider v-if="i > 0" class="my-2"></v-divider>
               <v-row>
                 <v-col cols="1" class="d-flex flex-column justify-center align-center">
@@ -228,15 +248,25 @@
                 <v-col cols="11">
                   <v-row>
                     <v-col cols="6">
-                      <v-text-field :label="$t('name')" v-model="device.name" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('name')" v-model="device.name" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field :label="$t('host')" v-model="device.host" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('host')" v-model="device.host" density="compact" hide-details></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row class="mt-n8">
+                  <v-row class="mt-n4">
                     <v-col cols="12">
                       <v-text-field :label="$t('container')" v-model="device.container" density="compact" hide-details></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row class="mt-n4">
+                    <v-col cols="12">
+                      <v-text-field
+                        :label="$t('description')"
+                        v-model="device.description"
+                        density="compact"
+                        hide-details
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -295,18 +325,28 @@
                 <v-col cols="11">
                   <v-row>
                     <v-col cols="6">
-                      <v-text-field :label="$t('name')" v-model="variable.name" density="compact" hide-details class="mb-4"></v-text-field>
+                      <v-text-field :label="$t('name')" v-model="variable.name" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
-                      <v-switch :label="$t('masked')" v-model="variable.mask" inset color="green" density="compact" hide-details class="mb-4"></v-switch>
+                      <v-switch :label="$t('masked')" v-model="variable.mask" inset color="green" density="compact" hide-details></v-switch>
                     </v-col>
                   </v-row>
-                  <v-row class="mt-n8">
+                  <v-row class="mt-n4">
                     <v-col cols="6">
                       <v-text-field :label="$t('key')" v-model="variable.key" density="compact" hide-details></v-text-field>
                     </v-col>
                     <v-col cols="6">
                       <v-text-field :label="$t('value')" v-model="variable.value" density="compact" :type="variable.mask ? 'password' : 'text'" hide-details></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row class="mt-n4">
+                    <v-col cols="12">
+                      <v-text-field
+                        :label="$t('description')"
+                        v-model="variable.description"
+                        density="compact"
+                        hide-details
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -630,6 +670,7 @@ const fillFormFromJson = (jsonData) => {
         mode: path.mode || '',
         host: path.host || '',
         container: path.container || '',
+        description: path.description || '',
       }))
     : [];
   form.value.ports = Array.isArray(jsonData.ports)
@@ -638,6 +679,7 @@ const fillFormFromJson = (jsonData) => {
         protocol: port.protocol || '',
         host: port.host || '',
         container: port.container || '',
+        description: port.description || '',
       }))
     : [];
   form.value.variables = Array.isArray(jsonData.variables)
@@ -646,6 +688,7 @@ const fillFormFromJson = (jsonData) => {
         key: variable.key || '',
         value: variable.value || '',
         mask: variable.mask || false,
+        description: variable.description || '',
       }))
     : [];
   form.value.devices = Array.isArray(jsonData.devices)
@@ -653,6 +696,7 @@ const fillFormFromJson = (jsonData) => {
         name: device.name || '',
         host: device.host || '',
         container: device.container || '',
+        description: device.description || '',
       }))
     : [];
   form.gpus = Array.isArray(jsonData.gpus) ? jsonData.gpus : [];
@@ -679,23 +723,27 @@ const createDocker = async () => {
         mode: path.mode,
         host: path.host,
         container: path.container,
+        description: path.description,
       })),
       ports: form.value.ports.map((port) => ({
         name: port.name,
         protocol: port.protocol,
         host: port.host,
         container: port.container,
+        description: port.description,
       })),
       variables: form.value.variables.map((variable) => ({
         name: variable.name,
         key: variable.key,
         value: variable.value,
         mask: variable.mask,
+        description: variable.description,
       })),
       devices: form.value.devices.map((device) => ({
         name: device.name,
         host: device.host,
         container: device.container,
+        description: device.description,
       })),
       gpus: form.gpus,
     },
@@ -783,6 +831,7 @@ const getDockerTemplate = async (docker, installed) => {
             mode: path.mode,
             host: path.host,
             container: path.container,
+            description: path.description,
           }))
         : [];
       form.value.ports = Array.isArray(result.ports)
@@ -791,6 +840,7 @@ const getDockerTemplate = async (docker, installed) => {
             protocol: port.protocol,
             host: port.host,
             container: port.container,
+            description: port.description,
           }))
         : [];
       form.value.variables = Array.isArray(result.variables)
@@ -799,6 +849,7 @@ const getDockerTemplate = async (docker, installed) => {
             key: variable.key,
             value: variable.value,
             mask: variable.mask || false,
+            description: variable.description,
           }))
         : [];
       form.value.devices = Array.isArray(result.devices)
@@ -806,6 +857,7 @@ const getDockerTemplate = async (docker, installed) => {
             name: device.name,
             host: device.host,
             container: device.container,
+            description: device.description,
           }))
         : [];
       form.value.gpus = Array.isArray(result.gpus) ? result.gpus : [];
