@@ -224,6 +224,8 @@
       <v-card-title>{{ $t('confirm delete') }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this nfs share?') }}
+        <v-checkbox v-model="deleteNfsDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" density="compact" hide-details=""/>
+        <v-checkbox v-model="deleteNfsDialog.removePathRule" :label="$t('remove path rule')" density="compact" hide-details=""/>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -415,6 +417,8 @@ const deleteSmbDialog = reactive({
 const deleteNfsDialog = reactive({
   value: false,
   share: null,
+  deleteDirectory: false,
+  removePathRule: true
 });
 const sharesLoading = ref(true);
 const openFsDialog = (cb, mntPoint = '/') => {
@@ -655,6 +659,10 @@ const deleteShareSmb = async () => {
 
 const deleteShareNfs = async () => {
   deleteNfsDialog.value = false;
+  const payload = {
+    deleteDirectory: deleteNfsDialog.deleteDirectory,
+    removePathRule: deleteNfsDialog.removePathRule,
+  };
 
   try {
     overlay.value = true;
@@ -662,7 +670,9 @@ const deleteShareNfs = async () => {
       method: 'DELETE',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify(payload),
     });
     overlay.value = false;
 
