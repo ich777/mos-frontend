@@ -84,7 +84,7 @@
                           </template>
                           <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="openEditSmbDialog(share)">
+                        <v-list-item @click="openEditNfsDialog(share)">
                           <template #prepend>
                             <v-icon>mdi-text-box-edit</v-icon>
                           </template>
@@ -206,7 +206,8 @@
       <v-card-title>{{ $t('confirm delete') }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this share?') }}
-        <v-checkbox v-model="deleteSmbDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" />
+        <v-checkbox v-model="deleteSmbDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" density="compact" hide-details="" />
+        <v-checkbox v-model="deleteSmbDialog.removePathRule" :label="$t('remove path rule')" density="compact" hide-details="" />
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -224,8 +225,8 @@
       <v-card-title>{{ $t('confirm delete') }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this nfs share?') }}
-        <v-checkbox v-model="deleteNfsDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" density="compact" hide-details=""/>
-        <v-checkbox v-model="deleteNfsDialog.removePathRule" :label="$t('remove path rule')" density="compact" hide-details=""/>
+        <v-checkbox v-model="deleteNfsDialog.deleteDirectory" :label="$t('delete directory')" class="mt-4" density="compact" hide-details="" />
+        <v-checkbox v-model="deleteNfsDialog.removePathRule" :label="$t('remove path rule')" density="compact" hide-details="" />
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -237,7 +238,7 @@
     </v-card>
   </v-dialog>
 
-  <!-- Edit Dialog -->
+  <!-- Edit Smb Dialog -->
   <v-dialog v-model="editSmbDialog.value" max-width="500">
     <v-card class="pa-0">
       <v-card-title>{{ $t('edit share') }}</v-card-title>
@@ -264,6 +265,34 @@
         <v-spacer />
         <v-btn color="onPrimary" @click="editSmbDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="updateShareSmb(editSmbDialog)">
+          {{ $t('save') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Edit Nfs Dialog -->
+  <v-dialog v-model="editNfsDialog.value" max-width="500">
+    <v-card class="pa-0">
+      <v-card-title>{{ $t('edit nfs share') }}</v-card-title>
+      <v-card-text>
+        <v-form>
+          <v-text-field v-model="editNfsDialog.name" :label="$t('share name')" readonly />
+          <v-text-field v-model="editNfsDialog.path" :label="$t('path')" readonly />
+          <v-text-field v-model="editNfsDialog.source" :label="$t('source')" required />
+          <v-text-field v-model="editNfsDialog.anonuid" :label="$t('anonymous uid')" type="number" />
+          <v-text-field v-model="editNfsDialog.anongid" :label="$t('anonymous gid')" type="number" />
+          <v-text-field v-model="editNfsDialog.write_operations" :label="$t('write operations')" />
+          <v-text-field v-model="editNfsDialog.mapping" :label="$t('mapping')" />
+          <v-switch v-model="editNfsDialog.read_only" :label="$t('read only')" inset hide-details density="compact" class="ml-4" color="green" />
+          <v-switch v-model="editNfsDialog.secure" :label="$t('secure')" inset hide-details density="compact" class="ml-4" color="green" />
+        </v-form>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="editNfsDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="updateShareNfs(editNfsDialog)">
           {{ $t('save') }}
         </v-btn>
       </v-card-actions>
@@ -409,16 +438,32 @@ const editSmbDialog = reactive({
   write_list: [],
   valid_users: [],
 });
+const editNfsDialog = reactive({
+  value: false,
+  id: '',
+  name: '',
+  path: '',
+  source: '',
+  enabled: true,
+  read_only: false,
+  anonuid: null,
+  anongid: null,
+  write_operations: '',
+  mapping: '',
+  secure: true,
+  pool: '',
+});
 const deleteSmbDialog = reactive({
   value: false,
   share: null,
   deleteDirectory: false,
+  removePathRule: false,
 });
 const deleteNfsDialog = reactive({
   value: false,
   share: null,
   deleteDirectory: false,
-  removePathRule: true
+  removePathRule: false,
 });
 const sharesLoading = ref(true);
 const openFsDialog = (cb, mntPoint = '/') => {
@@ -461,13 +506,17 @@ const getShares = async () => {
       },
     });
 
-    if (!res.ok) throw new Error('API-Error');
-    const result = await res.json();
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('shares could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
 
+    const result = await res.json();
     shares.value.smb = result.smb || [];
     shares.value.nfs = result.nfs || [];
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   }
 };
 
@@ -479,11 +528,15 @@ const getPools = async () => {
       },
     });
 
-    if (!res.ok) throw new Error(t('pools could not be loaded'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('pools could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
     const result = await res.json();
     pools.value = result;
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
     return [];
   }
 };
@@ -496,10 +549,14 @@ const getSmbUsers = async () => {
       },
     });
 
-    if (!res.ok) throw new Error(t('smb users could not be loaded'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('smb users could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
     smbUsers.value = await res.json();
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
     return [];
   }
 };
@@ -537,18 +594,21 @@ const createShareSmb = async () => {
       },
       body: JSON.stringify(newShare),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('share could not be created'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('share could not be created')}|$| ${error.error || t('unknown error')}`);
+    }
     showSnackbarSuccess(t('share created successfully'));
 
     createSmbDialog.value = false;
     clearCreateSmbDialog();
-
     getShares();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -577,9 +637,11 @@ const createShareNfs = async () => {
       },
       body: JSON.stringify(newShare),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('nfs share could not be created'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('nfs share could not be created')}|$| ${error.error || t('unknown error')}`);
+    }
     showSnackbarSuccess(t('nfs share created successfully'));
 
     createNfsDialog.value = false;
@@ -587,14 +649,16 @@ const createShareNfs = async () => {
 
     getShares();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
 const updateShareSmb = async (shareDialog) => {
   editSmbDialog.value = false;
-  const editShare = {
+  const payload = {
     comment: shareDialog.comment,
     enabled: shareDialog.enabled,
     read_only: shareDialog.read_only,
@@ -616,24 +680,67 @@ const updateShareSmb = async (shareDialog) => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
-      body: JSON.stringify(editShare),
+      body: JSON.stringify(payload),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('share could not be updated'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('share could not be updated')}|$| ${error.error || t('unknown error')}`);
+    } 
+
     showSnackbarSuccess(t('share updated successfully'));
-
     clearEditSmbDialog();
     getShares();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
+  }
+};
+
+const updateShareNfs = async (shareDialog) => {
+  editNfsDialog.value = false;
+  const payload = {
+    source: shareDialog.source,
+    enabled: shareDialog.enabled,
+    read_only: shareDialog.read_only,
+    anonuid: shareDialog.anonuid,
+    anongid: shareDialog.anongid,
+    write_operations: shareDialog.write_operations,
+    mapping: shareDialog.mapping,
+    secure: shareDialog.secure,
+  };
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/shares/nfs/${encodeURIComponent(shareDialog.id)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('nfs share could not be updated')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('nfs share updated successfully'));
+    clearEditNfsDialog();
+    getShares();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
   }
 };
 
 const deleteShareSmb = async () => {
   deleteSmbDialog.value = false;
-  const delShare = deleteSmbDialog.deleteDirectory ? { deleteDirectory: true } : {};
+  const payload = deleteSmbDialog.deleteDirectory ? { deleteDirectory: true } : {};
 
   try {
     overlay.value = true;
@@ -643,17 +750,22 @@ const deleteShareSmb = async () => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(delShare),
+      body: JSON.stringify(payload),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('share could not be deleted'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('nfs share could not be deleted')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('share deleted successfully'));
     getShares();
     clearDeleteSmbDialog();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -674,15 +786,20 @@ const deleteShareNfs = async () => {
       },
       body: JSON.stringify(payload),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('nfs share could not be deleted'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('nfs share could not be deleted')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('nfs share deleted successfully'));
     getShares();
     clearDeleteNfsDialog();
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 
@@ -693,16 +810,21 @@ const getTargetDevicesSmb = async (share) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
       },
     });
-    if (!res.ok) throw new Error(t('target devices could not be loaded'));
-    const result = await res.json();
 
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('target devices could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const result = await res.json();
     if (result.data != null && result.data.pathRule != null && result.data.pathRule.targetDevices.length > 0) {
       return result.data.pathRule.targetDevices;
     } else {
       return [];
     }
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
     return [];
   }
 };
@@ -723,12 +845,16 @@ const setTargetDevicesSmb = async (share, devices) => {
       body: JSON.stringify(payload),
     });
 
-    if (!res.ok) throw new Error(t('target devices could not be set'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('target devices could not be set')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('target devices set successfully'));
     targetDevicesDialog.value = false;
   } catch (e) {
-    overlay.value = false;
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     overlay.value = false;
   }
@@ -768,10 +894,14 @@ const openCreateNfsDialog = () => {
 const openDeleteSmbDialog = (share) => {
   deleteSmbDialog.value = true;
   deleteSmbDialog.share = share;
+  deleteSmbDialog.deleteDirectory = false;
+  deleteSmbDialog.removePathRule = false;
 };
 const openDeleteNfsDialog = (share) => {
   deleteNfsDialog.value = true;
   deleteNfsDialog.share = share;
+  deleteNfsDialog.deleteDirectory = false;
+  deleteNfsDialog.removePathRule = false;
 };
 const openEditSmbDialog = (share) => {
   editSmbDialog.value = true;
@@ -790,6 +920,21 @@ const openEditSmbDialog = (share) => {
   editSmbDialog.preserve_case = share.preserve_case || true;
   editSmbDialog.case_sensitive = share.case_sensitive || true;
   editSmbDialog.comment = share.comment || '';
+};
+const openEditNfsDialog = (share) => {
+  editNfsDialog.value = true;
+  editNfsDialog.id = share.id;
+  editNfsDialog.name = share.name;
+  editNfsDialog.path = share.path;
+  editNfsDialog.source = share.source;
+  editNfsDialog.enabled = share.enabled;
+  editNfsDialog.read_only = share.read_only;
+  editNfsDialog.anonuid = share.anonuid;
+  editNfsDialog.anongid = share.anongid;
+  editNfsDialog.write_operations = share.write_operations;
+  editNfsDialog.mapping = share.mapping;
+  editNfsDialog.secure = share.secure;
+  editNfsDialog.pool = share.pool;
 };
 const openTargetDevicesDialog = async (share) => {
   targetDevicesDialog.value = true;
@@ -830,6 +975,21 @@ const clearEditSmbDialog = () => {
   editSmbDialog.read_only = false;
   editSmbDialog.write_list = [];
   editSmbDialog.valid_users = [];
+};
+const clearEditNfsDialog = () => {
+  editNfsDialog.value = false;
+  editNfsDialog.id = '';
+  editNfsDialog.name = '';
+  editNfsDialog.path = '';
+  editNfsDialog.source = '';
+  editNfsDialog.enabled = true;
+  editNfsDialog.read_only = false;
+  editNfsDialog.anonuid = null;
+  editNfsDialog.anongid = null;
+  editNfsDialog.write_operations = '';
+  editNfsDialog.mapping = '';
+  editNfsDialog.secure = true;
+  editNfsDialog.pool = '';
 };
 const clearDeleteSmbDialog = () => {
   deleteSmbDialog.value = false;
