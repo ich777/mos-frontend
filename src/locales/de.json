@@ -1094,5 +1094,9 @@
   "are you sure you want to delete this smb share?": "Bist du sicher, dass du diese SMB Freigabe löschen möchtest?",
   "remote mounts": "Remote Mounts",
   "remove path rule": "Pfadregel entfernen",
-  "shares could not be loaded": "Freigaben konnten nicht geladen werden"
+  "shares could not be loaded": "Freigaben konnten nicht geladen werden",
+  "eta": "ETA",
+  "stripes": "Stripes",
+  "height": "Höhe",
+  "snapraid operation executed successfully": "SnapRAID Operation erfolgreich ausgeführt"
 }

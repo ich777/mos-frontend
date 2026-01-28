@@ -84,7 +84,21 @@
                     </template>
                     <v-list-item-title class="d-flex align-center">
                       {{ parity_device.device }}
-                      <v-chip v-if="pool.status.parity_operation" color="green" size="small" class="ml-2" label>{{ $t('operation running') }}</v-chip>
+                      <v-tooltip v-if="pool.status?.parity_operation" location="top">
+                        <template #activator="{ props }">
+                            <v-chip v-bind="props" color="green" size="small" class="ml-2" label>
+                            {{ $t('operation running') }} &nbsp;
+                            <span v-if="pool.status?.parity_progress?.percent != null">
+                              ({{ Math.round(pool.status.parity_progress.percent) }}%)
+                            </span>
+                          </v-chip>
+                        </template>
+                        {{ $t('status') }}: {{ pool.status.parity_progress.status }} <br />
+                        {{ $t('speed') }}: {{ pool.status.parity_progress.sspeed }}<br />
+                        {{ $t('height') }}: {{ pool.status.parity_progress.height }}<br />
+                        {{ $t('stripes') }}: {{ pool.status.parity_progress.stripes }}<br />
+                        {{ $t('eta') }}: {{ pool.status.parity_progress.eta }}<br />
+                      </v-tooltip>
                       <v-spacer />
                       <v-chip color="onPrimary" size="small" class="ml-2" label>
                         {{ parity_device.filesystem }}
