@@ -1,9 +1,16 @@
 <template>
     <v-container fluid class="d-flex justify-center">
         <v-container style="width: 100%; max-width: 1920px;" class="pa-0">
-            <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
-                <h2>{{ $t('webterminal') }}</h2>
-            </v-container>
+      <v-container col="12" fluid class="pt-0 pr-0 pl-0 pb-4">
+        <v-row>
+          <v-col cols="auto" class="d-flex align-center">
+            <v-icon @click="$router.back()" class="mr-2">mdi-arrow-left</v-icon>
+          </v-col>
+          <v-col>
+            <h2>{{ $t('tools') }}</h2>
+          </v-col>
+        </v-row>
+      </v-container>
             <div id="terminal" style="width: 100%; height: 420px; padding: 8px; background: #000000;"></div>
         </v-container>
     </v-container>

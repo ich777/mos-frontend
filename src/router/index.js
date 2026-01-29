@@ -14,6 +14,8 @@ import DockerChange from '../views/docker/dockerChange.vue';
 import DockerCompose from '../views/docker/dockerCompose.vue';
 import mosHub from '../views/mosHub.vue';
 import profile from '../views/profile.vue';
+import mosTools from '../views/mosTools.vue';
+import mosToolsWebterminal from '../views/mosTools/webterminal.vue';
 import mosSettings from '../views/mosSettings.vue';
 import mosSettingsDocker from '../views/mosSettings/dockerService.vue';
 import mosSettingsLXC from '../views/mosSettings/lxcService.vue';
@@ -29,7 +31,6 @@ import mosSettingsHub from '../views/mosSettings/mosHub.vue';
 import mosSettingsSensors from '../views/mosSettings/sensors.vue';
 import mosSettingsZram from '../views/mosSettings/zram.vue';
 import mosSettingsToken from '../views/mosSettings/token.vue';
-import webterminal from '../views/webterminal.vue';
 import webterminalPopup from '../views/webterminalPopup.vue';
 import Notifications from '../views/notifications.vue';
 import RemoteMounting from '../views/remoteMounting.vue';
@@ -69,6 +70,8 @@ const routes = [
   { path: '/mosHub', component: mosHub, meta: { hideAppBar: false, title: 'MOS Hub', description: 'Manage MOS Hub' } },
   { path: '/lxc', component: LXC, meta: { hideAppBar: false, title: 'LXC', description: 'Manage LXC containers' } },
   { path: '/vm', component: Vm, meta: { hideAppBar: false, title: 'VM', description: 'Manage virtual machines' } },
+  { path: '/mosTools', component: mosTools, meta: { hideAppBar: false, title: 'MOS Tools', description: 'Manage MOS tools' } },
+  { path: '/mosTools/webTerminal', component: mosToolsWebterminal, meta: { hideAppBar: false, title: 'Web Terminal', description: 'Access the web terminal' } },
   { path: '/mosSettings', component: mosSettings, meta: { hideAppBar: false, title: 'MOS Settings', description: 'Manage MOS settings' } },
   { path: '/mosSettings/docker', component: mosSettingsDocker, meta: { hideAppBar: false, title: 'MOS Settings - Docker', description: 'Manage Docker settings' } },
   { path: '/mosSettings/lxc', component: mosSettingsLXC, meta: { hideAppBar: false, title: 'MOS Settings - LXC', description: 'Manage LXC settings' } },
@@ -93,7 +96,6 @@ const routes = [
   { path: '/mosSettings/zram', component: mosSettingsZram, meta: { hideAppBar: false, title: 'MOS Settings - ZRAM', description: 'Manage ZRAM settings' } },
   { path: '/mosSettings/token', component: mosSettingsToken, meta: { hideAppBar: false, title: 'MOS Settings - Token', description: 'Manage API token' } },
   { path: '/profile', component: profile, meta: { hideAppBar: false, title: 'Profile', description: 'Manage your profile' } },
-  { path: '/webTerminal', component: webterminal, meta: { hideAppBar: false, title: 'Web Terminal', description: 'Access the web terminal' } },
   {
     path: '/webTerminalPopup',
     component: webterminalPopup,
@@ -101,11 +103,11 @@ const routes = [
   },
   { path: '/notifications', component: Notifications, meta: { hideAppBar: false, title: 'Notifications', description: 'View your notifications' } },
   { path: '/plugins', component: Plugins, meta: { hideAppBar: false, title: 'Plugins', description: 'Manage installed plugins' } },
-  { 
-    path: '/plugin/:pluginName', 
-    component: PluginView, 
+  {
+    path: '/plugins/:pluginName',
+    component: PluginView,
     props: true,
-    meta: { hideAppBar: false, title: 'Plugin', description: 'Plugin view' } 
+    meta: { hideAppBar: false, title: 'Plugin', description: 'Plugin view' },
   },
 ];
 

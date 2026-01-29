@@ -60,13 +60,13 @@
           <v-list-item to="/users" prepend-icon="mdi-account">
             <v-list-item-title>{{ $t('users') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/webTerminal" prepend-icon="mdi-powershell">
-            <v-list-item-title>{{ $t('webterminal') }}</v-list-item-title>
-          </v-list-item>
           <v-list-item to="/plugins" prepend-icon="mdi-puzzle">
             <v-list-item-title>{{ $t('plugins') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/mosSettings" prepend-icon="mdi-tools">
+          <v-list-item to="/mosTools" prepend-icon="mdi-tools">
+            <v-list-item-title>{{ $t('tools') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/mosSettings" prepend-icon="mdi-cog">
             <v-list-item-title>{{ $t('settings') }}</v-list-item-title>
           </v-list-item>
           <v-list-item v-on:click="logoutDialog = true" prepend-icon="mdi-logout">

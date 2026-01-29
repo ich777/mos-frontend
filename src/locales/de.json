@@ -1107,5 +1107,6 @@
   "select mergerfs policy": "Wähle MergerFS Richtlinie aus",
   "create policy": "Richtlinie erstellen",
   "read policy": "Lese-Richtlinie",
-  "search policy": "Such-Richtlinie"
+  "search policy": "Such-Richtlinie",
+  "tools": "Werkzeuge"
 }

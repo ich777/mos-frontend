@@ -107,7 +107,7 @@ export const hasMdiIcon = (plugin) => {
 };
 
 export const getPluginRoute = (plugin) => {
-  return `/plugin/${plugin.name}`;
+  return `/plugins/${plugin.name}`;
 };
 
 export const usePlugins = () => {

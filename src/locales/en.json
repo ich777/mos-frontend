@@ -1105,5 +1105,6 @@
   "mergerfs policies": "MergerFS Policies",
   "create policy": "Create Policy",
   "read policy": "Read Policy",
-  "search policy": "Search Policy"  
+  "search policy": "Search Policy",
+  "tools": "Tools"
 }
