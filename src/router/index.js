@@ -16,6 +16,7 @@ import mosHub from '../views/mosHub.vue';
 import profile from '../views/profile.vue';
 import mosTools from '../views/mosTools.vue';
 import mosToolsWebterminal from '../views/mosTools/webterminal.vue';
+import mosToolsFilebrowser from '../views/mosTools/filebrowser.vue';
 import mosSettings from '../views/mosSettings.vue';
 import mosSettingsDocker from '../views/mosSettings/dockerService.vue';
 import mosSettingsLXC from '../views/mosSettings/lxcService.vue';
@@ -71,7 +72,8 @@ const routes = [
   { path: '/lxc', component: LXC, meta: { hideAppBar: false, title: 'LXC', description: 'Manage LXC containers' } },
   { path: '/vm', component: Vm, meta: { hideAppBar: false, title: 'VM', description: 'Manage virtual machines' } },
   { path: '/mosTools', component: mosTools, meta: { hideAppBar: false, title: 'MOS Tools', description: 'Manage MOS tools' } },
-  { path: '/mosTools/webTerminal', component: mosToolsWebterminal, meta: { hideAppBar: false, title: 'Web Terminal', description: 'Access the web terminal' } },
+  { path: '/mosTools/webterminal', component: mosToolsWebterminal, meta: { hideAppBar: false, title: 'Web Terminal', description: 'Access the web terminal' } },
+  { path: '/mosTools/filebrowser', component: mosToolsFilebrowser, meta: { hideAppBar: false, title: 'File Browser', description: 'Browse files' } },
   { path: '/mosSettings', component: mosSettings, meta: { hideAppBar: false, title: 'MOS Settings', description: 'Manage MOS settings' } },
   { path: '/mosSettings/docker', component: mosSettingsDocker, meta: { hideAppBar: false, title: 'MOS Settings - Docker', description: 'Manage Docker settings' } },
   { path: '/mosSettings/lxc', component: mosSettingsLXC, meta: { hideAppBar: false, title: 'MOS Settings - LXC', description: 'Manage LXC settings' } },

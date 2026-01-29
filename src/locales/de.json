@@ -1108,5 +1108,7 @@
   "create policy": "Richtlinie erstellen",
   "read policy": "Lese-Richtlinie",
   "search policy": "Such-Richtlinie",
-  "tools": "Werkzeuge"
+  "tools": "Werkzeuge",
+  "filebrowser": "Dateibrowser",
+  "filesystem could not be loaded": "Dateisystem konnte nicht geladen werden"
 }

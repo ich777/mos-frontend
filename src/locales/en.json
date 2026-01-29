@@ -1103,8 +1103,12 @@
   "mergerfs policies could not be changed": "MergerFS policies could not be changed",
   "mergerfs policies changed successfully": "MergerFS policies changed successfully",
   "mergerfs policies": "MergerFS Policies",
+  "mergerfs policies could not be loaded": "MergerFS policies could not be loaded",
+  "select mergerfs policy": "Select MergerFS policy",
   "create policy": "Create Policy",
   "read policy": "Read Policy",
   "search policy": "Search Policy",
-  "tools": "Tools"
+  "tools": "Tools",
+  "filebrowser": "Filebrowser",
+  "filesystem could not be loaded": "Filesystem could not be loaded"
 }

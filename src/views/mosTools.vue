@@ -14,9 +14,13 @@
                 {{ $t('tools') }}
               </v-card-title>
               <v-card-text>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosTools/webTerminal">
+                <v-btn color="primary" block class="mb-2" rounded to="/mosTools/webterminal">
                   <v-icon start>mdi-powershell</v-icon>
                   {{ $t('webterminal') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosTools/filebrowser">
+                  <v-icon start>mdi-folder</v-icon>
+                  {{ $t('filebrowser') }}
                 </v-btn>
               </v-card-text>
             </v-card>
