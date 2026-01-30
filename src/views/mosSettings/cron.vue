@@ -70,9 +70,9 @@
   <v-dialog v-model="createCronJobDialog.value" max-width="600px">
     <v-card class="pa-0">
       <v-card-title>{{ $t('create cron job') }}</v-card-title>
-      <v-card-text>
+      <v-card-text class="pa-4 pt-2 pb-2 overflow-y-auto" style="max-height: 60vh">
         <v-form>
-          <v-switch v-model="createCronJobDialog.enabled" :label="$t('enabled')" inset color="green"></v-switch>
+          <v-switch v-model="createCronJobDialog.enabled" :label="$t('enabled')" inset color="green" density="compact"></v-switch>
           <v-text-field v-model="createCronJobDialog.name" :label="$t('name')" required></v-text-field>
           <v-text-field v-model="createCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
           <v-text-field v-model="createCronJobDialog.command" :label="$t('command')" required></v-text-field>
@@ -92,9 +92,9 @@
   <v-dialog v-model="changeCronJobDialog.value" max-width="600px">
     <v-card class="pa-0">
       <v-card-title>{{ $t('change cron job') }}</v-card-title>
-      <v-card-text>
+      <v-card-text class="pa-4 pt-2 pb-2 overflow-y-auto" style="max-height: 60vh">
         <v-form>
-          <v-switch v-model="changeCronJobDialog.enabled" :label="$t('enabled')" inset color="green"></v-switch>
+          <v-switch v-model="changeCronJobDialog.enabled" :label="$t('enabled')" inset color="green" density="compact"></v-switch>
           <v-text-field v-model="changeCronJobDialog.name" :label="$t('name')" required></v-text-field>
           <v-text-field v-model="changeCronJobDialog.schedule" :label="$t('schedule')" required></v-text-field>
           <v-text-field v-model="changeCronJobDialog.command" :label="$t('command')" required></v-text-field>
@@ -113,7 +113,7 @@
   <v-dialog v-model="deleteCronJobDialog.value" max-width="600px">
     <v-card class="pa-0">
       <v-card-title>{{ $t('delete cron job') }} - {{ deleteCronJobDialog.name }}</v-card-title>
-      <v-card-text>
+      <v-card-text class="pa-4 pt-2 pb-2 overflow-y-auto" style="max-height: 80vh">
         <p>{{ $t('are you sure you want to delete the cron job') }}?</p>
       </v-card-text>
       <v-divider />

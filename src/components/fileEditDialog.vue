@@ -14,7 +14,7 @@
           {{ errorMessage }}
         </v-alert>
         <div class="flex-grow-1" style="min-height: 300px; overflow: auto">
-          <v-textarea v-model="content" :loading="loading" :disabled="loading" auto-grow="false" rows="10" style="height: 100%; max-height: 100%; font-family: monospace" hide-details="auto" />
+          <v-textarea v-model="content" :loading="loading" :disabled="loading" :auto-grow="false" rows="10" style="height: 100%; max-height: 100%; font-family: monospace" hide-details="auto" />
         </div>
       </v-card-text>
       <v-divider />

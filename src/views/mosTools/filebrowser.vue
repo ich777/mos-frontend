@@ -13,18 +13,18 @@
       </v-container>
       <v-container fluid class="pa-0">
         <v-card class="pa-0">
-          <v-card-subtitle class="pb-0">
+          <v-card-title class="pb-0">
             <div class="d-flex align-center ga-2">
-              <v-btn size="small" variant="text" icon="mdi-home" @click="goRoot" color="secondary" :disabled="loading" />
-              <v-btn size="small" variant="text" icon="mdi-arrow-up" @click="goUp" color="secondary" :disabled="!canGoUp || loading" />
-              <v-btn size="small" variant="text" icon="mdi-refresh" @click="reload" color="secondary" :disabled="loading" />
+              <v-btn size="small" variant="text" icon="mdi-home" @click="goRoot" color="primary" :disabled="loading" />
+              <v-btn size="small" variant="text" icon="mdi-arrow-up" @click="goUp" color="primary" :disabled="!canGoUp || loading" />
+              <v-btn size="small" variant="text" icon="mdi-refresh" @click="reload" color="primary" :disabled="loading" />
               <v-chip size="small" class="ml-2" variant="tonal">
                 {{ currentPath || '/' }}
               </v-chip>
               <v-spacer />
-              <v-progress-circular v-if="loading" indeterminate size="20" color="secondary" />
+              <v-progress-circular v-if="loading" indeterminate size="20" color="primary" />
             </div>
-          </v-card-subtitle>
+          </v-card-title>
 
           <v-card-text class="pt-2" style="min-height: 300px; max-height: 60vh; overflow-y: auto">
             <v-alert v-if="errorMessage" type="error" density="compact" class="mb-2">
@@ -65,8 +65,8 @@
                     <span class="text-caption">{{ item.displayPath || item.path }}</span>
                   </td>
                   <td class="text-center">
-                    <v-btn v-if="item.type === 'directory'" size="small" icon="mdi-folder-open" variant="text" @click.stop="navigateInto(item)" :disabled="loading" />
-                    <v-btn v-else-if="isSelectable(item)" size="small" icon="mdi-check" variant="text" @click.stop="confirmSelect(item)" :disabled="loading" />
+                    <v-icon v-if="item.type === 'directory'" size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
+                    <v-icon v-else-if="isSelectable(item)" size="18" class="cursor-pointer" @click.stop="editFileDialogVisible = true; selectedFilePath = item.path" :disabled="loading">mdi-file-edit</v-icon>
                   </td>
                 </tr>
               </tbody>
@@ -82,20 +82,27 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <FileEditDialog v-model="editFileDialogVisible" :path="selectedFilePath" :createBackup="true" :title="$t('edit file')" @saved="onFileSaved" />
+
+  <v-overlay :model-value="overlay" class="align-center justify-center">
+    <v-progress-circular indeterminate size="64" color="primary" />
+  </v-overlay>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { showSnackbarError } from '@/composables/snackbar';
+import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
+import FileEditDialog from '@/components/fileEditDialog.vue';
 
 const modelValue = ref(true);
 const title = ref('');
-const selectType = ref('directory');
+const selectType = ref('all');
 const persistent = ref(false);
 const showSelectButton = ref(true);
 const roots = ref('');
-const emit = defineEmits(['update:modelValue', 'selected', 'cancel']);
+const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge', 'update:modelValue', 'selected', 'cancel']);
 const { t } = useI18n();
 const internalVisible = computed({
   get: () => modelValue.value,
@@ -108,6 +115,9 @@ const canGoUp = ref(false);
 const parentPath = ref(null);
 const errorMessage = ref('');
 const activeItem = ref(null);
+const overlay = ref(false);
+const editFileDialogVisible = ref(false);
+const selectedFilePath = ref('');
 
 onMounted(() => {
   loadPath(currentPath.value);
@@ -167,11 +177,12 @@ const isSelectable = (item) => {
   if (!item) return false;
   if (selectType.value === 'directory') return item.type === 'directory';
   if (selectType.value === 'file') return item.type !== 'directory';
-  return true; // 'both'
+  return true;
 };
 
 const setActiveItem = (item) => {
   activeItem.value = item;
+  selectedFilePath.value = item?.path || '';
 };
 
 const navigateInto = (item) => {
@@ -198,6 +209,10 @@ const goUp = () => {
 };
 
 const reload = () => {
+  loadPath(currentPath.value || '/');
+};
+
+const onFileSaved = () => {
   loadPath(currentPath.value || '/');
 };
 
