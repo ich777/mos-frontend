@@ -1114,5 +1114,6 @@
   "search policy": "Search Policy",
   "tools": "Tools",
   "filebrowser": "Filebrowser",
-  "filesystem could not be loaded": "Filesystem could not be loaded"
+  "filesystem could not be loaded": "Filesystem could not be loaded",
+  "create backup": "Create Backup"
 }

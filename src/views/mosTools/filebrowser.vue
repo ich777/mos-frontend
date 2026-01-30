@@ -26,7 +26,7 @@
             </div>
           </v-card-title>
 
-          <v-card-text class="pt-2" style="min-height: 300px; max-height: 60vh; overflow-y: auto">
+          <v-card-text class="pt-2" style="min-height: 300px; max-height: 75vh; overflow-y: auto">
             <v-alert v-if="errorMessage" type="error" density="compact" class="mb-2">
               {{ errorMessage }}
             </v-alert>
@@ -66,7 +66,18 @@
                   </td>
                   <td class="text-center">
                     <v-icon v-if="item.type === 'directory'" size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
-                    <v-icon v-else-if="isSelectable(item)" size="18" class="cursor-pointer" @click.stop="editFileDialogVisible = true; selectedFilePath = item.path" :disabled="loading">mdi-file-edit</v-icon>
+                    <v-icon
+                      v-else-if="isSelectable(item)"
+                      size="18"
+                      class="cursor-pointer"
+                      @click.stop="
+                        editFileDialogVisible = true;
+                        selectedFilePath = item.path;
+                      "
+                      :disabled="loading"
+                    >
+                      mdi-file-edit
+                    </v-icon>
                   </td>
                 </tr>
               </tbody>

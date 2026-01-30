@@ -9,13 +9,14 @@
       <v-card-subtitle>
         <v-progress-circular v-if="loading" size="20" indeterminate color="secondary" />
       </v-card-subtitle>
-      <v-card-text class="flex-grow-1 d-flex flex-column" style="overflow: hidden">
+      <v-card-text class="flex-grow-1 d-flex flex-column py-2" style="overflow: hidden">
         <v-alert v-if="errorMessage" type="error" class="mb-3">
           {{ errorMessage }}
         </v-alert>
-        <div class="flex-grow-1" style="min-height: 300px; overflow: auto">
-          <v-textarea v-model="content" :loading="loading" :disabled="loading" :auto-grow="false" rows="10" style="height: 100%; max-height: 100%; font-family: monospace" hide-details="auto" />
+        <div class="flex-grow-1" style="min-height: 400px; overflow: auto">
+          <v-textarea v-model="content" :loading="loading" :disabled="loading" :auto-grow="false" rows="20" style="height: 100%; max-height: 100%; font-family: monospace" hide-details="auto" />
         </div>
+        <v-checkbox v-model="createBackupFile" :label="t('create backup')" density="compact" hide-details="auto" class="pt-4"/>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -55,6 +56,7 @@ const internalVisible = computed({
 const loading = ref(false);
 const content = ref('');
 const errorMessage = ref('');
+const createBackupFile = ref(props.createBackup);
 
 const loadFile = async () => {
   loading.value = true;
@@ -95,7 +97,7 @@ const saveFile = async () => {
       body: JSON.stringify({
         path: props.path,
         content: content.value,
-        create_backup: props.createBackup,
+        create_backup: createBackupFile.value,
       }),
     });
 
