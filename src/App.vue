@@ -57,9 +57,6 @@
           <v-list-item v-if="mosServices.vm?.running" to="/vm" prepend-icon="mdi-monitor-account">
             <v-list-item-title>{{ $t('vm') }}</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/users" prepend-icon="mdi-account">
-            <v-list-item-title>{{ $t('users') }}</v-list-item-title>
-          </v-list-item>
           <v-list-item to="/plugins" prepend-icon="mdi-puzzle">
             <v-list-item-title>{{ $t('plugins') }}</v-list-item-title>
           </v-list-item>

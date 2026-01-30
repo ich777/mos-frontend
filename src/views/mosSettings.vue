@@ -38,6 +38,10 @@
                 {{ $t('system configuration') }}
               </v-card-title>
               <v-card-text>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/users">
+                  <v-icon start>mdi-account</v-icon>
+                  {{ $t('users') }}
+                </v-btn>                
                 <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/system">
                   <v-icon start>mdi-desktop-classic</v-icon>
                   {{ $t('system') }}

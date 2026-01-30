@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from '../views/dashboard.vue';
-import Users from '../views/users.vue';
 import Pools from '../views/pools.vue';
 import Disks from '../views/disks.vue';
 import Shares from '../views/shares.vue';
@@ -32,6 +31,7 @@ import mosSettingsHub from '../views/mosSettings/mosHub.vue';
 import mosSettingsSensors from '../views/mosSettings/sensors.vue';
 import mosSettingsZram from '../views/mosSettings/zram.vue';
 import mosSettingsToken from '../views/mosSettings/token.vue';
+import mosSettingsUsers from '../views/mosSettings/users.vue';
 import webterminalPopup from '../views/webterminalPopup.vue';
 import Notifications from '../views/notifications.vue';
 import RemoteMounting from '../views/remoteMounting.vue';
@@ -43,7 +43,6 @@ const routes = [
   { path: '/firstSetup', component: FirstSetup, props: true, meta: { hideAppBar: false, title: 'MOS First Setup', description: 'Set up your account for the first time' } },
   { path: '', component: Dashboard, meta: { hideAppBar: false, title: 'Dashboard', description: 'Overview of your account' } },
   { path: '/dashboard', component: Dashboard, meta: { hideAppBar: false, title: 'Dashboard', description: 'Overview of your account' } },
-  { path: '/users', component: Users, meta: { hideAppBar: false, title: 'Users', description: 'Manage users in your account' } },
   { path: '/pools', component: Pools, meta: { hideAppBar: false, title: 'Pools', description: 'Manage storage pools' } },
   { path: '/disks', component: Disks, meta: { hideAppBar: false, title: 'Disks', description: 'Manage disks in your account' } },
   { path: '/shares', component: Shares, meta: { hideAppBar: false, title: 'Shares', description: 'Manage shares in your account' } },
@@ -97,6 +96,7 @@ const routes = [
   { path: '/mosSettings/sensors', component: mosSettingsSensors, meta: { hideAppBar: false, title: 'MOS Settings - Sensors', description: 'Manage system sensors' } },
   { path: '/mosSettings/zram', component: mosSettingsZram, meta: { hideAppBar: false, title: 'MOS Settings - ZRAM', description: 'Manage ZRAM settings' } },
   { path: '/mosSettings/token', component: mosSettingsToken, meta: { hideAppBar: false, title: 'MOS Settings - Token', description: 'Manage API token' } },
+  { path: '/mosSettings/users', component: mosSettingsUsers, meta: { hideAppBar: false, title: 'MOS Settings - Users', description: 'Manage users' } },  
   { path: '/profile', component: profile, meta: { hideAppBar: false, title: 'Profile', description: 'Manage your profile' } },
   {
     path: '/webTerminalPopup',
