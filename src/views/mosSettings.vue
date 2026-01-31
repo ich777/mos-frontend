@@ -126,6 +126,14 @@
                   <v-icon start>mdi-usb-flash-drive</v-icon>
                   {{ $t('boot') }}
                 </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/usbDevices">
+                  <v-icon start>mdi-usb</v-icon>
+                  {{ $t('usb devices') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/pciDevices">
+                  <v-icon start>mdi-chip</v-icon>
+                  {{ $t('pci devices') }}
+                </v-btn>
                 <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/sensors">
                   <v-icon start>mdi-thermometer</v-icon>
                   {{ $t('sensors') }}

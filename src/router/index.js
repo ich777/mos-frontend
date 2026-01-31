@@ -32,6 +32,8 @@ import mosSettingsSensors from '../views/mosSettings/sensors.vue';
 import mosSettingsZram from '../views/mosSettings/zram.vue';
 import mosSettingsToken from '../views/mosSettings/token.vue';
 import mosSettingsUsers from '../views/mosSettings/users.vue';
+import mosSettingsUsbDevices from '../views/mosSettings/usbDevices.vue';
+import mosSettingsPciDevices from '../views/mosSettings/pciDevices.vue';
 import webterminalPopup from '../views/webterminalPopup.vue';
 import Notifications from '../views/notifications.vue';
 import RemoteMounting from '../views/remoteMounting.vue';
@@ -96,7 +98,9 @@ const routes = [
   { path: '/mosSettings/sensors', component: mosSettingsSensors, meta: { hideAppBar: false, title: 'MOS Settings - Sensors', description: 'Manage system sensors' } },
   { path: '/mosSettings/zram', component: mosSettingsZram, meta: { hideAppBar: false, title: 'MOS Settings - ZRAM', description: 'Manage ZRAM settings' } },
   { path: '/mosSettings/token', component: mosSettingsToken, meta: { hideAppBar: false, title: 'MOS Settings - Token', description: 'Manage API token' } },
-  { path: '/mosSettings/users', component: mosSettingsUsers, meta: { hideAppBar: false, title: 'MOS Settings - Users', description: 'Manage users' } },  
+  { path: '/mosSettings/users', component: mosSettingsUsers, meta: { hideAppBar: false, title: 'MOS Settings - Users', description: 'Manage users' } },
+  { path: '/mosSettings/usbDevices', component: mosSettingsUsbDevices, meta: { hideAppBar: false, title: 'MOS Settings - USB Devices', description: 'Manage USB devices' } },
+  { path: '/mosSettings/pciDevices', component: mosSettingsPciDevices, meta: { hideAppBar: false, title: 'MOS Settings - PCI Devices', description: 'Manage PCI devices' } },
   { path: '/profile', component: profile, meta: { hideAppBar: false, title: 'Profile', description: 'Manage your profile' } },
   {
     path: '/webTerminalPopup',
