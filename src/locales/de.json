@@ -1151,5 +1151,9 @@
   "subsystem": "Subsystem",
   "subsystem id": "Subsystem ID",
   "subsystem device id": "Subsystem Geräte ID",
-  "prog if": "Prog IF"
+  "prog if": "Prog IF",
+  "are you sure you want to delete this file": "Bist du sicher, dass du diese Datei löschen möchtest",
+  "file could not be deleted": "Datei konnte nicht gelöscht werden",
+  "file deleted successfully": "Datei erfolgreich gelöscht",
+  "successfully deleted": "Erfolgreich gelöscht"
 }

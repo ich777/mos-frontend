@@ -15,9 +15,9 @@
         <v-card class="pa-0">
           <v-card-title class="pb-0">
             <div class="d-flex align-center ga-2">
-              <v-btn size="small" variant="text" icon="mdi-home" @click="goRoot" color="primary" :disabled="loading" />
-              <v-btn size="small" variant="text" icon="mdi-arrow-up" @click="goUp" color="primary" :disabled="!canGoUp || loading" />
-              <v-btn size="small" variant="text" icon="mdi-refresh" @click="reload" color="primary" :disabled="loading" />
+              <v-btn size="small" variant="text" icon="mdi-home" @click="goRoot()" color="primary" :disabled="loading" />
+              <v-btn size="small" variant="text" icon="mdi-arrow-up" @click="goUp()" color="primary" :disabled="!canGoUp || loading" />
+              <v-btn size="small" variant="text" icon="mdi-refresh" @click="reload()" color="primary" :disabled="loading" />
               <v-chip size="small" class="ml-2" variant="tonal">
                 {{ currentPath || '/' }}
               </v-chip>
@@ -27,10 +27,6 @@
           </v-card-title>
 
           <v-card-text class="pt-2" style="min-height: 300px; max-height: 75vh; overflow-y: auto">
-            <v-alert v-if="errorMessage" type="error" density="compact" class="mb-2">
-              {{ errorMessage }}
-            </v-alert>
-
             <v-table density="compact">
               <thead>
                 <tr>
@@ -45,7 +41,6 @@
                     {{ t('no entries') }}
                   </td>
                 </tr>
-
                 <tr
                   v-for="item in items"
                   :key="item.path"
@@ -67,7 +62,20 @@
                   <td class="text-center">
                     <v-icon v-if="item.type === 'directory'" size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
                     <v-icon
-                      v-else-if="isSelectable(item)"
+                      v-if="item.type !== 'directory'"
+                      size="18"
+                      class="cursor-pointer"
+                      @click.stop="
+                        deleteFileDialog.value = true;
+                        deleteFileDialog.path = item.path;
+                      "
+                      :disabled="loading"
+                    >
+                      mdi-delete
+                    </v-icon>
+                    <span v-if="item.type !== 'directory'">&nbsp;</span>
+                    <v-icon
+                      v-if="item.type !== 'directory'"
                       size="18"
                       class="cursor-pointer"
                       @click.stop="
@@ -83,9 +91,7 @@
               </tbody>
             </v-table>
           </v-card-text>
-
           <v-divider />
-
           <v-card-actions class="d-flex align-center">
             <v-spacer />
           </v-card-actions>
@@ -93,6 +99,22 @@
       </v-container>
     </v-container>
   </v-container>
+
+  <!-- Delete File Dialog -->
+  <v-dialog v-model="deleteFileDialog.value" max-width="500">
+    <v-card class="pa-0">
+      <v-card-title class="text-h6" v-if="deleteFileDialog.path">{{ $t('delete') }} - {{ deleteFileDialog.path }}</v-card-title>
+      <v-card-text>{{ $t('are you sure you want to delete this file') }}?</v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="deleteFileDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="red" @click="deleteFileOrFolder(deleteFileDialog.path); deleteFileDialog.value = false">
+          {{ $t('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <FileEditDialog v-model="editFileDialogVisible" :path="selectedFilePath" :createBackup="true" :title="$t('edit file')" @saved="onFileSaved" />
 
@@ -124,11 +146,14 @@ const currentPath = ref('/');
 const items = ref([]);
 const canGoUp = ref(false);
 const parentPath = ref(null);
-const errorMessage = ref('');
 const activeItem = ref(null);
 const overlay = ref(false);
 const editFileDialogVisible = ref(false);
 const selectedFilePath = ref('');
+const deleteFileDialog = ref({
+  value: false,
+  path: null,
+});
 
 onMounted(() => {
   loadPath(currentPath.value);
@@ -136,7 +161,6 @@ onMounted(() => {
 
 const loadPath = async (path = '/') => {
   loading.value = true;
-  errorMessage.value = '';
   try {
     const url = new URL('/api/v1/mos/fsnavigator', window.location.origin);
     if (path && path !== '/') {
@@ -157,15 +181,8 @@ const loadPath = async (path = '/') => {
     });
 
     if (!res.ok) {
-      let apiError = '';
-      try {
-        const data = await res.json();
-        apiError = data.error || '';
-      } catch {
-        // ignore
-      }
-      const msg = apiError || t('filesystem could not be loaded');
-      throw new Error(msg);
+      const error = await res.json();
+      throw new Error(`${t('filesystem could not be loaded')}|$| ${error.error || t('unknown error')}`);
     }
 
     const data = await res.json();
@@ -176,11 +193,38 @@ const loadPath = async (path = '/') => {
     items.value = Array.isArray(data.items) ? data.items : [];
     activeItem.value = null;
   } catch (e) {
-    const msg = e?.message || t('unknown error');
-    errorMessage.value = msg;
-    showSnackbarError?.(t('filesystem could not be loaded'), msg);
+    const [mainMessage, detailMessage] = e.message.split('|$|');
+    showSnackbarError(t(mainMessage.trim()), detailMessage ? detailMessage.trim() : '');
   } finally {
     loading.value = false;
+  }
+};
+
+const deleteFileOrFolder = async (path, force = true, recursive = false) => {
+  const payload = { path: path, force: true, recursive };
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/mos/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('file or folder could not be deleted')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('successfully deleted'));
+    reload();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
   }
 };
 
