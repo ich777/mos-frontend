@@ -60,32 +60,16 @@
                     <span class="text-caption">{{ item.displayPath || item.path }}</span>
                   </td>
                   <td class="text-center">
-                    <v-icon v-if="item.type === 'directory'" size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
-                    <v-icon
-                      v-if="item.type !== 'directory'"
-                      size="18"
-                      class="cursor-pointer"
-                      @click.stop="
-                        deleteFileDialog.value = true;
-                        deleteFileDialog.path = item.path;
-                      "
-                      :disabled="loading"
-                    >
-                      mdi-delete
-                    </v-icon>
-                    <span v-if="item.type !== 'directory'">&nbsp;</span>
-                    <v-icon
-                      v-if="item.type !== 'directory'"
-                      size="18"
-                      class="cursor-pointer"
-                      @click.stop="
-                        editFileDialogVisible = true;
-                        selectedFilePath = item.path;
-                      "
-                      :disabled="loading"
-                    >
-                      mdi-file-edit
-                    </v-icon>
+                    <div v-if="item.type === 'directory'">
+                      <v-icon size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
+                      <span>&nbsp;</span>
+                      <v-icon size="18" class="cursor-pointer" @click.stop="openDeleteFileDialog(item)" :disabled="loading">mdi-delete</v-icon>
+                    </div>
+                    <div v-else>
+                      <v-icon size="18" class="cursor-pointer" @click.stop="openEditFileDialog(item)" :disabled="loading">mdi-file-edit</v-icon>
+                      <span>&nbsp;</span>
+                      <v-icon size="18" class="cursor-pointer" @click.stop="openDeleteFileDialog(item)" :disabled="loading">mdi-delete</v-icon>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -104,12 +88,16 @@
   <v-dialog v-model="deleteFileDialog.value" max-width="500">
     <v-card class="pa-0">
       <v-card-title class="text-h6" v-if="deleteFileDialog.path">{{ $t('delete') }} - {{ deleteFileDialog.path }}</v-card-title>
-      <v-card-text>{{ $t('are you sure you want to delete this file') }}?</v-card-text>
+      <v-card-text>
+        <v-container class="pb-4 px-0">{{ $t('are you sure you want to delete this file') }}?</v-container>
+        <v-checkbox  v-if="deleteFileDialog.pathType === 'directory'" v-model="deleteFileDialog.recursive" :label="$t('recursive')" :disabled="loading" hide-details="auto" density="compact"/>
+        <v-checkbox v-model="deleteFileDialog.force" :label="$t('force')" :disabled="loading" hide-details="auto" density="compact"/>
+      </v-card-text>
       <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="onPrimary" @click="deleteFileDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn color="red" @click="deleteFileOrFolder(deleteFileDialog.path); deleteFileDialog.value = false">
+        <v-btn color="red" @click="deleteFile(deleteFileDialog.path, deleteFileDialog.force, deleteFileDialog.recursive)">
           {{ $t('delete') }}
         </v-btn>
       </v-card-actions>
@@ -124,23 +112,16 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import FileEditDialog from '@/components/fileEditDialog.vue';
 
-const modelValue = ref(true);
-const title = ref('');
-const selectType = ref('all');
-const persistent = ref(false);
-const showSelectButton = ref(true);
-const roots = ref('');
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge', 'update:modelValue', 'selected', 'cancel']);
+const modelValue = ref(true);
+const selectType = ref('all');
+const roots = ref('');
 const { t } = useI18n();
-const internalVisible = computed({
-  get: () => modelValue.value,
-  set: (val) => emit('update:modelValue', val),
-});
 const loading = ref(false);
 const currentPath = ref('/');
 const items = ref([]);
@@ -150,9 +131,17 @@ const activeItem = ref(null);
 const overlay = ref(false);
 const editFileDialogVisible = ref(false);
 const selectedFilePath = ref('');
-const deleteFileDialog = ref({
+const deleteFileDialog = reactive({
   value: false,
   path: null,
+  pathType: '',
+  recursive: false,
+  force: true,
+});
+
+const internalVisible = computed({
+  get: () => modelValue.value,
+  set: (val) => emit('update:modelValue', val),
 });
 
 onMounted(() => {
@@ -200,8 +189,8 @@ const loadPath = async (path = '/') => {
   }
 };
 
-const deleteFileOrFolder = async (path, force = true, recursive = false) => {
-  const payload = { path: path, force: true, recursive };
+const deleteFile = async (path, force = true, recursive = false) => {
+  const payload = { path: path, force: force, recursive: recursive };
   try {
     overlay.value = true;
     const res = await fetch(`/api/v1/mos/delete`, {
@@ -215,7 +204,7 @@ const deleteFileOrFolder = async (path, force = true, recursive = false) => {
 
     if (!res.ok) {
       const errorDetails = await res.json();
-      throw new Error(`${t('file or folder could not be deleted')}|$| ${errorDetails.error || t('unknown error')}`);
+      throw new Error(`${t('file could not be deleted')}|$| ${errorDetails.error || t('unknown error')}`);
     }
 
     showSnackbarSuccess(t('successfully deleted'));
@@ -224,6 +213,7 @@ const deleteFileOrFolder = async (path, force = true, recursive = false) => {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
+    clearDeleteDialog();
     overlay.value = false;
   }
 };
@@ -299,6 +289,25 @@ watch(
     }
   },
 );
+
+const openDeleteFileDialog = (item) => {
+  if (!item) return;
+  deleteFileDialog.value = true;
+  deleteFileDialog.path = item.path;
+  deleteFileDialog.pathType = item.type;
+};
+const clearDeleteDialog = () => {
+  deleteFileDialog.value = false;
+  deleteFileDialog.path = null;
+  deleteFileDialog.pathType = '';
+  deleteFileDialog.recursive = false;
+  deleteFileDialog.force = true;
+};
+const openEditFileDialog = (item) => {
+  if (!item || item.type === 'directory') return;
+  selectedFilePath.value = item.path;
+  editFileDialogVisible.value = true;
+};
 </script>
 
 <style scoped>

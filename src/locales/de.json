@@ -1155,5 +1155,7 @@
   "are you sure you want to delete this file": "Bist du sicher, dass du diese Datei löschen möchtest",
   "file could not be deleted": "Datei konnte nicht gelöscht werden",
   "file deleted successfully": "Datei erfolgreich gelöscht",
-  "successfully deleted": "Erfolgreich gelöscht"
+  "successfully deleted": "Erfolgreich gelöscht",
+  "force": "Erzwingen",
+  "recursive": "Rekursiv"
 }

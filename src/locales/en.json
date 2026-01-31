@@ -1155,5 +1155,7 @@
   "are you sure you want to delete this file": "Are you sure you want to delete this file",
   "file could not be deleted": "File could not be deleted",
   "file deleted successfully": "File deleted successfully",
-  "sucessfully deleted": "Successfully deleted"
+  "sucessfully deleted": "Successfully deleted",
+  "force": "Force",
+  "recursive": "Recursive"  
 }

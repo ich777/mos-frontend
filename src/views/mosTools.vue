@@ -102,6 +102,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
+const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const rebootDialog = ref(false);
 const shutdownDialog = ref(false);
 const { t } = useI18n();

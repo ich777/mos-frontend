@@ -64,7 +64,7 @@ const props = defineProps({
 });
 
 const { plugins, getPlugins, loadPluginComponent, pluginsLoaded } = usePlugins();
-
+const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const loading = ref(true);
 const error = ref(false);
 const errorMessage = ref('');
@@ -116,6 +116,6 @@ watch(
   () => props.pluginName,
   () => {
     loadPlugin();
-  }
+  },
 );
 </script>
