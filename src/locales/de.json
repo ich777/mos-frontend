@@ -1157,5 +1157,19 @@
   "file deleted successfully": "Datei erfolgreich gelöscht",
   "successfully deleted": "Erfolgreich gelöscht",
   "force": "Erzwingen",
-  "recursive": "Rekursiv"
+  "recursive": "Rekursiv",
+  "folder could not be created": "Ordner konnte nicht erstellt werden",
+  "folder created successfully": "Ordner erfolgreich erstellt",
+  "create folder": "Ordner erstellen",
+  "folder name": "Ordnername",
+  "user": "Benutzer",
+  "group": "Gruppe",
+  "permissions": "Berechtigungen",
+  "successfully created folder": "Ordner erfolgreich erstellt",
+  "file could not be created": "Datei konnte nicht erstellt werden",
+  "file created successfully": "Datei erfolgreich erstellt",
+  "create file": "Datei erstellen",
+  "file name": "Dateiname",
+  "successfully created file": "Datei erfolgreich erstellt",
+  "content": "Inhalt"
 }

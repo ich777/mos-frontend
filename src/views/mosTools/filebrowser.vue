@@ -26,7 +26,7 @@
             </div>
           </v-card-title>
 
-          <v-card-text class="pt-2" style="min-height: 300px; max-height: 75vh; overflow-y: auto">
+          <v-card-text class="pa-0" style="min-height: 300px; max-height: 75vh; overflow-y: auto">
             <v-table density="compact">
               <thead>
                 <tr>
@@ -62,13 +62,9 @@
                   <td class="text-center">
                     <div v-if="item.type === 'directory'">
                       <v-icon size="18" class="cursor-pointer" @click.stop="navigateInto(item)" :disabled="loading">mdi-folder-open</v-icon>
-                      <span>&nbsp;</span>
-                      <v-icon size="18" class="cursor-pointer" @click.stop="openDeleteFileDialog(item)" :disabled="loading">mdi-delete</v-icon>
                     </div>
                     <div v-else>
                       <v-icon size="18" class="cursor-pointer" @click.stop="openEditFileDialog(item)" :disabled="loading">mdi-file-edit</v-icon>
-                      <span>&nbsp;</span>
-                      <v-icon size="18" class="cursor-pointer" @click.stop="openDeleteFileDialog(item)" :disabled="loading">mdi-delete</v-icon>
                     </div>
                   </td>
                 </tr>
@@ -77,7 +73,9 @@
           </v-card-text>
           <v-divider />
           <v-card-actions class="d-flex align-center">
-            <v-spacer />
+            <v-btn rounded variant="flat" color="primary" @click="openCreateFolderDialog(currentPath)">{{ $t('create folder') }}</v-btn>
+            <v-btn rounded variant="flat" color="primary" @click="openCreateFileDialog(currentPath)">{{ $t('create file') }}</v-btn>
+            <v-btn rounded variant="flat" :disabled="!activeItem" color="primary" @click="openDeleteFileDialog(activeItem)">{{ $t('delete') }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -86,12 +84,11 @@
 
   <!-- Delete File Dialog -->
   <v-dialog v-model="deleteFileDialog.value" max-width="500">
-    <v-card class="pa-0">
-      <v-card-title class="text-h6" v-if="deleteFileDialog.path">{{ $t('delete') }} - {{ deleteFileDialog.path }}</v-card-title>
+    <v-card class="pa-0" :title="`${$t('delete')} - ${deleteFileDialog.path}`" prepend-icon="mdi-delete">
       <v-card-text>
-        <v-container class="pb-4 px-0">{{ $t('are you sure you want to delete this file') }}?</v-container>
-        <v-checkbox  v-if="deleteFileDialog.pathType === 'directory'" v-model="deleteFileDialog.recursive" :label="$t('recursive')" :disabled="loading" hide-details="auto" density="compact"/>
-        <v-checkbox v-model="deleteFileDialog.force" :label="$t('force')" :disabled="loading" hide-details="auto" density="compact"/>
+        <v-container class="pb-4 pt-0 px-0">{{ $t('are you sure you want to delete this file') }}?</v-container>
+        <v-checkbox v-if="deleteFileDialog.pathType === 'directory'" v-model="deleteFileDialog.recursive" :label="$t('recursive')" :disabled="loading" hide-details="auto" density="compact" />
+        <v-checkbox v-model="deleteFileDialog.force" :label="$t('force')" :disabled="loading" hide-details="auto" density="compact" />
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -99,6 +96,54 @@
         <v-btn color="onPrimary" @click="deleteFileDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="deleteFile(deleteFileDialog.path, deleteFileDialog.force, deleteFileDialog.recursive)">
           {{ $t('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Create Folder Dialog -->
+  <v-dialog v-model="createFolderDialog.value" max-width="500">
+    <v-card class="pa-0" :title="$t('create folder')" prepend-icon="mdi-folder-plus">
+      <v-card-text class="py-0">
+        <v-container class="px-0">
+          <v-text-field v-model="createFolderDialog.folderName" :label="$t('folder name')" :disabled="loading" />
+          <v-text-field v-model="createFolderDialog.user" :label="$t('user')" :disabled="loading" />
+          <v-text-field v-model="createFolderDialog.group" :label="$t('group')" :disabled="loading" />
+          <v-text-field v-model="createFolderDialog.permissions" :label="$t('permissions')" :disabled="loading" />
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="createFolderDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="createFolder(createFolderDialog.currentPath, createFolderDialog.folderName, createFolderDialog.user, createFolderDialog.group, createFolderDialog.permissions)">
+          {{ $t('create') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Create File Dialog -->
+  <v-dialog v-model="createFileDialog.value" max-width="600">
+    <v-card class="pa-0" :title="$t('create file')" prepend-icon="mdi-file-plus">
+      <v-card-text class="py-0">
+        <v-container class="px-0">
+          <v-text-field v-model="createFileDialog.fileName" :label="$t('file name')" :disabled="loading" />
+          <v-textarea v-model="createFileDialog.content" :label="$t('content')" :disabled="loading" rows="6" />
+          <v-text-field v-model="createFileDialog.user" :label="$t('user')" :disabled="loading" />
+          <v-text-field v-model="createFileDialog.group" :label="$t('group')" :disabled="loading" />
+          <v-text-field v-model="createFileDialog.permissions" :label="$t('permissions')" :disabled="loading" />
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="createFileDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn
+          color="primary"
+          @click="createFile(createFileDialog.currentPath, createFileDialog.fileName, createFileDialog.content, createFileDialog.user, createFileDialog.group, createFileDialog.permissions)"
+        >
+          {{ $t('create') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -137,6 +182,23 @@ const deleteFileDialog = reactive({
   pathType: '',
   recursive: false,
   force: true,
+});
+const createFolderDialog = reactive({
+  value: false,
+  folderName: '',
+  currentPath: '',
+  user: '500',
+  group: '500',
+  permissions: '777',
+});
+const createFileDialog = reactive({
+  value: false,
+  fileName: '',
+  currentPath: '',
+  content: '',
+  user: '500',
+  group: '500',
+  permissions: '777',
 });
 
 const internalVisible = computed({
@@ -214,6 +276,78 @@ const deleteFile = async (path, force = true, recursive = false) => {
     showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     clearDeleteDialog();
+    overlay.value = false;
+  }
+};
+
+const createFolder = async (path, folderName, user = '500', group = '500', permissions = '777') => {
+  if (!folderName || folderName.trim() === '') {
+    showSnackbarError(t('folder name cannot be empty'));
+    return;
+  }
+  if (!path || path.trim() === '') {
+    showSnackbarError(t('path cannot be empty'));
+    return;
+  }
+  const payload = { path: path + '/' + folderName, user: user, group: group, permissions: permissions };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/mos/createfolder`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('folder could not be created')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('successfully created folder'));
+    reload();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    createFolderDialog.value = false;
+    overlay.value = false;
+  }
+};
+
+const createFile = async (path, fileName, content = '', user = '500', group = '500', permissions = '777') => {
+  if (!fileName || fileName.trim() === '') {
+    showSnackbarError(t('file name cannot be empty'));
+    return;
+  }
+  if (!path || path.trim() === '') {
+    showSnackbarError(t('path cannot be empty'));
+    return;
+  }
+  const payload = { path: path + '/' + fileName, content: content, user: user, group: group, permissions: permissions };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/mos/createfile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('file could not be created')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('successfully created file'));
+    reload();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    createFileDialog.value = false;
     overlay.value = false;
   }
 };
@@ -307,6 +441,23 @@ const openEditFileDialog = (item) => {
   if (!item || item.type === 'directory') return;
   selectedFilePath.value = item.path;
   editFileDialogVisible.value = true;
+};
+const openCreateFolderDialog = (currentPath) => {
+  createFolderDialog.value = true;
+  createFolderDialog.currentPath = currentPath;
+  createFolderDialog.folderName = '';
+  createFolderDialog.user = '500';
+  createFolderDialog.group = '500';
+  createFolderDialog.permissions = '777';
+};
+const openCreateFileDialog = (currentPath) => {
+  createFileDialog.value = true;
+  createFileDialog.currentPath = currentPath;
+  createFileDialog.fileName = '';
+  createFileDialog.content = '';
+  createFileDialog.user = '500';
+  createFileDialog.group = '500';
+  createFileDialog.permissions = '777';
 };
 </script>
 

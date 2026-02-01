@@ -1157,5 +1157,19 @@
   "file deleted successfully": "File deleted successfully",
   "sucessfully deleted": "Successfully deleted",
   "force": "Force",
-  "recursive": "Recursive"  
+  "recursive": "Recursive",
+  "folder could not be created": "Folder could not be created",
+  "folder created successfully": "Folder created successfully",
+  "create folder": "Create Folder",
+  "folder name": "Folder Name",
+  "user": "User",
+  "group": "Group",
+  "permissions": "Permissions",
+  "successfully created folder": "Successfully created folder",
+  "file could not be created": "File could not be created",
+  "file created successfully": "File created successfully",
+  "create file": "Create File",
+  "file name": "File Name",
+  "successfully created file": "Successfully created file",
+  "content": "Content"
 }
