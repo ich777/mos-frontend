@@ -1171,5 +1171,14 @@
   "create file": "Create File",
   "file name": "File Name",
   "successfully created file": "Successfully created file",
-  "content": "Content"
+  "content": "Content",
+  "path cannot be empty": "Path cannot be empty",
+  "file name cannot be empty": "File name cannot be empty",
+  "permissions could not be set": "Permissions could not be set",
+  "permissions successfully set": "Permissions successfully set",
+  "adjust permissions": "Adjust permissions",
+  "adjust ownership": "Adjust ownership",
+  "adjust": "Adjust",
+  "ownership could not be set": "Ownership could not be set",
+  "ownership successfully set": "Ownership successfully set"  
 }

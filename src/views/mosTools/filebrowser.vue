@@ -76,6 +76,8 @@
             <v-btn rounded variant="flat" color="primary" @click="openCreateFolderDialog(currentPath)">{{ $t('create folder') }}</v-btn>
             <v-btn rounded variant="flat" color="primary" @click="openCreateFileDialog(currentPath)">{{ $t('create file') }}</v-btn>
             <v-btn rounded variant="flat" :disabled="!activeItem" color="primary" @click="openDeleteFileDialog(activeItem)">{{ $t('delete') }}</v-btn>
+            <v-btn rounded variant="flat" :disabled="!activeItem" color="primary" @click="openChModDialog(activeItem)">{{ $t('adjust permissions') }}</v-btn>
+            <v-btn rounded variant="flat" :disabled="!activeItem" color="primary" @click="openChOwnDialog(activeItem)">{{ $t('adjust ownership') }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -107,8 +109,21 @@
       <v-card-text class="py-0">
         <v-container class="px-0">
           <v-text-field v-model="createFolderDialog.folderName" :label="$t('folder name')" :disabled="loading" />
-          <v-text-field v-model="createFolderDialog.user" :label="$t('user')" :disabled="loading" />
-          <v-text-field v-model="createFolderDialog.group" :label="$t('group')" :disabled="loading" />
+          <v-select
+            v-model="createFolderDialog.userddsel"
+            :label="$t('user')"
+            :items="createFolderDialog.userdd"
+            :disabled="loading"
+            @update:modelValue="
+              (val) => {
+                if (val === 'mos') createFolderDialog.user = createFolderDialog.group = '500';
+                else if (val === 'admin') createFolderDialog.user = createFolderDialog.group = '0';
+                else createFolderDialog.user = createFolderDialog.group = '';
+              }
+            "
+          />
+          <v-text-field v-if="createFolderDialog.userddsel === 'custom'" v-model="createFolderDialog.user" :label="$t('user')" :disabled="loading" />
+          <v-text-field v-if="createFolderDialog.userddsel === 'custom'" v-model="createFolderDialog.group" :label="$t('group')" :disabled="loading" />
           <v-text-field v-model="createFolderDialog.permissions" :label="$t('permissions')" :disabled="loading" />
         </v-container>
       </v-card-text>
@@ -130,8 +145,21 @@
         <v-container class="px-0">
           <v-text-field v-model="createFileDialog.fileName" :label="$t('file name')" :disabled="loading" />
           <v-textarea v-model="createFileDialog.content" :label="$t('content')" :disabled="loading" rows="6" />
-          <v-text-field v-model="createFileDialog.user" :label="$t('user')" :disabled="loading" />
-          <v-text-field v-model="createFileDialog.group" :label="$t('group')" :disabled="loading" />
+          <v-select
+            v-model="createFileDialog.userddsel"
+            :label="$t('user')"
+            :items="createFileDialog.userdd"
+            :disabled="loading"
+            @update:modelValue="
+              (val) => {
+                if (val === 'mos') createFileDialog.user = createFileDialog.group = '500';
+                else if (val === 'admin') createFileDialog.user = createFileDialog.group = '0';
+                else createFileDialog.user = createFileDialog.group = '';
+              }
+            "
+          />
+          <v-text-field v-if="createFileDialog.userddsel === 'custom'" v-model="createFileDialog.user" :label="$t('user')" :disabled="loading" />
+          <v-text-field v-if="createFileDialog.userddsel === 'custom'" v-model="createFileDialog.group" :label="$t('group')" :disabled="loading" />
           <v-text-field v-model="createFileDialog.permissions" :label="$t('permissions')" :disabled="loading" />
         </v-container>
       </v-card-text>
@@ -144,6 +172,60 @@
           @click="createFile(createFileDialog.currentPath, createFileDialog.fileName, createFileDialog.content, createFileDialog.user, createFileDialog.group, createFileDialog.permissions)"
         >
           {{ $t('create') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Chmod Dialog -->
+  <v-dialog v-model="setChmodDialog.value" max-width="500">
+    <v-card class="pa-0" :title="$t('adjust permissions')" prepend-icon="mdi-lock">
+      <v-card-text class="py-0">
+        <v-container class="px-0">
+          <v-text-field v-model="setChmodDialog.permissions" :label="$t('permissions')" :disabled="loading" />
+          <v-checkbox v-model="setChmodDialog.recursive" :label="$t('recursive')" :disabled="loading" hide-details="auto" density="compact" />
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="setChmodDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="setChmod(setChmodDialog.path, setChmodDialog.permissions, setChmodDialog.recursive)">
+          {{ $t('adjust') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Chown Dialog -->
+  <v-dialog v-model="setChownDialog.value" max-width="500">
+    <v-card class="pa-0" :title="$t('adjust ownership')" prepend-icon="mdi-account-lock">
+      <v-card-text class="py-0">
+        <v-container class="px-0">
+          <v-select
+            v-model="setChownDialog.userddsel"
+            :label="$t('user')"
+            :items="setChownDialog.userdd"
+            :disabled="loading"
+            @update:modelValue="
+              (val) => {
+                if (val === 'mos') setChownDialog.user = setChownDialog.group = '500';
+                else if (val === 'admin') setChownDialog.user = setChownDialog.group = '0';
+                else setChownDialog.user = setChownDialog.group = '';
+              }
+            "
+          />
+          <v-text-field v-if="setChownDialog.userddsel === 'custom'" v-model="setChownDialog.user" :label="$t('user')" :disabled="loading" />
+          <v-text-field v-if="setChownDialog.userddsel === 'custom'" v-model="setChownDialog.group" :label="$t('group')" :disabled="loading" />
+          <v-checkbox v-model="setChownDialog.recursive" :label="$t('recursive')" :disabled="loading" hide-details="auto" density="compact" />
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="onPrimary" @click="setChownDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="setChown(setChownDialog.path, setChownDialog.user, setChownDialog.group, setChownDialog.recursive)">
+          {{ $t('adjust') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -187,6 +269,8 @@ const createFolderDialog = reactive({
   value: false,
   folderName: '',
   currentPath: '',
+  userddsel: 'mos',
+  userdd: ['mos', 'admin', 'custom'],
   user: '500',
   group: '500',
   permissions: '777',
@@ -196,9 +280,26 @@ const createFileDialog = reactive({
   fileName: '',
   currentPath: '',
   content: '',
+  userddsel: 'mos',
+  userdd: ['mos', 'admin', 'custom'],
   user: '500',
   group: '500',
   permissions: '777',
+});
+const setChmodDialog = reactive({
+  value: false,
+  path: '',
+  permissions: '777',
+  recursive: false,
+});
+const setChownDialog = reactive({
+  value: false,
+  path: '',
+  userddsel: 'mos',
+  userdd: ['mos', 'admin', 'custom'],
+  user: '500',
+  group: '500',
+  recursive: false,
 });
 
 const internalVisible = computed({
@@ -352,6 +453,70 @@ const createFile = async (path, fileName, content = '', user = '500', group = '5
   }
 };
 
+const setChmod = async (path, permissions = '777', recursive = false) => {
+  if (!path || path.trim() === '') {
+    showSnackbarError(t('path cannot be empty'));
+    return;
+  }
+  const payload = { path: path, permissions: permissions, recursive: recursive };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/mos/chmod`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('permissions could not be set')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('permissions successfully set'));
+    reload();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    setChmodDialog.value = false;
+    overlay.value = false;
+  }
+};
+
+const setChown = async (path, user = '500', group = '500', recursive = false) => {
+  if (!path || path.trim() === '') {
+    showSnackbarError(t('path cannot be empty'));
+    return;
+  }
+  const payload = { path: path, user: user, group: group, recursive: recursive };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/mos/chown`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('ownership could not be set')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    showSnackbarSuccess(t('ownership successfully set'));
+    reload();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    setChownDialog.value = false;
+    overlay.value = false;
+  }
+};
+
 const isSelectable = (item) => {
   if (!item) return false;
   if (selectType.value === 'directory') return item.type === 'directory';
@@ -446,6 +611,7 @@ const openCreateFolderDialog = (currentPath) => {
   createFolderDialog.value = true;
   createFolderDialog.currentPath = currentPath;
   createFolderDialog.folderName = '';
+  createFolderDialog.userddsel = 'mos';
   createFolderDialog.user = '500';
   createFolderDialog.group = '500';
   createFolderDialog.permissions = '777';
@@ -455,9 +621,24 @@ const openCreateFileDialog = (currentPath) => {
   createFileDialog.currentPath = currentPath;
   createFileDialog.fileName = '';
   createFileDialog.content = '';
+  createFileDialog.userddsel = 'mos';
   createFileDialog.user = '500';
   createFileDialog.group = '500';
   createFileDialog.permissions = '777';
+};
+const openChModDialog = (item) => {
+  setChmodDialog.value = true;
+  setChmodDialog.path = item.path;
+  setChmodDialog.permissions = '777';
+  setChmodDialog.recursive = false;
+};
+const openChOwnDialog = (item) => {
+  setChownDialog.value = true;
+  setChownDialog.path = item.path;
+  setChownDialog.userddsel = 'mos';
+  setChownDialog.user = '500';
+  setChownDialog.group = '500';
+  setChownDialog.recursive = false;
 };
 </script>
 
