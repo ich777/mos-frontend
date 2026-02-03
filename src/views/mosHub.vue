@@ -34,7 +34,7 @@
                 <v-list-item
                   @click="
                     currentPage = 1;
-                    getMosHub(searchOnlineTemplate, pageLimit, 0, 'asc', 'name', '');
+                    hubTypeSel = '';
                   "
                 >
                   <v-list-item-title>{{ $t('all') }}</v-list-item-title>
@@ -44,7 +44,8 @@
                   :key="type"
                   @click="
                     currentPage = 1;
-                    getMosHub(searchOnlineTemplate, pageLimit, 0, 'asc', 'name', type);
+                    hubTypeSel = type;
+                    getMosHub(searchOnlineTemplate, pageLimit, 0, 'asc', 'name', hubTypeSel);
                   "
                 >
                   <v-list-item-title>{{ $t(type) }}</v-list-item-title>
@@ -357,6 +358,7 @@ const mosServices = ref({});
 const searchOnlineTemplate = ref('');
 const hubLoading = ref(true);
 const releasesLoading = ref(false);
+const hubTypeSel = ref('');
 const hubTypes = ref([]);
 const installDialog = reactive({
   value: false,
@@ -381,7 +383,7 @@ onMounted(() => {
   getHubTypes();
 });
 
-const getMosHub = async (search, limit = 24, skip = 0, order = 'asc', sort = 'name', type = '', category = '') => {
+const getMosHub = async (search, limit = 24, skip = 0, order = 'asc', sort = 'name', type = hubTypeSel.value, category = '') => {
   hubLoading.value = true;
   try {
     const url = new URL('/api/v1/mos/hub/index', window.location.origin);
