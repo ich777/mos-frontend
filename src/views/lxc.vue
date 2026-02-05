@@ -97,12 +97,13 @@
                     </td>
 
                     <td style="padding: 4px 8px; vertical-align: middle">
-                      <div class="text-caption-2">{{ lxc.name }}</div>
+                      <div class="text-caption-2">{{ lxc.name }} <v-chip v-if="lxc.unprivileged" :style="{ fontSize: '10px' }" size="little" class="mr-2">{{ $t('unprivileged') }}</v-chip></div>
                       <div class="text-caption" :style="{ color: lxc.state === 'running' ? 'green' : 'red' }">{{ lxc.state }}</div>
                     </td>
 
                     <td style="padding: 4px 8px; vertical-align: middle">
                       {{ lxc.distribution || '-' }}
+                      <v-chip :style="{ fontSize: '10px', color: lxc.architecture === 'amd64' ? 'green' : 'blue'}" size="small">{{ lxc.architecture }}</v-chip>
                     </td>
 
                     <td style="padding: 4px 8px; vertical-align: middle">{{ lxc.cpu.usage ? lxc.cpu.usage.toFixed(2) : '0' }} {{ lxc.cpu.unit ? lxc.cpu.unit : '%' }}</td>
@@ -145,6 +146,7 @@
           <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" required />
           <v-select v-model="createDialog.arch" :items="getArchitectuesfromDistribution(createDialog.distribution, createDialog.release)" :label="$t('architecture')" required />
           <v-textarea v-model="createDialog.description" :label="$t('description')" rows="2" />
+          <v-switch v-model="createDialog.unprivileged" :label="$t('unprivileged')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.autostart" :label="$t('autostart')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.start_after_creation" :label="$t('start after creation')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
         </v-form>
@@ -420,6 +422,7 @@ const createLXC = async () => {
     distribution: createDialog.distribution,
     release: createDialog.release,
     arch: createDialog.arch,
+    unprivileged: createDialog.unprivileged,
     autostart: createDialog.autostart,
     description: createDialog.description,
     start_after_creation: createDialog.start_after_creation,
