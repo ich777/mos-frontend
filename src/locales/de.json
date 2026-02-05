@@ -251,7 +251,7 @@
   "pool": "Pool",
   "write list": "Schreiben",
   "valid users": "Gültige Benutzer",
-  "webterminal": "Webterminal",
+  "webterminal": "Terminal",
   "failed to create terminal session": "Fehler beim Erstellen der Terminal-Sitzung",
   "failed to retrieve terminal sessions": "Fehler beim Abrufen der Terminal-Sitzungen",
   "connection to mos terminal established": "Verbindung zum MOS-Terminal hergestellt",
@@ -1180,5 +1180,6 @@
   "adjust ownership": "Eigentümer anpassen",
   "adjust": "Anpassen",
   "ownership could not be set": "Eigentümer konnte nicht gesetzt werden",
-  "ownership successfully set": "Eigentümer erfolgreich gesetzt"
+  "ownership successfully set": "Eigentümer erfolgreich gesetzt",
+  "unprivileged": "Unpriviligiert"
 }
