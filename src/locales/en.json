@@ -1180,5 +1180,6 @@
   "adjust ownership": "Adjust ownership",
   "adjust": "Adjust",
   "ownership could not be set": "Ownership could not be set",
-  "ownership successfully set": "Ownership successfully set"  
+  "ownership successfully set": "Ownership successfully set"  ,
+  "unprivileged": "Unprivileged"
 }
