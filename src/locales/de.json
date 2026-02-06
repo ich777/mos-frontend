@@ -1181,5 +1181,6 @@
   "adjust": "Anpassen",
   "ownership could not be set": "Eigentümer konnte nicht gesetzt werden",
   "ownership successfully set": "Eigentümer erfolgreich gesetzt",
-  "unprivileged": "Unpriviligiert"
+  "unprivileged": "Unpriviligiert",
+  "dnsmasq": "Dnsmasq"
 }
