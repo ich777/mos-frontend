@@ -87,8 +87,6 @@ import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
-const eth0IPv6Enabled = ref(false);
-const br0IPv6Enabled = ref(false);
 const settingsNetwork = ref({
   ssh: {
     enabled: false,

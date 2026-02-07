@@ -22,7 +22,16 @@
             <v-switch :label="$t('persist history')" color="green" inset v-model="settingsSystem.persist_history" hide-details="auto"></v-switch>
             <v-divider class="my-2"></v-divider>
             <span class="text-subtitle-1 font-weight-medium">{{ $t('display settings') }}</span>
-            <v-select :items="['on', 'off']" :label="$t('powersave')" v-model="settingsSystem.display.powersave" class="pt-4"></v-select>
+            <v-switch
+              :label="$t('powersave')"
+              color="green"
+              inset
+              v-model="settingsSystem.display.powersave"
+              :true-value="'on'"
+              :false-value="'off'"
+              class="pt-4"
+              density="compact"
+            />
             <v-text-field :label="$t('powerdown (min)')" type="number" v-model="settingsSystem.display.powerdown"></v-text-field>
             <v-text-field :label="$t('timeout (min)')" type="number" v-model="settingsSystem.display.timeout"></v-text-field>
             <v-divider class="my-2"></v-divider>
@@ -62,8 +71,13 @@
               type="number"
               v-model="settingsSystem.swapfile.config.accept_threshold_percent"
               :disabled="!settingsSystem.swapfile.enabled"
+              hide-details="auto"
             ></v-text-field>
-            <v-divider class="my-2"></v-divider>
+            <v-divider class="my-4"></v-divider>
+            <span class="text-subtitle-1 font-weight-medium">{{ $t('binfmt') }}</span>
+            <v-switch :label="$t('enable binfmt')" color="green" inset v-model="settingsSystem.binfmt.enabled" hide-details="auto"></v-switch>
+            <v-select multiple chips :items="architectures" :label="$t('binfmt architectures')" v-model="settingsSystem.binfmt.architectures" :disabled="!settingsSystem.binfmt.enabled" hide-details="auto"></v-select>
+            <v-divider class="my-4"></v-divider>
             <span class="text-subtitle-1 font-weight-medium">{{ $t('date & time') }}</span>
             <v-text-field class="mt-4" :label="$t('currently')" :model-value="`${currentTimeDate.date} ${currentTimeDate.time}`" readonly></v-text-field>
             <v-text-field
@@ -184,6 +198,10 @@ const settingsSystem = ref({
       accept_threshold_percent: 90,
     },
   },
+  binfmt: {
+    enabled: false,
+    architectures: [],
+  },
 });
 const zswapAlgorithms = ref([]);
 const keymaps = ref([]);
@@ -195,8 +213,14 @@ const proxies = ref({
   no_proxy: '',
 });
 const governors = ref([]);
+const architectures = ref([]);
 const overlay = ref(false);
 const { t } = useI18n();
+const timedate = ref({
+  date: '',
+  time: '',
+});
+let dateTimeInterval = null;
 
 onMounted(() => {
   getSystemSettings();
@@ -205,6 +229,7 @@ onMounted(() => {
   getProxies();
   getGovernors();
   getZswapAlgorithms();
+  getBinFmtArchitectures();
   dateTimeInterval = setInterval(updateDateTime, 1000);
 });
 
@@ -242,11 +267,6 @@ const getCurrentTime = () => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-const timedate = ref({
-  date: '',
-  time: '',
-});
-
 const currentTimeDate = ref({
   date: getCurrentDate(),
   time: getCurrentTime(),
@@ -260,8 +280,6 @@ const updateDateTime = () => {
     getTimeDate();
   }
 };
-
-let dateTimeInterval = null;
 
 const getSystemSettings = async () => {
   try {
@@ -377,8 +395,8 @@ const setSystemSettings = async () => {
       const errorDetails = await res.json();
       throw new Error(`${t('system settings could not be changed')}|$| ${errorDetails.error || t('unknown error')}`);
     }    
-    if (!res.ok) {
-      const errorDetails = await res.json();
+    if (!resProxy.ok) {
+      const errorDetails = await resProxy.json();
       throw new Error(`${t('proxies could not be changed')}|$| ${errorDetails.error || t('unknown error')}`);
     }
 
@@ -475,4 +493,29 @@ const getGovernors = async () => {
     showSnackbarError(userMessage, apiErrorMessage);
   }
 };
+
+const getBinFmtArchitectures = async () => {
+  try {
+    const res = await fetch('/api/v1/vm/binfmt_architectures', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('binfmt architectures could not be loaded')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+    //architectures.value = await res.json();
+    architectures.value = [
+  "aarch64",
+  "arm",
+  "riscv64",
+  "x86_64"
+];
+  } catch (e) {    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
 </script>

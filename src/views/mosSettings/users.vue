@@ -2,7 +2,14 @@
   <v-container fluid class="d-flex justify-center">
     <v-container style="width: 100%; max-width: 1920px" class="pa-0">
       <v-container fluid class="pt-0 pr-0 pl-0 pb-4">
-        <h2>{{ $t('users') }}</h2>
+        <v-row>
+          <v-col cols="auto" class="d-flex align-center">
+            <v-icon @click="$router.back()" class="mr-2">mdi-arrow-left</v-icon>
+          </v-col>
+          <v-col>
+            <h2>{{ $t('users') }}</h2>
+          </v-col>
+        </v-row>        
       </v-container>
       <v-card fluid style="margin-bottom: 80px" class="pa-0">
         <v-list class="bg-transparent">

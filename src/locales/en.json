@@ -1182,5 +1182,13 @@
   "ownership could not be set": "Ownership could not be set",
   "ownership successfully set": "Ownership successfully set"  ,
   "unprivileged": "Unprivileged",
-  "dnsmasq": "Dnsmasq"
+  "dnsmasq": "Dnsmasq",
+  "backup": "Backup",
+  "btrfs": "Btrfs",
+  "backup path": "Backup Path",
+  "backups to keep": "Backups to Keep",
+  "compression": "Compression",
+  "threads": "Threads",
+  "use snapshot for backups": "Use Snapshots for Backups",
+  "binfmt": "Binfmt"
 }

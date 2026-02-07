@@ -62,6 +62,42 @@
             </v-card>
           </v-col>
 
+          <!-- Hardware Card -->
+          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
+            <v-card class="pa-0">
+              <v-card-title class="text-h6 mb-3">
+                <v-icon color="primary" class="mr-2">mdi-chip</v-icon>
+                {{ $t('hardware') }}
+              </v-card-title>
+              <v-card-text>
+                <!--<v-btn color="primary" block class="mb-2" rounded to="/mosSettings/drivers">
+                  <v-icon start>mdi-expansion-card</v-icon>
+                  {{ $t('drivers') }}
+                </v-btn>-->
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/boot">
+                  <v-icon start>mdi-usb-flash-drive</v-icon>
+                  {{ $t('boot') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/usbDevices">
+                  <v-icon start>mdi-usb</v-icon>
+                  {{ $t('usb devices') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/pciDevices">
+                  <v-icon start>mdi-chip</v-icon>
+                  {{ $t('pci devices') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/sensors">
+                  <v-icon start>mdi-thermometer</v-icon>
+                  {{ $t('sensors') }}
+                </v-btn>
+                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/zram">
+                  <v-icon start>mdi-memory</v-icon>
+                  {{ $t('zram') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-col>          
+
           <!-- Virtualization Card -->
           <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
             <v-card class="pa-0">
@@ -105,42 +141,6 @@
                 <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/token">
                   <v-icon start>mdi-key</v-icon>
                   {{ $t('token') }}
-                </v-btn>
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          <!-- Hardware Card -->
-          <v-col cols="12" md="6" lg="4" xl="3" class="pb-0">
-            <v-card class="pa-0">
-              <v-card-title class="text-h6 mb-3">
-                <v-icon color="primary" class="mr-2">mdi-chip</v-icon>
-                {{ $t('hardware') }}
-              </v-card-title>
-              <v-card-text>
-                <!--<v-btn color="primary" block class="mb-2" rounded to="/mosSettings/drivers">
-                  <v-icon start>mdi-expansion-card</v-icon>
-                  {{ $t('drivers') }}
-                </v-btn>-->
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/boot">
-                  <v-icon start>mdi-usb-flash-drive</v-icon>
-                  {{ $t('boot') }}
-                </v-btn>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/usbDevices">
-                  <v-icon start>mdi-usb</v-icon>
-                  {{ $t('usb devices') }}
-                </v-btn>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/pciDevices">
-                  <v-icon start>mdi-chip</v-icon>
-                  {{ $t('pci devices') }}
-                </v-btn>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/sensors">
-                  <v-icon start>mdi-thermometer</v-icon>
-                  {{ $t('sensors') }}
-                </v-btn>
-                <v-btn color="primary" block class="mb-2" rounded to="/mosSettings/zram">
-                  <v-icon start>mdi-memory</v-icon>
-                  {{ $t('zram') }}
                 </v-btn>
               </v-card-text>
             </v-card>

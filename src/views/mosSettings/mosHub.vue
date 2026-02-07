@@ -68,7 +68,8 @@ const getMosHubSettings = async () => {
     }
     settingsMosHub.value = await res.json();
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     mosHubLoading.value = false;
   }
@@ -85,7 +86,6 @@ const setMosHubSettings = async () => {
       },
       body: JSON.stringify(settingsMosHub.value),
     });
-    overlay.value = false;
 
     if (!res.ok) {
       const error = await res.json();
@@ -95,8 +95,10 @@ const setMosHubSettings = async () => {
     showSnackbarSuccess(t('mos hub settings changed successfully'));
     emit('refresh-drawer');
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 </script>

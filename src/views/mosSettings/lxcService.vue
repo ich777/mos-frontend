@@ -15,27 +15,48 @@
         <v-skeleton-loader :loading="lxcServiceLoading" type="card" class="w-100">
           <v-card fluid style="margin-bottom: 80px" class="pa-0">
             <v-card-text>
-              <v-form>
-                <v-switch :label="$t('lxc service')" color="green" inset density="compact" v-model="settingsLXC.enabled" hide-details="auto"></v-switch>
-                <v-switch :label="$t('bridge')" color="green" inset density="compact" v-model="settingsLXC.bridge"></v-switch>
-                <v-text-field
-                  :label="$t('directory')"
-                  v-model="settingsLXC.directory"
-                  append-inner-icon="mdi-folder"
-                  @click:append-inner="
-                    openFsDialog((item) => {
-                      settingsLXC.directory = item.path;
-                    })
-                  "
-                ></v-text-field>
-                <v-text-field :label="$t('start wait (seconds)')" type="number" v-model="settingsLXC.start_wait"></v-text-field>
-                <v-text-field :label="$t('lxc registry')" v-model="settingsLXC.lxc_registry" placeholder="images.linuxcontainers.org or empty"></v-text-field>
-                <v-select
-                  :items="['directory', 'btrfs']"
-                  :label="$t('backing storage')"
-                  v-model="settingsLXC.backing_storage"
-                ></v-select>
-              </v-form>
+              <v-switch :label="$t('lxc service')" color="green" inset density="compact" v-model="settingsLXC.enabled" hide-details="auto"></v-switch>
+              <v-switch :label="$t('bridge')" color="green" inset density="compact" v-model="settingsLXC.bridge"></v-switch>
+              <v-text-field
+                :label="$t('directory')"
+                v-model="settingsLXC.directory"
+                append-inner-icon="mdi-folder"
+                @click:append-inner="
+                  openFsDialog((item) => {
+                    settingsLXC.directory = item.path;
+                  })
+                "
+              ></v-text-field>
+              <v-text-field :label="$t('start wait (seconds)')" type="number" v-model="settingsLXC.start_wait"></v-text-field>
+              <v-text-field :label="$t('lxc registry')" v-model="settingsLXC.lxc_registry" placeholder="images.linuxcontainers.org or empty"></v-text-field>
+              <v-select
+                :items="[
+                  { label: $t('directory'), value: 'directory' },
+                  { label: $t('btrfs'), value: 'btrfs' },
+                ]"
+                item-title="label"
+                item-value="value"
+                :label="$t('backing storage')"
+                v-model="settingsLXC.backing_storage"
+              />
+              <v-divider class="my-2"></v-divider>
+              <span class="text-subtitle-1 font-weight-medium">{{ $t('backup') }}</span>
+              <v-text-field
+                class="mt-4"
+                :label="$t('backup path')"
+                v-model="settingsLXC.backup_path"
+                append-inner-icon="mdi-folder"
+                placeholder="/path/to/backup/location"
+                @click:append-inner="
+                  openFsDialog((item) => {
+                    settingsLXC.backup_path = item.path;
+                  })
+                "
+              ></v-text-field>
+              <v-text-field :label="$t('backups to keep')" type="number" v-model.number="settingsLXC.backups_to_keep" :min="0" :max="50" />
+              <v-slider v-model="settingsLXC.compression" :min="0" :max="9" step="1" :label="$t('compression')" thumb-label />
+              <v-text-field :label="$t('threads')" type="number" v-model="settingsLXC.threads" :min="0"></v-text-field>
+              <v-switch :label="$t('use snapshot for backups')" color="green" inset density="compact" v-model="settingsLXC.use_snapshot" hide-details="auto"></v-switch>
             </v-card-text>
           </v-card>
         </v-skeleton-loader>
@@ -71,7 +92,12 @@ const settingsLXC = ref({
   directory: '',
   start_wait: '0',
   lxc_registry: null,
-  backing_storage: ''
+  backing_storage: '',
+  backup_path: '',
+  backups_to_keep: 0,
+  compression: 0,
+  threads: 0,
+  use_snapshot: false,
 });
 const overlay = ref(false);
 const { t } = useI18n();
@@ -101,18 +127,23 @@ const getLXCService = async () => {
       },
     });
 
-    if (!res.ok) throw new Error(t('lxc service could not be loaded'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc service could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
     settingsLXC.value = await res.json();
   } catch (e) {
-    showSnackbarError(e.message);
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
   } finally {
     lxcServiceLoading.value = false;
   }
 };
 
 const setLXCService = async () => {
+  overlay.value = true;
   try {
-    overlay.value = true;
     const res = await fetch('/api/v1/mos/settings/lxc', {
       method: 'POST',
       headers: {
@@ -121,14 +152,19 @@ const setLXCService = async () => {
       },
       body: JSON.stringify(settingsLXC.value),
     });
-    overlay.value = false;
 
-    if (!res.ok) throw new Error(t('lxc service could not be changed'));
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('lxc service could not be changed')}|$| ${error.error || t('unknown error')}`);
+    }
+
     showSnackbarSuccess(t('lxc service changed successfully'));
     emit('refresh-drawer');
   } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
     overlay.value = false;
-    showSnackbarError(e.message);
   }
 };
 </script>
