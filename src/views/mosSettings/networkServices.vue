@@ -18,6 +18,7 @@
               <v-col cols="12" md="6">
                 <v-switch :label="$t('ssh')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.ssh.enabled"></v-switch>
                 <v-switch :label="$t('nfs')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.nfs.enabled"></v-switch>
+                <v-switch :label="$t('dnsmasq')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.dnsmasq.enabled"></v-switch>
               </v-col>
               <v-col cols="12" md="6">
                 <v-switch :label="$t('nut')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.nut.enabled"></v-switch>
@@ -119,6 +120,9 @@ const settingsNetwork = ref({
   remote_mounting: {
     enabled: false,
   },
+  dnsmasq: {
+    enabled: false
+  }
 });
 const overlay = ref(false);
 const { t } = useI18n();
