@@ -506,13 +506,8 @@ const getBinFmtArchitectures = async () => {
       const errorDetails = await res.json();
       throw new Error(`${t('binfmt architectures could not be loaded')}|$| ${errorDetails.error || t('unknown error')}`);
     }
-    //architectures.value = await res.json();
-    architectures.value = [
-  "aarch64",
-  "arm",
-  "riscv64",
-  "x86_64"
-];
+    
+    architectures.value = await res.json();
   } catch (e) {    const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);
   }
