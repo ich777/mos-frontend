@@ -1190,5 +1190,7 @@
   "compression": "Compression",
   "threads": "Threads",
   "use snapshot for backups": "Use Snapshots for Backups",
-  "binfmt": "Binfmt"
+  "binfmt": "Binfmt",
+  "enable binfmt": "Enable Binfmt",
+  "binfmt architectures": "Binfmt Architectures"  
 }
