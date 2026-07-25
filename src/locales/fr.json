@@ -1647,6 +1647,11 @@
   "processed": "Traité",
   "errors": "Erreurs",
   "virtual pool": "Virtual Pool",
+  "acknowledge": "Prendre acte de",
+  "known repositories": "Dépôts connus",
+  "could not get known repositories": "Impossible de récupérer les dépôts connus",
+  "reinstall": "Réinstaller",
+  "create virtual pool": "Créer un pool virtuel",
   "virtual pool created successfully": "Virtual Pool créé avec succès",
   "virtual pool could not be created": "Impossible de créer le Virtual Pool",
   "virtual pools": "Virtual Pools",
@@ -1659,8 +1664,5 @@
   "virtual pool deleted successfully": "Virtual Pool supprimé avec succès",
   "virtual pool order could not be saved": "Impossible de sauvegarder l'ordre des Virtual Pools",
   "virtual pool order saved successfully": "Ordre des Virtual Pools sauvegardé avec succès",
-  "acknowledge": "Prendre acte de",
-  "known repositories": "Dépôts connus",
-  "could not get known repositories": "Impossible de récupérer les dépôts connus",
-  "reinstall": "Réinstaller"
+  "smart attribute acknowledged successfully": "Attribut SMART acquitté avec succès"
 }
