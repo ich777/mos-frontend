@@ -37,9 +37,11 @@
               <v-card-title class="d-flex justify-space-between align-center">
                 <div>
                   {{ token.name }}
-                  <v-chip v-if="token.description" class="ml-2" size="small">{{ token.description }}</v-chip>
+                  <v-chip v-if="token.description" class="ml-2" size="small">{{ token.permissions.mode}}</v-chip>
                 </div>
               </v-card-title>
+              <v-card-subtitle v-if="token.description" class="pt-0 pb-0">{{ token.description }}</v-card-subtitle>
+              <v-divider class="my-2"></v-divider>
               <v-card-text class="pb-0">
                 <v-text-field
                   v-model="token.token"
@@ -53,10 +55,10 @@
               </v-card-text>
               <v-card-actions>
                 <v-row class="d-flex justify-end">
-                  <v-btn variant="text" @click="copyAuthToken(token.token)" class="mr-4">
+                  <v-btn variant="text" color="onPrimary" size="small" @click="copyAuthToken(token.token)" class="mr-4" prepend-icon="mdi-content-copy">
                     {{ $t('copy') }}
                   </v-btn>
-                  <v-btn color="red" @click="deleteAdminToken(token.id)" class="mr-4">
+                  <v-btn color="red" size="small" @click="deleteAdminToken(token.id)" class="mr-4" prepend-icon="mdi-delete">
                     {{ $t('delete') }}
                   </v-btn>
                 </v-row>
@@ -91,7 +93,7 @@
           </v-card-text>
           <v-card-actions>
             <v-row class="d-flex justify-end mt-0">
-              <v-btn variant="text" @click="validateClientToken()" class="mr-4">
+              <v-btn variant="text" color="onPrimary" size="small" @click="validateClientToken()" class="mr-4" prepend-icon="mdi-check">
                 {{ $t('validate') }}
               </v-btn>
             </v-row>
@@ -102,18 +104,33 @@
   </v-container>
 
   <!-- Create Admin Token Dialog -->
-  <v-dialog v-model="createAdminTokenDialog.value" max-width="600">
-    <v-card>
-      <v-card-title>{{ $t('create admin api token') }}</v-card-title>
-      <v-card-text>
+  <v-dialog v-model="createAdminTokenDialog.value" max-width="600" scrollable>
+    <v-card class="pa-0" :title="$t('create admin api token')" prepend-icon="mdi-key">
+      <v-card-text class="pt-2">
         <v-text-field v-model="createAdminTokenDialog.name" :label="$t('name')" required></v-text-field>
         <v-text-field v-model="createAdminTokenDialog.description" :label="$t('description')"></v-text-field>
+        <v-select v-model="createAdminTokenDialog.permissions.mode" :label="$t('mode')" :items="permissionModes"></v-select>
+        <div v-if="createAdminTokenDialog.permissions.mode === 'custom'">
+          <v-select v-model="createAdminTokenDialog.permissions.resources.auth" :label="$t('auth')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.disks" :label="$t('disks')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.pools" :label="$t('pools')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.iscsi" :label="$t('iscsi')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.docker" :label="$t('docker')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.lxc" :label="$t('lxc')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.vm" :label="$t('vm')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.users" :label="$t('users')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.shares" :label="$t('shares')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.cron" :label="$t('cron')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.system" :label="$t('system')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.mos" :label="$t('mos')" :items="resourcesValueModes"></v-select>
+          <v-select v-model="createAdminTokenDialog.permissions.resources.terminal" :label="$t('terminal')" :items="resourcesValueModes"></v-select>
+        </div>
       </v-card-text>
       <v-divider />
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="onPrimary" variant="text" @click="createAdminTokenDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn color="onPrimary" @click="createAdminToken()">{{ $t('create') }}</v-btn>
+      <v-card-actions style="flex-shrink: 0">
+        <v-spacer />
+        <v-btn color="onPrimary" variant="text" size="small" @click="createAdminTokenDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" size="small" @click="createAdminToken()">{{ $t('create') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -154,7 +171,7 @@
       <v-divider />
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="onPrimary" variant="text" @click="showValidateResult.value = false">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" variant="text" size="small" @click="showValidateResult.value = false">{{ $t('close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -164,9 +181,6 @@
     <v-icon>mdi-content-save</v-icon>
   </v-fab>
 
-  <v-overlay :model-value="overlay" class="align-center justify-center">
-    <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
-  </v-overlay>
 </template>
 
 <script setup>
@@ -182,10 +196,30 @@ const { overlay } = useOverlay();
 const showPassword = ref(false);
 const showPasswortGithub = ref(false);
 const showPasswortDockerhub = ref(false);
+const permissionModes = ['full', 'custom', 'readonly'];
+const resourcesValueModes = ['read', 'write', 'none'];
 const createAdminTokenDialog = reactive({
   value: false,
   name: '',
   description: '',
+  permissions: {
+    mode: "full",
+    resources: {
+      auth: "read",
+      disks: "read",
+      pools: "read",
+      iscsi: "read",
+      docker: "read",
+      lxc: "read",
+      vm: "read",
+      users: "read",
+      shares: "read",
+      cron: "read",
+      system: "read",
+      mos: "read",
+      terminal: "read"
+    }
+  }
 });
 const clientToken = ref({
   github: '',
@@ -293,10 +327,17 @@ const setClientToken = async () => {
 };
 
 const createAdminToken = async (name) => {
-  const newAdminToken = {
+  const payload = {
     name: createAdminTokenDialog.name,
     description: createAdminTokenDialog.description,
+    permissions: {
+      mode: createAdminTokenDialog.permissions.mode,
+    },
   };
+
+  if (createAdminTokenDialog.permissions.mode === 'custom') {
+    payload.permissions.resources = createAdminTokenDialog.permissions.resources;
+  }
 
   try {
     overlay.value = true;
@@ -306,7 +347,7 @@ const createAdminToken = async (name) => {
         Authorization: 'Bearer ' + localStorage.getItem('authToken'),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newAdminToken),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {

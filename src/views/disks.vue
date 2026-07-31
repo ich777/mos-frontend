@@ -180,7 +180,7 @@
   </v-dialog>
 
   <!-- Confirm S.M.A.R.T. Dialog -->
-  <v-dialog v-model="smartDialog.value" max-width="800">
+  <v-dialog v-model="smartDialog.value" width="1000" max-width="1000px">
     <v-card class="pa-0" :title="$t('smart infos')" prepend-icon="mdi-chart-timeline-variant-shimmer">
       <v-card-text style="overflow: auto">
         <div v-if="smartDialog.loading">
@@ -277,6 +277,7 @@
                   <th>{{ $t('worst') }}</th>
                   <th>{{ $t('threshold') }}</th>
                   <th>{{ $t('raw value') }}</th>
+                  <th>{{ $t('acknowledge') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -287,6 +288,11 @@
                   <td>{{ attr.worst }}</td>
                   <td>{{ attr.threshold }}</td>
                   <td>{{ attr.rawValue }}</td>
+                  <td>
+                    <v-btn v-if="(!smartDialog.smartDiskConfig.acknowledged || smartDialog.smartDiskConfig.acknowledged[attr.id] === null || parseInt(attr.rawValue) > smartDialog.smartDiskConfig.acknowledged[attr.id]) && attr.rawValue > 0" size="x-small" type="text" @click="acknowledgeSmartAttribute(attr.id)">
+                      {{ $t('acknowledge') }}
+                    </v-btn>
+                  </td>
                 </tr>
               </tbody>
             </v-table>
@@ -390,10 +396,11 @@ const smartDialog = reactive({
     temperatureCritical: 0,
     monitoredAttributes: [5, 187, 198, 199],
     attributeNotificationCooldown: 0,
-    lastSeen: '2026-04-08T12:14:07.437Z',
-    model: 'WDC WD40EFRX-68N32N0',
-    diskType: 'hdd',
+    lastSeen: '',
+    model: '',
+    diskType: '',
     warning: false,
+    acknowledged: { 5: null, 187: null, 198: null, 199: null },
   },
   loading: false,
 });
@@ -744,6 +751,40 @@ const saveSmartDiskConfig = async () => {
 
     showSnackbarSuccess(t('smart disk config saved successfully'));
     smartDialog.value = false;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const acknowledgeSmartAttribute = async (attributeId) => {
+const payload = {
+    attributes: [ 
+      attributeId,
+    ],
+  };
+
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/disks/smart/config/disks/${smartDialog.disk.name}/acknowledge`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorDetails = await res.json();
+      throw new Error(`${t('smart attribute could not be acknowledged')}|$| ${errorDetails.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('smart attribute acknowledged successfully'));
+    smartDialog.smartInfos = await getSmartInfos(smartDialog.disk, false);
+    smartDialog.smartDiskConfig = await getSmartDiskConfig(smartDialog.disk);
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
     showSnackbarError(userMessage, apiErrorMessage);

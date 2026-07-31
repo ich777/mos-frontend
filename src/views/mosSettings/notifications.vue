@@ -20,7 +20,7 @@
               <v-tab v-for="provider in providerNames" :key="`tab-${provider}`" :value="provider">
                 <div class="d-flex align-center ga-2">
                   <span>{{ provider === EMAIL_PROVIDER ? $t('email') : provider }}</span>
-                  <v-chip size="x-small" :color="providers[provider]?.enabled ? 'green' : 'default'" variant="tonal">
+                  <v-chip size="x-small" variant="tonal">
                     {{ providers[provider]?.enabled ? $t('enabled') : $t('disabled') }}
                   </v-chip>
                 </div>
@@ -167,9 +167,6 @@
     <v-icon>mdi-content-save</v-icon>
   </v-fab>
 
-  <v-overlay :model-value="overlay" class="align-center justify-center">
-    <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
-  </v-overlay>
 </template>
 
 <script setup>
@@ -433,7 +430,7 @@ const safeParse = (value) => {
 
 const isValidEmailAddress = (value) => {
   const normalized = String(value || '').trim();
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized);
+  return normalized === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized);
 };
 
 const isJsonValid = (providerName, fieldName) => {

@@ -151,23 +151,23 @@
               <template v-if="mosHub.length > 0">
                 <div class="hub-grid">
                   <v-card v-for="(tpl, i) in mosHub" :key="tpl.name || i" style="height: 250px; display: flex; flex-direction: column" class="pa-0">
-                    <v-card-text class="pa-0 pt-4">
+                    <v-card-text class="pa-0 pt-4" style="position: relative">
                       <div class="d-flex justify-center">
-                        <v-img v-if="tpl.icon" :src="tpl.icon" height="60" contain style="max-width: 100%"></v-img>
-                        <v-icon v-else size="60" color="grey" style="opacity: 0.5">mdi-package-variant</v-icon>
+                        <v-img v-if="tpl.icon" :src="tpl.icon" height="60" contain style="max-width: 100%; z-index: 0"></v-img>
+                        <v-icon v-else size="100" color="grey" style="opacity: 0.5; z-index: 0">mdi-package-variant</v-icon>
                       </div>
                       <v-chip
                         v-if="tpl.maintainer"
                         size="small"
                         class="position-absolute"
-                        style="top: 12px; left: 12px; background: var(--v-theme-secondary); color: var(--v-theme-on-secondary)"
+                        style="top: 12px; left: 12px; background: var(--v-theme-secondary); color: var(--v-theme-on-secondary); z-index: 1"
                         :href="tpl.maintainer_donate"
                         target="_blank"
                         prepend-icon="mdi-account"
                       >
                         {{ tpl.maintainer || $t('unknown') }}
                       </v-chip>
-                      <v-chip v-if="tpl.type" size="small" class="position-absolute" style="top: 12px; right: 12px; background: var(--v-theme-primary); color: var(--v-theme-on-primary)">
+                      <v-chip v-if="tpl.type" size="small" class="position-absolute" style="top: 12px; right: 12px; background: var(--v-theme-primary); color: var(--v-theme-on-primary); z-index: 1">
                         {{ $t(tpl.type) }}
                       </v-chip>
                     </v-card-text>
@@ -194,6 +194,9 @@
                     <v-spacer />
                     <v-divider />
                     <v-card-actions style="flex: 0 0 auto; gap: 4px; padding: 8px">
+                      <v-chip v-if="tpl.installed" color="secondary" size="small">
+                        {{ $t('installed') }}
+                      </v-chip>
                       <v-spacer />
                       <v-btn color="secondary" :href="tpl.website" target="_blank" v-if="tpl.website" prepend-icon="mdi-web" size="small">
                         {{ $t('webpage') }}
@@ -210,7 +213,7 @@
                         "
                         :disabled="!mosServices.docker.running"
                       >
-                        {{ $t('install') }}
+                        {{ tpl.installed ? $t('reinstall') : $t('install') }}
                       </v-btn>
                       <v-btn
                         v-else-if="tpl.type == 'compose' && mosServices && mosServices.docker"
@@ -269,12 +272,10 @@
   </v-container>
 
   <!-- Repositories Dialog -->
-  <v-dialog v-model="mosHubRepositoriesDialog.value" max-width="600px">
-    <v-card class="pa-0">
-      <v-card-title>{{ $t('repositories') }}</v-card-title>
-      <v-card-text class="pa-0">
-        <v-container fluid>
-          <v-row class="pa-0">
+  <v-dialog v-model="mosHubRepositoriesDialog.value" max-width="600px" scrollable>
+    <v-card class="pa-0" :title="$t('repositories')" prepend-icon="mdi-source-repository">
+      <v-card-text class="py-0" style="max-height: 60vh; overflow-y: auto">
+          <v-row class="pa-0 pt-2">
             <v-col cols="12" v-for="(repo, index) in mosHubRepositoriesDialog.repositories" :key="index" class="d-flex align-center">
               <v-text-field
                 v-model="mosHubRepositoriesDialog.repositories[index]"
@@ -289,19 +290,21 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" class="d-flex justify-end mt-2">
+            <v-col cols="12" class="d-flex flex-column gap-2 mt-0 mb-2" style="align-items: flex-end">
+              <v-btn color="primary" variant="text" prepend-icon="mdi-plus" @click="openKnownReposDialog()">
+                {{ $t('known repositories') }}
+              </v-btn>
               <v-btn color="primary" variant="text" prepend-icon="mdi-plus" @click="mosHubRepositoriesDialog.repositories.push('')">
                 {{ $t('add repository') }}
               </v-btn>
             </v-col>
           </v-row>
-        </v-container>
       </v-card-text>
       <v-divider />
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="mosHubRepositoriesDialog.value = false">{{ $t('cancel') }}</v-btn>
-        <v-btn color="primary" @click="setHubRepositories(mosHubRepositoriesDialog.repositories)">{{ $t('save') }}</v-btn>
+      <v-card-actions style="flex-shrink: 0">
+        <v-spacer />
+        <v-btn color="onPrimary" @click="mosHubRepositoriesDialog.value = false">{{ $t('cancel') }}</v-btn>
+        <v-btn color="onPrimary" @click="setHubRepositories(mosHubRepositoriesDialog.repositories)">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -405,14 +408,41 @@
         </v-row>
       </v-card-text>
       <v-divider />
-      <v-card-actions class="px-6 py-2">
+      <v-card-actions style="flex-shrink: 0">
+        <v-tooltip :text="$t('mos hub is community driven and not all templates are tested and verified. please check the template/source before installing and use at your own risk')" location="top" max-width="300">
+          <template #activator="{ props }">
+            <v-icon v-bind="props" color="info" icon="mdi-information"></v-icon>
+          </template>
+        </v-tooltip>
         <v-spacer />
-        <v-btn color="onPrimary" variant="text" @click="installDialog.value = false">
+        <v-btn color="onPrimary" @click="installDialog.value = false">
           {{ $t('cancel') }}
         </v-btn>
         <v-btn color="onPrimary" :disabled="installDialog.type === 'plugin' ? !installDialog.release : !mosServices?.docker?.running" :prepend-icon="getInstallDialogIcon()" @click="doDialogInstall()">
           {{ $t('install') }}
         </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Pick known repos -->
+  <v-dialog v-model="knownReposDialog.value" persistent max-width="600" scrollable>
+    <v-card :title="$t('known repositories')" prepend-icon="mdi-source-repository">
+      <v-card-text style="max-height: 60vh; overflow-y: auto">
+          <v-list>
+            <v-list-item v-for="repo in knownRepos" :key="repo" @click="toggleKnownRepo(repo)">
+              <template #append>
+                <v-icon v-if="selectedKnownRepos.includes(repo)" color="success">mdi-check-circle</v-icon>
+              </template>
+              <v-list-item-title>{{ repo }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions style="flex-shrink: 0">
+        <v-spacer />
+        <v-btn color="onPrimary" @click="knownReposDialog.value = false">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" @click="saveSelectedKnownRepos()">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -477,6 +507,12 @@ const errorMsg = ref('');
 const releasesItems = ref([]);
 const mosHub = ref([]);
 const mosHubCount = ref(0);
+const knownRepos = ref([]);
+const selectedKnownRepos = ref([]);
+const knownReposDialog = reactive({
+  value: false,
+  loading: false,
+});
 
 const mosHubRepositoriesDialog = reactive({
   value: false,
@@ -760,6 +796,47 @@ const openPluginInstallDialog = (tpl) => {
   releasesItems.value = [];
   installDialog.release = null;
   getPluginReleases(tpl?.repository);
+};
+const openKnownReposDialog = async () => {
+  knownReposDialog.value = true;
+  knownReposDialog.loading = true;
+  await getKnownRepos();
+  selectedKnownRepos.value = [...mosHubRepositoriesDialog.repositories];
+  knownReposDialog.loading = false;
+};
+
+const getKnownRepos = async () => {
+  try {
+    const res = await fetch('/api/v1/mos/hub/knownrepositories', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('could not get known repositories')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    knownRepos.value = await res.json();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const toggleKnownRepo = (repoName) => {
+  const index = selectedKnownRepos.value.indexOf(repoName);
+  if (index === -1) {
+    selectedKnownRepos.value.push(repoName);
+  } else {
+    selectedKnownRepos.value.splice(index, 1);
+  }
+};
+
+const saveSelectedKnownRepos = () => {
+  mosHubRepositoriesDialog.repositories = [...selectedKnownRepos.value];
+  knownReposDialog.value = false;
 };
 </script>
 

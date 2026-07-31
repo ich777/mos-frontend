@@ -889,7 +889,7 @@ const getDevicesOfPool = async (pool) => {
     const normalize = (d) => {
       if (typeof d === 'string') return { name: d, value: d };
       const value = parseInt(d?.slot) || '';
-      const name = d?.device + ' (' + d?.storage.totalSpace_human + ')' || '';
+      const name = `${d?.device} (${d?.storage.totalSpace_human}) (${d.diskInfo?.diskSerial})` || '';
       return { name, value };
     };
 
