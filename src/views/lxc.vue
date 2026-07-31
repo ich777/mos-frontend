@@ -156,9 +156,9 @@
       <v-card-text>
         <v-form>
           <v-text-field v-model="createDialog.name" :label="$t('name')" required />
-          <v-select v-model="createDialog.distribution" :items="images.map((image) => image.name)" :label="$t('distribution')" required />
-          <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" required />
-          <v-select v-model="createDialog.arch" :items="getArchitectuesfromDistribution(createDialog.distribution, createDialog.release)" :label="$t('architecture')" required />
+          <v-select v-model="createDialog.distribution" :items="images.map((image) => image.name)" :label="$t('distribution')" :loading="lxcImagesLoading" required/>
+          <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" :loading="lxcImagesLoading" required/>
+          <v-select v-model="createDialog.arch" :items="getArchitectuesfromDistribution(createDialog.distribution, createDialog.release)" :label="$t('architecture')" :loading="lxcImagesLoading" required/>
           <v-textarea v-model="createDialog.description" :label="$t('description')" rows="2" />
           <v-switch v-model="createDialog.unprivileged" :label="$t('unprivileged')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.autostart" :label="$t('autostart')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
@@ -238,6 +238,7 @@ const deleteDialog = reactive({
   lxc: null,
 });
 const lxcsLoading = ref(true);
+const lxcImagesLoading = ref(true);
 const searchTerm = ref('');
 const filteredLxcs = computed(() => {
   const term = (searchTerm.value || '').trim().toLowerCase();
@@ -248,7 +249,6 @@ let socket = null;
 
 onMounted(() => {
   getLXCs();
-  getImages();
   getLXCWS();
 });
 
@@ -465,7 +465,6 @@ const createLXC = async () => {
 
     showSnackbarSuccess(t('lxc container created successfully'));
     getLXCs();
-    clearCreateDialog();
     createDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
@@ -492,7 +491,6 @@ const removeLXC = async (name) => {
 
     showSnackbarSuccess(t('lxc container removed successfully'));
     getLXCs();
-    clearDeleteDialog();
     deleteDialog.value = false;
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
@@ -679,19 +677,14 @@ const openDeleteDialog = (lxc) => {
   deleteDialog.value = true;
   deleteDialog.lxc = lxc;
 };
-const clearDeleteDialog = () => {
-  deleteDialog.value = false;
-  deleteDialog.lxc = null;
-};
-const openCreateDialog = () => {
+const openCreateDialog = async () => {
   createDialog.value = true;
-};
-const clearCreateDialog = () => {
-  createDialog.value = false;
   createDialog.name = '';
   createDialog.distribution = null;
   createDialog.release = null;
   createDialog.arch = null;
+  await getImages();
+  lxcImagesLoading.value = false;
 };
 
 const getLxcIconSrc = (lxc) => {
