@@ -34,59 +34,62 @@
                     <td style="padding: 4px 8px; vertical-align: middle">
                       <v-menu>
                         <template #activator="{ props }">
-                          <v-img class="drag-handle" v-bind="props" :src="getLxcIconSrc(lxc)" alt="lxc image" width="24" height="24" style="cursor: pointer">
+                          <v-img v-if="!lxc.invalid_config" class="drag-handle" v-bind="props" :src="getLxcIconSrc(lxc)" alt="lxc image" width="24" height="24" style="cursor: pointer">
                             <template #error>
                               <v-sheet class="d-flex align-center justify-center" height="100%" width="100%">
                                 <v-icon color="grey-darken-1">mdi-image-off</v-icon>
                               </v-sheet>
                             </template>
                           </v-img>
+                          <v-sheet v-else class="d-flex align-center justify-center" height="100%" width="100%">
+                            <v-icon color="red" v-bind="props" class="drag-handle" alt="lxc image" width="24" height="24" style="cursor: pointer">mdi-file-alert</v-icon>
+                          </v-sheet>
                         </template>
 
                         <v-list>
-                          <v-list-item v-if="checkWebui(lxc)" @click="showWebui(lxc)">
+                          <v-list-item v-if="checkWebui(lxc)" @click="showWebui(lxc)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-web</v-icon></template>
                             <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-console</v-icon></template>
                             <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
                           </v-list-item>
 
                           <v-divider />
 
-                          <v-list-item v-if="lxc.state !== 'running'" @click="startLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state !== 'running'" @click="startLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-play-circle</v-icon></template>
                             <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'running'" @click="stopLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'running'" @click="stopLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-stop-circle</v-icon></template>
                             <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'running'" @click="killLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'running'" @click="killLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-close-octagon</v-icon></template>
                             <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'running'" @click="restartLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'running'" @click="restartLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-restart</v-icon></template>
                             <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'running'" @click="freezeLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'running'" @click="freezeLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-snowflake</v-icon></template>
                             <v-list-item-title>{{ $t('freeze') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item v-if="lxc.state === 'frozen'" @click="unfreezeLXC(lxc.name)">
+                          <v-list-item v-if="lxc.state === 'frozen'" @click="unfreezeLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-snowflake-off</v-icon></template>
                             <v-list-item-title>{{ $t('unfreeze') }}</v-list-item-title>
                           </v-list-item>
 
-                          <v-list-item @click="openDeleteDialog(lxc)">
+                          <v-list-item @click="openDeleteDialog(lxc)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-delete</v-icon></template>
                             <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                           </v-list-item>
@@ -156,9 +159,15 @@
       <v-card-text>
         <v-form>
           <v-text-field v-model="createDialog.name" :label="$t('name')" required />
-          <v-select v-model="createDialog.distribution" :items="images.map((image) => image.name)" :label="$t('distribution')" :loading="lxcImagesLoading" required/>
-          <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" :loading="lxcImagesLoading" required/>
-          <v-select v-model="createDialog.arch" :items="getArchitectuesfromDistribution(createDialog.distribution, createDialog.release)" :label="$t('architecture')" :loading="lxcImagesLoading" required/>
+          <v-select v-model="createDialog.distribution" :items="images.map((image) => image.name)" :label="$t('distribution')" :loading="lxcImagesLoading" required />
+          <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" :loading="lxcImagesLoading" required />
+          <v-select
+            v-model="createDialog.arch"
+            :items="getArchitectuesfromDistribution(createDialog.distribution, createDialog.release)"
+            :label="$t('architecture')"
+            :loading="lxcImagesLoading"
+            required
+          />
           <v-textarea v-model="createDialog.description" :label="$t('description')" rows="2" />
           <v-switch v-model="createDialog.unprivileged" :label="$t('unprivileged')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.autostart" :label="$t('autostart')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
@@ -179,9 +188,7 @@
   <!-- Delete LXC Dialog -->
   <v-dialog v-model="deleteDialog.value" max-width="500">
     <v-card class="pa-0">
-      <v-card-title class="text-h6">
-        {{ $t('delete') }} {{ deleteDialog.lxc ? deleteDialog.lxc.name : '' }}
-      </v-card-title>
+      <v-card-title class="text-h6">{{ $t('delete') }} {{ deleteDialog.lxc ? deleteDialog.lxc.name : '' }}</v-card-title>
       <v-card-text>
         {{ $t('are you sure you want to delete this lxc container?') }}
       </v-card-text>
@@ -202,7 +209,6 @@
   <v-fab @click="openCreateDialog()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-plus</v-icon>
   </v-fab>
-
 </template>
 
 <script setup>
