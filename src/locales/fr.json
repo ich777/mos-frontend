@@ -1647,6 +1647,11 @@
   "processed": "Traité",
   "errors": "Erreurs",
   "virtual pool": "Virtual Pool",
+  "acknowledge": "Prendre acte de",
+  "known repositories": "Dépôts connus",
+  "could not get known repositories": "Impossible de récupérer les dépôts connus",
+  "reinstall": "Réinstaller",
+  "create virtual pool": "Créer un pool virtuel",
   "virtual pool created successfully": "Virtual Pool créé avec succès",
   "virtual pool could not be created": "Impossible de créer le Virtual Pool",
   "virtual pools": "Virtual Pools",
@@ -1659,8 +1664,10 @@
   "virtual pool deleted successfully": "Virtual Pool supprimé avec succès",
   "virtual pool order could not be saved": "Impossible de sauvegarder l'ordre des Virtual Pools",
   "virtual pool order saved successfully": "Ordre des Virtual Pools sauvegardé avec succès",
-  "acknowledge": "Prendre acte de",
-  "known repositories": "Dépôts connus",
-  "could not get known repositories": "Impossible de récupérer les dépôts connus",
-  "reinstall": "Réinstaller"
+  "smart attribute acknowledged successfully": "Attribut SMART acquitté avec succès",
+  "max log directory size": "Taille maximale du répertoire de journaux",
+  "mos hub is community driven and not all templates are tested and verified. please check the template/source before installing and use at your own risk": "MOS Hub est géré par la communauté et tous les modèles ne sont pas testés et vérifiés. Veuillez vérifier le modèle/la source avant l'installation et l'utiliser à vos propres risques",
+  "bond": "Bond",
+  "not enough physical network interfaces for bonding": "Pas assez d'interfaces réseau physiques pour le bonding",
+  "bonding requires at least two physical network adapters, only one was found": "Le bonding nécessite au moins deux adaptateurs réseau physiques, un seul a été trouvé"
 }
