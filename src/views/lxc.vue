@@ -153,9 +153,8 @@
   </v-container>
 
   <!-- Create LXC Dialog -->
-  <v-dialog v-model="createDialog.value" max-width="600">
-    <v-card class="pa-0">
-      <v-card-title>{{ $t('create lxc container') }}</v-card-title>
+  <v-dialog v-model="createDialog.value" max-width="700">
+    <v-card class="pa-0" :title="$t('create lxc container')" prepend-icon="mdi-plus">
       <v-card-text>
         <v-form>
           <v-text-field v-model="createDialog.name" :label="$t('name')" required />
@@ -169,6 +168,40 @@
             required
           />
           <v-textarea v-model="createDialog.description" :label="$t('description')" rows="2" />
+          <v-divider class="my-3"></v-divider>
+
+          <div class="d-flex align-center justify-space-between mb-2">
+            <span class="text-subtitle-2">{{ $t('mounts') }}</span>
+            <v-btn variant="text" color="success" size="small" prepend-icon="mdi-plus" @click="createDialog.mounts.push({ source: '', destination: '', readonly: false, type: 'file' })">
+              {{ $t('add') }}
+            </v-btn>
+          </div>
+
+          <v-sheet v-if="!createDialog.mounts.length" border rounded class="pa-4 text-center text-medium-emphasis mb-2">
+            {{ $t('no mounts defined') }}
+          </v-sheet>
+
+          <v-sheet v-for="(mount, i) in createDialog.mounts" :key="i" border rounded class="pa-3 mb-2">
+            <v-row align="center">
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details />
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field v-model="mount.destination" :label="$t('destination')" density="compact" variant="outlined" hide-details />
+              </v-col>
+              <v-col cols="6" sm="2">
+                <v-select v-model="mount.type" :items="['file', 'directory']" :label="$t('type')" density="compact" variant="outlined" hide-details />
+              </v-col>
+              <v-col cols="4" sm="3" class="d-flex justify-center">
+                <v-checkbox v-model="mount.readonly" :label="$t('readonly')" density="compact" hide-details class="flex-grow-0" style="white-space: nowrap" />
+              </v-col>
+              <v-col cols="2" sm="1" class="d-flex justify-end">
+                <v-btn icon="mdi-delete-outline" variant="text" color="error" size="small" @click="createDialog.mounts.splice(i, 1)" />
+              </v-col>
+            </v-row>
+          </v-sheet>
+
+          <v-divider class="my-3"></v-divider>
           <v-switch v-model="createDialog.unprivileged" :label="$t('unprivileged')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.autostart" :label="$t('autostart')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.start_after_creation" :label="$t('start after creation')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
@@ -238,6 +271,8 @@ const createDialog = reactive({
   autostart: false,
   description: '',
   start_after_creation: false,
+  mounts: [
+  ],
 });
 const deleteDialog = reactive({
   value: false,
@@ -451,6 +486,12 @@ const createLXC = async () => {
     autostart: createDialog.autostart,
     description: createDialog.description,
     start_after_creation: createDialog.start_after_creation,
+    mounts: createDialog.mounts.map((mount) => ({
+      source: mount.source,
+      destination: mount.destination,
+      readonly: mount.readonly,
+      type: mount.type,
+    })),
   };
 
   try {

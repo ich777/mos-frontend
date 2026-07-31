@@ -1669,5 +1669,8 @@
   "mos hub is community driven and not all templates are tested and verified. please check the template/source before installing and use at your own risk":  "MOS Hub is community driven and not all templates are tested and verified. Please check the template/source before installing and use at your own risk",
   "bond": "Bond",
   "not enough physical network interfaces for bonding": "Not enough physical network interfaces for bonding",
-  "bonding requires at least two physical network adapters, only one was found": "Bonding requires at least two physical network adapters, only one was found"
+  "bonding requires at least two physical network adapters, only one was found": "Bonding requires at least two physical network adapters, only one was found",
+  "no mounts defined": "No mounts defined",
+  "destination": "Destination",
+  "readonly": "Read Only"
 }
