@@ -203,6 +203,24 @@
             <small class="text-center mt-0">{{ $t('Hugepages') }}</small>
           </v-col>
         </v-row>
+        <v-divider class="my-4" />
+        <!-- Cpu Configuration -->
+        <div class="mb-4">
+          <v-row>
+            <v-col cols="12" class="d-flex align-center justify-space-between">
+              <span class="text-title-medium font-weight-bold">{{ $t('cpu') }}</span>
+            </v-col>
+          </v-row>        
+        <v-slider
+          :model-value="newVm.selectedCores.length"
+          @update:model-value="selectFirstNCores"
+          :label="$t('cores')"
+          min="0"
+          :max="(cpu.cores || []).length || 0"
+          step="1"
+          thumb-label="always"
+          variant="outlined"
+        />
         <details>
           <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline" class="text-body-2 mb-0">{{ $t('core pinning') }}</summary>
           <v-row v-for="(core, i) in (cpu.cores || []).filter((c) => c.isPhysical)" :key="i" density="comfortable" class="align-center flex-wrap ga-2" no-gutters>
@@ -228,6 +246,8 @@
             </v-col>
           </v-row>
         </details>
+        </div>
+        <v-divider class="my-4" />        
         <v-select v-model="newVm.machineTypeArchitecture" :items="availableMachineTypeArchitectures" :label="$t('machine type')" variant="outlined" class="mt-8 mb-3" />
         <v-select
           v-if="newVm.machineTypeArchitecture"
@@ -562,12 +582,31 @@
             <small class="text-center mt-0">{{ $t('Hugepages') }}</small>
           </v-col>
         </v-row>
-        <details>
-          <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline" class="text-body-2 mb-0">{{ $t('core pinning') }}</summary>
-          <v-row v-for="(core, i) in (cpu.cores || []).filter((c) => c.isPhysical)" :key="i" density="comfortable" class="align-center flex-wrap ga-2" no-gutters>
-            <v-col cols="auto" class="py-0">
-              <div class="core-row" style="min-width: 0; display: flex; align-items: center; gap: 6px">
-                <v-checkbox v-model="editedVm.selectedCores" :name="`core-${core.number}`" :value="core.number" hide-details density="compact" />
+        <v-divider class="my-4" />
+        <!-- Cpu Configuration -->
+        <div class="mb-4">
+          <v-row>
+            <v-col cols="12" class="d-flex align-center justify-space-between">
+              <span class="text-title-medium font-weight-bold">{{ $t('cpu') }}</span>
+            </v-col>
+          </v-row>
+          <v-slider
+            :model-value="editedVm.selectedCores.length"
+            @update:model-value="selectFirstNCoresEdit"
+            :label="$t('cores')"
+            min="0"
+            :max="(cpu.cores || []).length || 0"
+            step="1"
+            thumb-label="always"
+            variant="outlined"
+            class="mb-4"
+          />
+          <details>
+            <summary style="cursor: pointer; color: var(--v-theme-primary); text-decoration: underline" class="text-body-2 mb-0">{{ $t('core pinning') }}</summary>
+            <v-row v-for="(core, i) in (cpu.cores || []).filter((c) => c.isPhysical)" :key="i" density="comfortable" class="align-center flex-wrap ga-2" no-gutters>
+              <v-col cols="auto" class="py-0">
+                <div class="core-row" style="min-width: 0; display: flex; align-items: center; gap: 6px">
+                  <v-checkbox v-model="editedVm.selectedCores" :name="`core-${core.number}`" :value="core.number" hide-details density="compact" />
                 <div class="core-label text-body-2">
                   <small>
                     <b>Core-{{ core.number }}</b>
@@ -586,7 +625,9 @@
               </div>
             </v-col>
           </v-row>
-        </details>
+          </details>
+        </div>
+        <v-divider class="my-4" />
         <v-select v-model="editedVm.machineTypeArchitecture" :items="availableMachineTypeArchitectures" :label="$t('machine type')" variant="outlined" class="mt-8 mb-3" />
         <v-select
           v-if="editedVm.machineTypeArchitecture"
@@ -1941,6 +1982,20 @@ const recalculateBootOrder = () => {
     .forEach((device, index) => {
       device.item.boot_order = index + 1;
     });
+};
+
+const selectFirstNCores = (count) => {
+  const allCores = (cpu.value.cores || [])
+    .map(c => c.number)
+    .sort((a, b) => a - b);
+  newVm.value.selectedCores = allCores.slice(0, count);
+};
+
+const selectFirstNCoresEdit = (count) => {
+  const allCores = (cpu.value.cores || [])
+    .map(c => c.number)
+    .sort((a, b) => a - b);
+  editedVm.value.selectedCores = allCores.slice(0, count);
 };
 
 const addDisk = () => {

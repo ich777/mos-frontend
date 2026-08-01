@@ -4,6 +4,10 @@ import path from 'path';
 import federation from '@originjs/vite-plugin-federation';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Target configuration
+const API_TARGET = 'http://mos-test.home';
+const WS_TARGET = 'ws://mos-test.home';
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -57,30 +61,30 @@ export default defineConfig({
     port: 80,
     proxy: {
       '^/api/(?!v1/socket\\.io)': {
-        target: 'http://mos-test.home',
+        target: API_TARGET,
         changeOrigin: true,
       },
       '/api/v1/socket.io': {
-        target: 'http://mos-test.home',
+        target: API_TARGET,
         changeOrigin: true,
         ws: true,
       },
       '/ws': {
-        target: 'ws://mos-test.home',
+        target: WS_TARGET,
         ws: true,
       },
       '/api/v1/notify': {
-        target: 'http://mos-test.home',
+        target: API_TARGET,
         changeOrigin: true,
         ws: true,
       },
       '/api/v1/vm/vnc/ws': {
-        target: 'ws://mos-test.home',
+        target: WS_TARGET,
         changeOrigin: true,
         ws: true,
       },
       '/_plugins': {
-        target: 'http://mos-test.home',
+        target: API_TARGET,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/_plugins/, '/plugins'),
       },
