@@ -1672,5 +1672,8 @@
   "bonding requires at least two physical network adapters, only one was found": "Bonding requires at least two physical network adapters, only one was found",
   "no mounts defined": "No mounts defined",
   "destination": "Destination",
-  "readonly": "Read Only"
+  "readonly": "Read Only",
+  "mounts could not be saved": "Mounts could not be saved",
+  "mounts saved successfully": "Mounts saved successfully",
+  "mounts could not be loaded": "Mounts could not be loaded"
 }

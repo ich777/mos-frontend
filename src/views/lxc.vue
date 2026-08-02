@@ -51,49 +51,43 @@
                             <template #prepend><v-icon>mdi-web</v-icon></template>
                             <v-list-item-title>{{ $t('web ui') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'running'" @click="openTerminal(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-console</v-icon></template>
                             <v-list-item-title>{{ $t('terminal') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-divider />
-
                           <v-list-item v-if="lxc.state !== 'running'" @click="startLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-play-circle</v-icon></template>
                             <v-list-item-title>{{ $t('start') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'running'" @click="stopLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-stop-circle</v-icon></template>
                             <v-list-item-title>{{ $t('stop') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'running'" @click="killLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-close-octagon</v-icon></template>
                             <v-list-item-title>{{ $t('kill') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'running'" @click="restartLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-restart</v-icon></template>
                             <v-list-item-title>{{ $t('restart') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'running'" @click="freezeLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-snowflake</v-icon></template>
                             <v-list-item-title>{{ $t('freeze') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item v-if="lxc.state === 'frozen'" @click="unfreezeLXC(lxc.name)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-snowflake-off</v-icon></template>
                             <v-list-item-title>{{ $t('unfreeze') }}</v-list-item-title>
                           </v-list-item>
-
                           <v-list-item @click="openDeleteDialog(lxc)" :disabled="lxc.invalid_config">
                             <template #prepend><v-icon>mdi-delete</v-icon></template>
                             <v-list-item-title>{{ $t('delete') }}</v-list-item-title>
                           </v-list-item>
-
+                          <v-list-item v-if="lxc.state === 'stopped'" @click="openMountsDialog(lxc)" :disabled="lxc.invalid_config">
+                            <template #prepend><v-icon>mdi-database</v-icon></template>
+                            <v-list-item-title>{{ $t('mounts') }}</v-list-item-title>
+                          </v-list-item>
                           <v-list-item v-if="lxc.config && lxc.config != ''" @click="openFileEditor(lxc.config)">
                             <template #prepend><v-icon>mdi-text-box-edit</v-icon></template>
                             <v-list-item-title>{{ $t('edit config') }}</v-list-item-title>
@@ -156,7 +150,6 @@
   <v-dialog v-model="createDialog.value" max-width="700">
     <v-card class="pa-0" :title="$t('create lxc container')" prepend-icon="mdi-plus">
       <v-card-text>
-        <v-form>
           <v-text-field v-model="createDialog.name" :label="$t('name')" required />
           <v-select v-model="createDialog.distribution" :items="images.map((image) => image.name)" :label="$t('distribution')" :loading="lxcImagesLoading" required />
           <v-select v-model="createDialog.release" :items="getReleasesfromDistribution(createDialog.distribution)" :label="$t('release')" :loading="lxcImagesLoading" required />
@@ -205,7 +198,6 @@
           <v-switch v-model="createDialog.unprivileged" :label="$t('unprivileged')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.autostart" :label="$t('autostart')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
           <v-switch v-model="createDialog.start_after_creation" :label="$t('start after creation')" class="mt-2" inset density="compact" hide-details="auto" color="green" />
-        </v-form>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -230,6 +222,51 @@
         <v-btn text @click="deleteDialog.value = false" color="onPrimary">{{ $t('cancel') }}</v-btn>
         <v-btn color="red" @click="removeLXC(deleteDialog.lxc.name)">
           {{ $t('delete') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Mounts Dialog -->
+  <v-dialog v-model="mountsDialog.value" max-width="700">
+    <v-card class="pa-0" :title="$t('mounts')" prepend-icon="mdi-database">
+      <v-card-text>
+        <div class="d-flex align-center justify-space-between mb-2">
+          <span class="text-subtitle-2"></span>
+          <v-btn variant="text" color="success" size="small" prepend-icon="mdi-plus" @click="mountsDialog.lxc?.mounts?.push({ source: '', destination: '', readonly: false, type: 'file' })">
+            {{ $t('add') }}
+          </v-btn>
+        </div>
+
+        <v-sheet v-if="!mountsDialog.lxc || !mountsDialog.lxc.mounts || !mountsDialog.lxc.mounts.length" border rounded class="pa-4 text-center text-medium-emphasis mb-2">
+          {{ $t('no mounts defined') }}
+        </v-sheet>
+
+        <v-sheet v-for="(mount, i) in mountsDialog.lxc ? mountsDialog.lxc.mounts : []" :key="i" border rounded class="pa-3 mb-2">
+          <v-row align="center">
+            <v-col cols="12" sm="3">
+              <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details />
+            </v-col>
+            <v-col cols="12" sm="3">
+              <v-text-field v-model="mount.destination" :label="$t('destination')" density="compact" variant="outlined" hide-details />
+            </v-col>
+            <v-col cols="6" sm="2">
+              <v-select v-model="mount.type" :items="['file', 'directory']" :label="$t('type')" density="compact" variant="outlined" hide-details />
+            </v-col>
+            <v-col cols="4" sm="3" class="d-flex justify-center">
+              <v-checkbox v-model="mount.readonly" :label="$t('readonly')" density="compact" hide-details class="flex-grow-0" style="white-space: nowrap" />
+            </v-col>
+            <v-col cols="2" sm="1" class="d-flex justify-end">
+              <v-btn icon="mdi-delete-outline" variant="text" color="error" size="small" @click="mountsDialog.lxc?.mounts?.splice(i, 1)" />
+            </v-col>
+          </v-row>
+        </v-sheet>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="mountsDialog.value = false" color="onPrimary">{{ $t('close') }}</v-btn>
+        <v-btn color="onPrimary" @click="saveMounts(mountsDialog.lxc)" :disabled="!mountsDialog.lxc || !mountsDialog.lxc.mounts || mountsDialog.lxc.mounts.length <= 0">
+          {{ $t('save') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -275,6 +312,10 @@ const createDialog = reactive({
   ],
 });
 const deleteDialog = reactive({
+  value: false,
+  lxc: null,
+});
+const mountsDialog = reactive({
   value: false,
   lxc: null,
 });
@@ -732,6 +773,65 @@ const openCreateDialog = async () => {
   createDialog.arch = null;
   await getImages();
   lxcImagesLoading.value = false;
+};
+const openMountsDialog = async (lxc) => {
+  mountsDialog.value = true;
+  mountsDialog.lxc = lxc;
+  if (!mountsDialog.lxc.mounts) {
+    mountsDialog.lxc.mounts = await getMounts(lxc) || [];
+  }
+};
+
+const getMounts = async (lxc) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/lxc/containers/${lxc.name}/mounts`, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('mounts could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const mountsResult = await res.json();
+    return mountsResult;
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
+};
+
+const saveMounts = async (lxc) => {
+  try {
+    overlay.value = true;
+    const res = await fetch(`/api/v1/lxc/containers/${lxc.name}/mounts`, {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(lxc.mounts),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(`${t('mounts could not be saved')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    showSnackbarSuccess(t('mounts saved successfully'));
+    mountsDialog.value = false;
+    getLXCs();
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  } finally {
+    overlay.value = false;
+  }
 };
 
 const getLxcIconSrc = (lxc) => {

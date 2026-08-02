@@ -1669,5 +1669,7 @@
   "mos hub is community driven and not all templates are tested and verified. please check the template/source before installing and use at your own risk": "MOS Hub est géré par la communauté et tous les modèles ne sont pas testés et vérifiés. Veuillez vérifier le modèle/la source avant l'installation et l'utiliser à vos propres risques",
   "bond": "Bond",
   "not enough physical network interfaces for bonding": "Pas assez d'interfaces réseau physiques pour le bonding",
-  "bonding requires at least two physical network adapters, only one was found": "Le bonding nécessite au moins deux adaptateurs réseau physiques, un seul a été trouvé"
+  "bonding requires at least two physical network adapters, only one was found": "Le bonding nécessite au moins deux adaptateurs réseau physiques, un seul a été trouvé",
+  "mounts could not be saved": "Les montages n'ont pas pu être sauvegardés",
+  "mounts saved successfully": "Montages sauvegardés avec succès"
 }
