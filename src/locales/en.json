@@ -1675,5 +1675,9 @@
   "readonly": "Read Only",
   "mounts could not be saved": "Mounts could not be saved",
   "mounts saved successfully": "Mounts saved successfully",
-  "mounts could not be loaded": "Mounts could not be loaded"
+  "mounts could not be loaded": "Mounts could not be loaded",
+  "slaac": "SLAAC",
+  "dhcp": "DHCP",
+  "static": "Static",
+  "slaac assigns the address automatically based on the mac address": "SLAAC assigns the address automatically based on the MAC address"
 }

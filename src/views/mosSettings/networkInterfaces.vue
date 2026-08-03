@@ -72,15 +72,7 @@
                         <v-text-field :label="$t('ipv4 address')" v-model="iface.ipv4[0].address" variant="outlined" hide-details="auto"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
-                        <v-text-field
-                          :label="$t('cidr')"
-                          v-model="iface.ipv4[0].cidr"
-                          variant="outlined"
-                          hide-details="auto"
-                          min="0"
-                          max="32"
-                          type="number"
-                        ></v-text-field>
+                        <v-text-field :label="$t('cidr')" v-model="iface.ipv4[0].cidr" variant="outlined" hide-details="auto" min="0" max="32" type="number"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
                         <v-text-field :label="$t('mtu')" v-model="iface.ipv4[0].mtu" variant="outlined" hide-details="auto" type="number"></v-text-field>
@@ -114,13 +106,23 @@
 
               <v-row v-if="iface.ipv6.length > 0">
                 <v-col cols="12">
-                  <v-switch :label="$t('ipv6 dhcp')" v-model="iface.ipv6[0].dhcp" inset density="compact" color="green" hide-details="auto"></v-switch>
+                  <v-btn-toggle :model-value="iface.ipv6[0].mode" @update:model-value="(val) => setIpv6Mode(iface.ipv6[0], val)" mandatory density="compact" color="green">
+                    <v-btn value="slaac">{{ $t('slaac') }}</v-btn>
+                    <v-btn value="dhcp">{{ $t('dhcp') }}</v-btn>
+                    <v-btn value="static">{{ $t('static') }}</v-btn>
+                  </v-btn-toggle>
+                  <div v-if="iface.ipv6[0] && iface.ipv6[0].mode === 'slaac'" class="text-caption text-medium-emphasis mt-1">
+                    {{ $t('slaac assigns the address automatically based on the mac address') }}
+                  </div>
                 </v-col>
-                <template v-if="!iface.ipv6[0].dhcp">
+                <template v-if="iface.ipv6[0].mode === 'static'">
                   <v-col cols="12" md="6">
                     <v-text-field :label="$t('ipv6 address')" v-model="iface.ipv6[0].address" variant="outlined" hide-details="auto"></v-text-field>
                   </v-col>
                   <v-col cols="12" md="6">
+                    <v-text-field :label="$t('ipv6 gateway')" v-model="iface.ipv6[0].gateway" variant="outlined" hide-details="auto"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
                     <v-text-field :label="$t('ipv6 dns (comma separated)')" v-model="getIfaceIpDnsString(iface, 'ipv6').value" variant="outlined" hide-details="auto"></v-text-field>
                   </v-col>
                 </template>
@@ -188,15 +190,7 @@
                         <v-text-field :label="$t('ipv4 address')" v-model="iface.ipv4[0].address" variant="outlined" hide-details="auto"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
-                        <v-text-field
-                          :label="$t('cidr')"
-                          v-model="iface.ipv4[0].cidr"
-                          variant="outlined"
-                          hide-details="auto"
-                          min="0"
-                          max="32"
-                          type="number"
-                        ></v-text-field>
+                        <v-text-field :label="$t('cidr')" v-model="iface.ipv4[0].cidr" variant="outlined" hide-details="auto" min="0" max="32" type="number"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
                         <v-text-field :label="$t('mtu')" v-model="iface.ipv4[0].mtu" variant="outlined" hide-details="auto" type="number"></v-text-field>
@@ -230,9 +224,23 @@
               ></v-switch>
               <v-row v-if="iface.ipv6.length > 0">
                 <v-col cols="12">
-                  <v-switch :label="$t('ipv6 dhcp')" v-model="iface.ipv6[0].dhcp" inset density="compact" color="green" hide-details="auto"></v-switch>
+                  <v-btn-toggle
+                    style="border: 1px solid #ccc"
+                    :model-value="iface.ipv6[0].mode"
+                    @update:model-value="(val) => setIpv6Mode(iface.ipv6[0], val)"
+                    mandatory
+                    density="compact"
+                    color="green"
+                  >
+                    <v-btn value="slaac">{{ $t('slaac') }}</v-btn>
+                    <v-btn value="dhcp">{{ $t('dhcp') }}</v-btn>
+                    <v-btn value="static">{{ $t('static') }}</v-btn>
+                  </v-btn-toggle>
+                  <div v-if="iface.ipv6[0] && iface.ipv6[0].mode === 'slaac'" class="text-caption text-medium-emphasis mt-1">
+                    {{ $t('slaac assigns the address automatically based on the mac address') }}
+                  </div>
                 </v-col>
-                <template v-if="!iface.ipv6[0].dhcp">
+                <template v-if="iface.ipv6[0].mode === 'static'">
                   <v-col cols="12" md="6">
                     <v-text-field :label="$t('ipv6 address')" v-model="iface.ipv6[0].address" variant="outlined" hide-details="auto"></v-text-field>
                   </v-col>
@@ -268,7 +276,11 @@
                 chips
                 variant="outlined"
                 hide-details="auto"
-                @update:model-value="(val) => { iface.interfaces = val.length > 2 ? val.slice(0, 2) : val; }"
+                @update:model-value="
+                  (val) => {
+                    iface.interfaces = val.length > 2 ? val.slice(0, 2) : val;
+                  }
+                "
               ></v-select>
               <v-divider class="my-4"></v-divider>
               <div class="d-flex align-center mb-2">
@@ -285,15 +297,7 @@
                         <v-text-field :label="$t('ipv4 address')" v-model="iface.ipv4[0].address" variant="outlined" hide-details="auto"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
-                        <v-text-field
-                          :label="$t('cidr')"
-                          v-model="iface.ipv4[0].cidr"
-                          variant="outlined"
-                          hide-details="auto"
-                          min="0"
-                          max="32"
-                          type="number"
-                        ></v-text-field>
+                        <v-text-field :label="$t('cidr')" v-model="iface.ipv4[0].cidr" variant="outlined" hide-details="auto" min="0" max="32" type="number"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="3">
                         <v-text-field :label="$t('mtu')" v-model="iface.ipv4[0].mtu" variant="outlined" hide-details="auto" type="number"></v-text-field>
@@ -327,9 +331,16 @@
               ></v-switch>
               <v-row v-if="iface.ipv6.length > 0">
                 <v-col cols="12">
-                  <v-switch :label="$t('ipv6 dhcp')" v-model="iface.ipv6[0].dhcp" inset density="compact" color="green" hide-details="auto"></v-switch>
+                  <v-btn-toggle bordered :model-value="iface.ipv6[0].mode" @update:model-value="(val) => setIpv6Mode(iface.ipv6[0], val)" mandatory density="compact" color="green">
+                    <v-btn value="slaac">{{ $t('slaac') }}</v-btn>
+                    <v-btn value="dhcp">{{ $t('dhcp') }}</v-btn>
+                    <v-btn value="static">{{ $t('static') }}</v-btn>
+                  </v-btn-toggle>
+                  <div v-if="iface.ipv6[0] && iface.ipv6[0].mode === 'slaac'" class="text-caption text-medium-emphasis mt-1">
+                    {{ $t('slaac assigns the address automatically based on the mac address') }}
+                  </div>
                 </v-col>
-                <template v-if="!iface.ipv6[0].dhcp">
+                <template v-if="iface.ipv6[0].mode === 'static'">
                   <v-col cols="12" md="6">
                     <v-text-field :label="$t('ipv6 address')" v-model="iface.ipv6[0].address" variant="outlined" hide-details="auto"></v-text-field>
                   </v-col>
@@ -416,7 +427,8 @@
                   <td>
                     <div v-if="vlan.ipv6 && vlan.ipv6.length">
                       <div v-if="vlan.ipv6[0].dhcp">{{ $t('dhcp') }}</div>
-                      <div v-else>{{ vlan.ipv6[0].address || '' }}</div>
+                      <div v-else-if="vlan.ipv6[0].address">{{ vlan.ipv6[0].address }}</div>
+                      <div v-else>{{ $t('slaac') }}</div>
                     </div>
                   </td>
                 </tr>
@@ -484,12 +496,11 @@
             color="green"
             inset
             density="compact"
-            :model-value="addVlanDialog.ipv6 && addVlanDialog.ipv6.dhcp !== undefined"
+            :model-value="addVlanDialog.ipv6 !== null"
             @update:model-value="
               (val) => {
                 if (val) {
-                  if (!addVlanDialog.ipv6) addVlanDialog.ipv6 = {};
-                  addVlanDialog.ipv6.dhcp = true;
+                  addVlanDialog.ipv6 = { mode: 'slaac', dhcp: false, address: '', gateway: '', dns: '' };
                 } else {
                   addVlanDialog.ipv6 = null;
                 }
@@ -497,19 +508,26 @@
             "
             hide-details="auto"
           ></v-switch>
-          <v-switch
-            v-if="addVlanDialog.ipv6 && addVlanDialog.ipv6.dhcp !== undefined"
-            :label="$t('ipv6 dhcp')"
-            v-model="addVlanDialog.ipv6.dhcp"
-            inset
-            density="compact"
-            color="green"
-            hide-details="auto"
-          ></v-switch>
-          <template v-if="addVlanDialog.ipv6 && addVlanDialog.ipv6.dhcp !== undefined && !addVlanDialog.ipv6.dhcp">
-            <v-text-field :label="$t('ipv6 address')" v-model="addVlanDialog.ipv6.address" variant="outlined" class="pt-2"></v-text-field>
-            <v-text-field :label="$t('ipv6 gateway')" v-model="addVlanDialog.ipv6.gateway" variant="outlined"></v-text-field>
-            <v-text-field :label="$t('ipv6 dns (comma separated)')" v-model="addVlanDialog.ipv6.dns" variant="outlined" hide-details="auto"></v-text-field>
+          <template v-if="addVlanDialog.ipv6 !== null">
+            <v-btn-toggle
+              style="border: 1px solid #ccc"
+              :model-value="addVlanDialog.ipv6.mode"
+              @update:model-value="(val) => setDialogIpv6Mode(addVlanDialog.ipv6, val)"
+              mandatory
+              density="compact"
+              color="green"
+              class="mb-2"
+            >
+              <v-btn value="slaac">{{ $t('slaac') }}</v-btn>
+              <v-btn value="dhcp">{{ $t('dhcp') }}</v-btn>
+              <v-btn value="static">{{ $t('static') }}</v-btn>
+            </v-btn-toggle>
+            <div v-if="addVlanDialog.ipv6.mode === 'slaac'" class="text-caption text-medium-emphasis mb-2">{{ $t('slaac assigns the address automatically based on the mac address') }}</div>
+            <template v-if="addVlanDialog.ipv6.mode === 'static'">
+              <v-text-field :label="$t('ipv6 address')" v-model="addVlanDialog.ipv6.address" variant="outlined" class="pt-2"></v-text-field>
+              <v-text-field :label="$t('ipv6 gateway')" v-model="addVlanDialog.ipv6.gateway" variant="outlined"></v-text-field>
+              <v-text-field :label="$t('ipv6 dns (comma separated)')" v-model="addVlanDialog.ipv6.dns" variant="outlined" hide-details="auto"></v-text-field>
+            </template>
           </template>
         </div>
       </v-card-text>
@@ -553,7 +571,6 @@
   <v-fab @click="saveNetworkSettingsDialog.value = true" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-content-save</v-icon>
   </v-fab>
-
 </template>
 
 <script setup>
@@ -640,7 +657,6 @@ const getNetworkSettings = async () => {
 
     settingsNetwork.value = await res.json();
     settingsNetwork.value.interfaces.forEach((iface) => {
-      // Initialize ipv4/ipv6 for all types except bonded
       if (iface.type === 'bonded') {
         iface.ipv4 = [];
         iface.ipv6 = [];
@@ -657,6 +673,11 @@ const getNetworkSettings = async () => {
         if (!iface.ipv6) {
           iface.ipv6 = [];
         }
+      }
+
+      if (iface.ipv6 && iface.ipv6.length > 0 && iface.ipv6[0].mode === undefined) {
+        const entry = iface.ipv6[0];
+        entry.mode = entry.dhcp ? 'dhcp' : entry.address ? 'static' : 'slaac';
       }
 
       if (!iface.vlans) iface.vlans = [];
@@ -679,7 +700,7 @@ const getNetworkSettings = async () => {
 
 const validateBondInterfaces = () => {
   const bonds = settingsNetwork.value.interfaces.filter((iface) => iface.type === 'bond');
-  
+
   for (const bond of bonds) {
     const memberCount = Array.isArray(bond.interfaces) ? bond.interfaces.length : 0;
 
@@ -689,10 +710,7 @@ const validateBondInterfaces = () => {
     const potentialTotal = memberCount + available.length;
 
     if (potentialTotal < 2) {
-      showSnackbarError(
-        t('not enough physical network interfaces for bonding'),
-        t('bonding requires at least two physical network adapters, only one was found')
-      );
+      showSnackbarError(t('not enough physical network interfaces for bonding'), t('bonding requires at least two physical network adapters, only one was found'));
     } else {
       showSnackbarError(t('bond requires exactly two interfaces'));
     }
@@ -707,15 +725,88 @@ const normalizeMtuValue = (value) => {
   return value;
 };
 
-const normalizeIpv4MtuArray = (ipv4Array) => {
-  if (!Array.isArray(ipv4Array)) return ipv4Array;
-  return ipv4Array.map((entry) => {
-    if (!entry || typeof entry !== 'object' || !Object.prototype.hasOwnProperty.call(entry, 'mtu')) return entry;
-    return {
-      ...entry,
+const normalizeNullableString = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'string' && value.trim() === '') return null;
+  return value;
+};
+
+const normalizeDnsList = (value) => {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => (typeof item === 'string' ? item.trim() : '')).filter(Boolean);
+};
+
+const hasDhcpFlag = (entry) => {
+  return !!entry && typeof entry === 'object' && Object.prototype.hasOwnProperty.call(entry, 'dhcp');
+};
+
+const normalizeIpv4ArrayForPayload = (ipv4Array) => {
+  if (!Array.isArray(ipv4Array) || ipv4Array.length === 0) return [];
+
+  const entry = ipv4Array[0];
+  if (!hasDhcpFlag(entry)) return ipv4Array;
+
+  if (entry.dhcp) {
+    return [
+      {
+        dhcp: true,
+        cidr: null,
+        mtu: normalizeMtuValue(entry.mtu),
+      },
+    ];
+  }
+
+  return [
+    {
+      dhcp: false,
+      address: normalizeNullableString(entry.address),
+      cidr: normalizeNullableString(entry.cidr),
+      gateway: normalizeNullableString(entry.gateway),
       mtu: normalizeMtuValue(entry.mtu),
-    };
-  });
+      dns: normalizeDnsList(entry.dns),
+    },
+  ];
+};
+
+const normalizeIpv6ArrayForPayload = (ipv6Array) => {
+  if (!Array.isArray(ipv6Array) || ipv6Array.length === 0) return [];
+
+  const entry = ipv6Array[0];
+  if (!hasDhcpFlag(entry)) return ipv6Array;
+
+  const mode = entry.mode || (entry.dhcp ? 'dhcp' : entry.address ? 'static' : 'slaac');
+
+  if (mode === 'dhcp') {
+    return [
+      {
+        dhcp: true,
+        address: null,
+        gateway: null,
+        dns: [],
+      },
+    ];
+  }
+
+  if (mode === 'slaac') {
+    return [
+      {
+        dhcp: false,
+        address: null,
+        gateway: null,
+        dns: [],
+      },
+    ];
+  }
+
+  // static
+  return [
+    {
+      dhcp: false,
+      address: normalizeNullableString(entry.address),
+      gateway: normalizeNullableString(entry.gateway),
+      dns: normalizeDnsList(entry.dns),
+    },
+  ];
 };
 
 const setNetworkSettings = async () => {
@@ -740,13 +831,15 @@ const setNetworkSettings = async () => {
               };
 
       baseIface.mtu = normalizeMtuValue(baseIface.mtu);
-      baseIface.ipv4 = normalizeIpv4MtuArray(baseIface.ipv4);
+      baseIface.ipv4 = normalizeIpv4ArrayForPayload(baseIface.ipv4);
+      baseIface.ipv6 = normalizeIpv6ArrayForPayload(baseIface.ipv6);
 
       if (Array.isArray(baseIface.vlans)) {
         baseIface.vlans = baseIface.vlans.map((vlan) => ({
           ...vlan,
           mtu: normalizeMtuValue(vlan.mtu),
-          ipv4: normalizeIpv4MtuArray(vlan.ipv4),
+          ipv4: normalizeIpv4ArrayForPayload(vlan.ipv4),
+          ipv6: normalizeIpv6ArrayForPayload(vlan.ipv6),
         }));
       }
 
@@ -840,7 +933,6 @@ const changeInterfaceType = (iface) => {
         }
       }
     });
-    // Ensure ipv4/ipv6 are initialized for ethernet
     if (!iface.ipv4 || iface.ipv4.length === 0) {
       iface.ipv4 = [{ dhcp: true, address: null, cidr: null, gateway: null, mtu: null, dns: [] }];
     }
@@ -879,7 +971,6 @@ const changeInterfaceType = (iface) => {
       });
     }
   } else if (iface.type === 'bonded') {
-    // If changing to bonded, remove any bridge that includes this interface
     const bridgeIdx = settingsNetwork.value.interfaces.findIndex((i) => i.type === 'bridge' && i.interfaces.includes(iface.name));
     if (bridgeIdx !== -1) {
       settingsNetwork.value.interfaces.splice(bridgeIdx, 1);
@@ -928,7 +1019,8 @@ const changeIPv6Enabled = (iface, enabled) => {
     if (!iface.ipv6) iface.ipv6 = [];
     if (iface.ipv6.length === 0) {
       iface.ipv6.push({
-        dhcp: true,
+        mode: 'slaac',
+        dhcp: false,
         address: null,
         gateway: null,
         dns: [],
@@ -936,6 +1028,26 @@ const changeIPv6Enabled = (iface, enabled) => {
     }
   } else {
     iface.ipv6 = [];
+  }
+};
+
+const setIpv6Mode = (entry, mode) => {
+  entry.mode = mode;
+  entry.dhcp = mode === 'dhcp';
+  if (mode !== 'static') {
+    entry.address = null;
+    entry.gateway = null;
+    entry.dns = [];
+  }
+};
+
+const setDialogIpv6Mode = (entry, mode) => {
+  entry.mode = mode;
+  entry.dhcp = mode === 'dhcp';
+  if (mode !== 'static') {
+    entry.address = '';
+    entry.gateway = '';
+    entry.dns = '';
   }
 };
 
@@ -964,15 +1076,11 @@ const findBridgeForInterface = (iface) => {
 
 const getAvailableBondedInterfacesForBond = (bond) => {
   const physicalInterfaces = settingsNetwork.value.interfaces.filter((i) => i.type === 'ethernet' && i.mac && i.mac !== '' && i.mac !== null && i.mac !== undefined).map((i) => i.name);
-  
-  const assignedInOtherBonds = settingsNetwork.value.interfaces
-    .filter((i) => i.type === 'bond' && i.name !== bond.name && Array.isArray(i.interfaces))
-    .flatMap((i) => i.interfaces);
-  
-  const assignedInBridges = settingsNetwork.value.interfaces
-    .filter((i) => i.type === 'bridge' && Array.isArray(i.interfaces))
-    .flatMap((i) => i.interfaces);
-  
+
+  const assignedInOtherBonds = settingsNetwork.value.interfaces.filter((i) => i.type === 'bond' && i.name !== bond.name && Array.isArray(i.interfaces)).flatMap((i) => i.interfaces);
+
+  const assignedInBridges = settingsNetwork.value.interfaces.filter((i) => i.type === 'bridge' && Array.isArray(i.interfaces)).flatMap((i) => i.interfaces);
+
   return physicalInterfaces.filter((name) => !assignedInOtherBonds.includes(name) && !assignedInBridges.includes(name));
 };
 
@@ -1035,19 +1143,31 @@ const addVlanToInterfaces = () => {
       },
     ];
     if (addVlanDialog.ipv6) {
-      newVlan.ipv6 = [
-        {
-          dhcp: addVlanDialog.ipv6.dhcp,
-          address: addVlanDialog.ipv6.address,
-          gateway: addVlanDialog.ipv6.gateway,
-          dns: addVlanDialog.ipv6.dns
-            ? addVlanDialog.ipv6.dns
-                .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : [],
-        },
-      ];
+      const mode = addVlanDialog.ipv6.mode || 'slaac';
+      if (mode === 'static') {
+        newVlan.ipv6 = [
+          {
+            dhcp: false,
+            address: addVlanDialog.ipv6.address || null,
+            gateway: addVlanDialog.ipv6.gateway || null,
+            dns: addVlanDialog.ipv6.dns
+              ? addVlanDialog.ipv6.dns
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : [],
+          },
+        ];
+      } else {
+        newVlan.ipv6 = [
+          {
+            dhcp: mode === 'dhcp',
+            address: null,
+            gateway: null,
+            dns: [],
+          },
+        ];
+      }
     }
   } else {
     newVlan.ipv4 = [{}];
