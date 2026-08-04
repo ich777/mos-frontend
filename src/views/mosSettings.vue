@@ -679,7 +679,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, inject } from 'vue';
+import { onMounted, ref, reactive, inject, watch, nextTick } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { useOverlay } from '@/composables/useOverlay';
@@ -1067,6 +1067,28 @@ const openSupportDialog = () => {
   supportDialog.showEnterCode = false;
   supportDialog.supportCode = '';
 };
+
+const onChannelChange = async () => {
+  await nextTick();
+  if (getMosReleasesOfChannel().length > 0) {
+    updateOsDialog.release = 'latest';
+  }
+};
+
+watch(
+  () => updateOsDialog.value,
+  async (newVal) => {
+    if (newVal) {
+      await nextTick();
+      updateOsDialog.channel = osInfo.value?.mos?.channel || null;
+      await nextTick();
+      if (getMosReleasesOfChannel().length > 0) {
+        updateOsDialog.release = 'latest';
+      }
+    }
+  }
+);
+
 const openUpdateOsDialog = () => {
   updateOsDialog.value = true;
   clearUpdateOsDialog();
