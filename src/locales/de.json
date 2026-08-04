@@ -1679,5 +1679,7 @@
   "slaac": "SLAAC",
   "dhcp": "DHCP",
   "static": "Statisch",
-  "slaac assigns the address automatically based on the mac address": "SLAAC weist die Adresse automatisch basierend auf der MAC-Adresse zu"
+  "slaac assigns the address automatically based on the mac address": "SLAAC weist die Adresse automatisch basierend auf der MAC-Adresse zu",
+  "invalid releases data": "Ungültige Release-Daten",
+  "required channels not found": "Erforderliche Kanäle nicht gefunden"
 }
