@@ -177,7 +177,7 @@
           <v-sheet v-for="(mount, i) in createDialog.mounts" :key="i" border rounded class="pa-3 mb-2">
             <v-row align="center">
               <v-col cols="12" sm="3">
-                <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details />
+                <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details append-inner-icon="mdi-folder-open" @click:append-inner="() => { currentCreateMountIndex = i; fsDialogVisibleCreate = true; }" />
               </v-col>
               <v-col cols="12" sm="3">
                 <v-text-field v-model="mount.destination" :label="$t('destination')" density="compact" variant="outlined" hide-details />
@@ -245,7 +245,7 @@
         <v-sheet v-for="(mount, i) in mountsDialog.lxc ? mountsDialog.lxc.mounts : []" :key="i" border rounded class="pa-3 mb-2">
           <v-row align="center">
             <v-col cols="12" sm="3">
-              <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details />
+              <v-text-field v-model="mount.source" :label="$t('source')" density="compact" variant="outlined" hide-details append-inner-icon="mdi-folder-open" @click:append-inner="() => { currentMountIndex = i; fsDialogVisible = true; }" />
             </v-col>
             <v-col cols="12" sm="3">
               <v-text-field v-model="mount.destination" :label="$t('destination')" density="compact" variant="outlined" hide-details />
@@ -275,6 +275,12 @@
   <!-- File Edit Dialog -->
   <FileEditDialog v-model="editFileDialogVisible" :path="selectedFilePath" :createBackup="true" :title="$t('edit file')" @saved="onFileSaved" />
 
+  <!-- File System Navigator Dialog -->
+  <FsNavigatorDialog v-model="fsDialogVisible" :initialPath="currentMountIndex >= 0 && mountsDialog.lxc?.mounts?.[currentMountIndex]?.source ? mountsDialog.lxc.mounts[currentMountIndex].source : '/'" :selectType="currentMountIndex >= 0 && mountsDialog.lxc?.mounts?.[currentMountIndex]?.type ? mountsDialog.lxc.mounts[currentMountIndex].type : 'directory'" :title="$t('select path')" @selected="(item) => { if (currentMountIndex >= 0 && mountsDialog.lxc?.mounts?.[currentMountIndex]) { mountsDialog.lxc.mounts[currentMountIndex].source = item.path; fsDialogVisible = false; } }" />
+
+  <!-- File System Navigator Dialog for Create -->
+  <FsNavigatorDialog v-model="fsDialogVisibleCreate" :initialPath="currentCreateMountIndex >= 0 && createDialog.mounts?.[currentCreateMountIndex]?.source ? createDialog.mounts[currentCreateMountIndex].source : '/'" :selectType="currentCreateMountIndex >= 0 && createDialog.mounts?.[currentCreateMountIndex]?.type ? createDialog.mounts[currentCreateMountIndex].type : 'directory'" :title="$t('select path')" @selected="(item) => { if (currentCreateMountIndex >= 0 && createDialog.mounts?.[currentCreateMountIndex]) { createDialog.mounts[currentCreateMountIndex].source = item.path; fsDialogVisibleCreate = false; } }" />
+
   <!-- Floating Action Button -->
   <v-fab @click="openCreateDialog()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-plus</v-icon>
@@ -289,10 +295,15 @@ import { useI18n } from 'vue-i18n';
 import { useOverlay } from '@/composables/useOverlay';
 import { openTerminalPopup } from '@/composables/terminalpopup';
 import FileEditDialog from '@/components/fileEditDialog.vue';
+import FsNavigatorDialog from '@/components/fsNavigatorDialog.vue';
 import { io } from 'socket.io-client';
 
 const editFileDialogVisible = ref(false);
 const selectedFilePath = ref('');
+const fsDialogVisible = ref(false);
+const currentMountIndex = ref(-1);
+const fsDialogVisibleCreate = ref(false);
+const currentCreateMountIndex = ref(-1);
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const lxcs = ref([]);
 const images = ref([]);
