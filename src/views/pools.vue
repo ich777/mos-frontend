@@ -2215,9 +2215,9 @@ const createVPool = async() => {
     options: {
       automount: createVpoolDialog.automount,
       comment: createVpoolDialog.comment,
-      policies: createVpoolDialog.config.policies,
     },
     config: {
+      policies: createVpoolDialog.config.policies,
       shared: createVpoolDialog.config.shared,
     },
   };
