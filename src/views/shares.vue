@@ -433,7 +433,7 @@ const createNfsDialog = reactive({
   anongid: null,
   write_operations: '',
   mapping: '',
-  secure: true,
+  secure: false,
 });
 const editSmbDialog = reactive({
   value: false,
@@ -1030,6 +1030,6 @@ const clearCreateNfsDialog = () => {
   createNfsDialog.anongid = null;
   createNfsDialog.write_operations = '';
   createNfsDialog.mapping = '';
-  createNfsDialog.secure = true;
+  createNfsDialog.secure = false;
 };
 </script>
