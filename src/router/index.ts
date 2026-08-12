@@ -104,6 +104,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/mosSettings/notifications.vue'),
     meta: { title: 'MOS Settings - Notifications', description: 'Manage notification settings' },
   },
+  { path: '/mosSettings/nut', component: () => import('../views/mosSettings/nut.vue'), meta: { title: 'MOS Settings - NUT', description: 'Manage NUT settings' } },
   { path: '/profile', component: () => import('../views/profile.vue'), meta: { title: 'Profile', description: 'Manage your profile' } },
   {
     path: '/webTerminalPopup',

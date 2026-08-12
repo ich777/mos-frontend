@@ -214,6 +214,15 @@
                       <v-icon size="small" color="medium-emphasis">mdi-chevron-right</v-icon>
                     </template>
                   </v-list-item>
+                  <v-list-item rounded="lg" to="/mosSettings/nut" color="primary">
+                    <template v-slot:prepend>
+                      <v-icon icon="mdi-peanut-outline" class="mr-3"></v-icon>
+                    </template>
+                    <v-list-item-title class="font-weight-medium">{{ $t('nut') }}</v-list-item-title>
+                    <template v-slot:append>
+                      <v-icon size="small" color="medium-emphasis">mdi-chevron-right</v-icon>
+                    </template>
+                  </v-list-item>
                 </v-list>
               </div>
             </div>
@@ -684,7 +693,6 @@ import { onMounted, ref, reactive, inject, watch, nextTick } from 'vue';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 import { useI18n } from 'vue-i18n';
 import { useOverlay } from '@/composables/useOverlay';
-import { TRUE } from 'sass';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const mosReleases = ref({});
