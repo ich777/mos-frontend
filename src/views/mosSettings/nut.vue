@@ -65,6 +65,16 @@
             <!-- NUT Configuration -->
             <span class="text-title-medium font-weight-medium">{{ $t('nut configuration') }}</span>
 
+            <v-switch
+              :label="$t('enabled')"
+              color="green"
+              inset
+              v-model="nutSettings.enabled"
+              hide-details="auto"
+              density="compact"
+              class="mt-4"
+            ></v-switch>
+
             <!-- Mode Selection -->
             <v-select :items="['standalone', 'netclient', 'netserver']" :label="$t('mode')" v-model="nutSettings.mode" class="mt-4" @update:model-value="onModeChange"></v-select>
 
