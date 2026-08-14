@@ -1690,6 +1690,7 @@
   "battery runtime": "Battery Runtime",
   "input voltage": "Input Voltage",
   "nut configuration": "NUT Configuration",
+  "the main nut switch is located in the network settings": "The main NUT switch is located in the network settings",
   "spindown disks": "Spindown Disks",
   "server configuration": "Server Configuration",
   "listen addresses": "Listen Addresses",

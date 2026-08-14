@@ -1690,6 +1690,7 @@
   "battery runtime": "Batterie-Laufzeit",
   "input voltage": "Eingangsspannung",
   "nut configuration": "NUT-Konfiguration",
+  "the main nut switch is located in the network settings": "Der Hauptschalter für NUT befindet sich in den Netzwerkeinstellungen",
   "spindown disks": "Festplatten herunterfahren",
   "server configuration": "Serverkonfiguration",
   "listen addresses": "Abhöraddressen",
