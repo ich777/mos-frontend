@@ -17,7 +17,7 @@
           <v-card-text>
             <!-- UPS Status -->
             <span class="text-title-medium font-weight-medium">{{ $t('ups status') }}</span>
-            <v-card class="mt-4 mb-4" :color="nutStatus.reachable ? 'success' : 'error'" variant="tonal">
+            <v-card class="mt-4 mb-4" :color="statusCardColor" variant="tonal">
               <v-card-text>
                 <v-row>
                   <v-col cols="12" sm="6">
@@ -25,6 +25,9 @@
                       <strong>{{ $t('status') }}:</strong>
                       {{ nutStatus.reachable ? $t('reachable') : $t('unreachable') }}
                     </p>
+                    <div v-if="statusChips.length" class="mb-2 d-flex flex-wrap ga-1">
+                      <v-chip v-for="chip in statusChips" :key="chip.token" :color="chip.color" size="small" variant="flat">{{ chip.token }} — {{ chip.label }}</v-chip>
+                    </div>
                     <p class="mb-2">
                       <strong>{{ $t('ups name') }}:</strong>
                       {{ nutStatus.name || '-' }}
@@ -41,11 +44,11 @@
                   <v-col cols="12" sm="6">
                     <p class="mb-2">
                       <strong>{{ $t('load') }}:</strong>
-                      {{ nutStatus.data?.load || '-' }}%
+                      {{ nutStatus.data?.load ?? '-' }}%
                     </p>
                     <p class="mb-2">
                       <strong>{{ $t('battery charge') }}:</strong>
-                      {{ nutStatus.data?.battery?.charge || '-' }}%
+                      {{ nutStatus.data?.battery?.charge ?? '-' }}%
                     </p>
                     <p class="mb-2">
                       <strong>{{ $t('battery runtime') }}:</strong>
@@ -53,10 +56,27 @@
                     </p>
                     <p class="mb-2">
                       <strong>{{ $t('input voltage') }}:</strong>
-                      {{ nutStatus.data?.input?.voltage || '-' }}V
+                      {{ nutStatus.data?.input?.voltage ?? '-' }}V
                     </p>
                   </v-col>
                 </v-row>
+
+                <!-- Reported raw vars -->
+                <v-expansion-panels v-if="nutStatus.reachable && hasVars" variant="accordion" class="mt-2">
+                  <v-expansion-panel>
+                    <v-expansion-panel-title>{{ $t('reported values') }}</v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      <v-row dense>
+                        <v-col cols="12" sm="6" md="4" v-for="(value, key) in nutStatus.vars" :key="key">
+                          <span class="text-caption text-medium-emphasis">{{ key }}:</span>
+                          <span class="text-caption">{{ value }}</span>
+                        </v-col>
+                      </v-row>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+
+                <p v-if="nutStatus.error" class="mb-0 mt-2 text-caption">{{ nutStatus.error }}</p>
               </v-card-text>
             </v-card>
 
@@ -172,7 +192,14 @@
                         <v-text-field :label="$t('password')" type="password" v-model="nutSettings.server.users[i].password" hide-details="auto"></v-text-field>
                       </v-col>
                       <v-col cols="12">
-                        <v-select :items="['primary', 'secondary']" :label="$t('upsmon role')" v-model="nutSettings.server.users[i].upsmon" hide-details="auto"></v-select>
+                        <v-select
+                          :items="upsmonRoleOptions"
+                          item-title="title"
+                          item-value="value"
+                          :label="$t('upsmon role')"
+                          v-model="nutSettings.server.users[i].upsmon"
+                          hide-details="auto"
+                        ></v-select>
                       </v-col>
                       <v-col cols="12">
                         <v-select :items="availableActions" :label="$t('allowed actions')" v-model="nutSettings.server.users[i].actions" multiple chips hide-details="auto"></v-select>
@@ -215,8 +242,12 @@
             <v-divider class="my-4"></v-divider>
             <span class="text-title-medium font-weight-medium">{{ $t('shutdown configuration') }}</span>
             <v-text-field :label="$t('shutdown command')" v-model="nutSettings.shutdown.command" class="mt-4"></v-text-field>
-            <v-select :items="['lowbattery', 'on battery', 'after delay']" :label="$t('shutdown mode')" v-model="nutSettings.shutdown.mode"></v-select>
-            <v-text-field :label="$t('shutdown timer (seconds)')" type="number" v-model="nutSettings.shutdown.timer_seconds"></v-text-field>
+            <!--
+              Werte "lowbattery" / "timer" aus der Backend-Referenzdoku uebernommen.
+              Falls es weitere gueltige Modi gibt, bitte Liste ergaenzen.
+            -->
+            <v-select :items="['lowbattery', 'timer']" :label="$t('shutdown mode')" v-model="nutSettings.shutdown.mode"></v-select>
+            <v-text-field v-if="nutSettings.shutdown.mode === 'timer'" :label="$t('shutdown timer (seconds)')" type="number" v-model="nutSettings.shutdown.timer_seconds"></v-text-field>
             <v-text-field :label="$t('final delay')" type="number" v-model="nutSettings.shutdown.finaldelay"></v-text-field>
             <v-text-field :label="$t('minimum supplies')" type="number" v-model="nutSettings.shutdown.minsupplies"></v-text-field>
             <v-text-field :label="$t('powerdown flag')" v-model="nutSettings.shutdown.powerdownflag" class="mb-4"></v-text-field>
@@ -237,18 +268,19 @@
 
             <!-- Docker Services -->
             <div class="mt-4">
-              <span class="text-subtitle-2 font-weight-medium">{{ $t('docker services') }}</span>
+              <span class="text-subtitle-2 font-weight-medium">{{ $t('docker') }}</span>
               <v-row v-for="(service, i) in nutSettings.stop_services.docker" :key="`docker-${i}`" class="ga-2 mb-2 mt-2">
                 <v-col cols="12" sm="6">
-                  <v-text-field :label="$t('service name')" v-model="nutSettings.stop_services.docker[i].name" hide-details="auto"></v-text-field>
+                  <v-select :label="$t('docker')" v-model="nutSettings.stop_services.docker[i].name" :items="dockerServiceOptions" hide-details="auto" clearable>
+                    <template #prepend>
+                      <v-btn color="red" variant="text" icon size="small" @click="nutSettings.stop_services.docker.splice(i, 1)">
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-select>
                 </v-col>
                 <v-col cols="12" sm="4">
                   <v-switch :label="$t('enabled')" v-model="nutSettings.stop_services.docker[i].enabled" hide-details="auto" inset color="green"></v-switch>
-                </v-col>
-                <v-col cols="12" sm="2" class="d-flex align-center">
-                  <v-btn color="red" variant="tonal" icon size="small" @click="nutSettings.stop_services.docker.splice(i, 1)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
                 </v-col>
               </v-row>
               <div class="d-flex align-center my-2">
@@ -271,18 +303,19 @@
 
             <!-- LXC Services -->
             <div class="mt-4">
-              <span class="text-subtitle-2 font-weight-medium">{{ $t('lxc services') }}</span>
+              <span class="text-subtitle-2 font-weight-medium">{{ $t('lxc') }}</span>
               <v-row v-for="(service, i) in nutSettings.stop_services.lxc" :key="`lxc-${i}`" class="ga-2 mb-2 mt-2">
                 <v-col cols="12" sm="6">
-                  <v-text-field :label="$t('service name')" v-model="nutSettings.stop_services.lxc[i].name" hide-details="auto"></v-text-field>
+                  <v-select :label="$t('lxc')" v-model="nutSettings.stop_services.lxc[i].name" :items="lxcServiceOptions" hide-details="auto" clearable>
+                    <template #prepend>
+                      <v-btn color="red" variant="text" icon size="small" @click="nutSettings.stop_services.lxc.splice(i, 1)">
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-select>
                 </v-col>
                 <v-col cols="12" sm="4">
                   <v-switch :label="$t('enabled')" v-model="nutSettings.stop_services.lxc[i].enabled" hide-details="auto" inset color="green"></v-switch>
-                </v-col>
-                <v-col cols="12" sm="2" class="d-flex align-center">
-                  <v-btn color="red" variant="tonal" icon size="small" @click="nutSettings.stop_services.lxc.splice(i, 1)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
                 </v-col>
               </v-row>
               <div class="d-flex align-center my-2">
@@ -305,18 +338,19 @@
 
             <!-- VMs -->
             <div class="mt-4">
-              <span class="text-subtitle-2 font-weight-medium">{{ $t('virtual machines') }}</span>
+              <span class="text-subtitle-2 font-weight-medium">{{ $t('vms') }}</span>
               <v-row v-for="(vm, i) in nutSettings.stop_services.vms" :key="`vm-${i}`" class="ga-2 mb-2 mt-2">
                 <v-col cols="12" sm="6">
-                  <v-text-field :label="$t('vm name')" v-model="nutSettings.stop_services.vms[i].name" hide-details="auto"></v-text-field>
+                  <v-select :label="$t('vm')" v-model="nutSettings.stop_services.vms[i].name" :items="vmServiceOptions" hide-details="auto" clearable>
+                    <template #prepend>
+                      <v-btn color="red" variant="text" icon size="small" @click="nutSettings.stop_services.vms.splice(i, 1)">
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-select>
                 </v-col>
                 <v-col cols="12" sm="4">
                   <v-switch :label="$t('enabled')" v-model="nutSettings.stop_services.vms[i].enabled" hide-details="auto" inset color="green"></v-switch>
-                </v-col>
-                <v-col cols="12" sm="2" class="d-flex align-center">
-                  <v-btn color="red" variant="tonal" icon size="small" @click="nutSettings.stop_services.vms.splice(i, 1)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
                 </v-col>
               </v-row>
               <div class="d-flex align-center my-2">
@@ -337,7 +371,6 @@
   <v-fab @click="saveNutSettings()" color="primary" style="position: fixed; bottom: 32px; right: 32px; z-index: 1000" size="large" icon>
     <v-icon>mdi-content-save</v-icon>
   </v-fab>
-
 </template>
 
 <script setup>
@@ -402,7 +435,26 @@ const nutSettings = ref({
     docker: [],
     lxc: [],
     vms: [],
-  }
+  },
+});
+
+const dockerServiceNames = ref([]);
+const lxcServiceNames = ref([]);
+const vmServiceNames = ref([]);
+
+const dockerServiceOptions = computed(() => {
+  const currentNames = (nutSettings.value.stop_services.docker || []).map((service) => service?.name).filter(Boolean);
+  return [...new Set([...dockerServiceNames.value, ...currentNames])].sort((a, b) => a.localeCompare(b));
+});
+
+const lxcServiceOptions = computed(() => {
+  const currentNames = (nutSettings.value.stop_services.lxc || []).map((service) => service?.name).filter(Boolean);
+  return [...new Set([...lxcServiceNames.value, ...currentNames])].sort((a, b) => a.localeCompare(b));
+});
+
+const vmServiceOptions = computed(() => {
+  const currentNames = (nutSettings.value.stop_services.vms || []).map((service) => service?.name).filter(Boolean);
+  return [...new Set([...vmServiceNames.value, ...currentNames])].sort((a, b) => a.localeCompare(b));
 });
 
 const nutStatus = reactive({
@@ -440,6 +492,55 @@ const extraConfigList = computed(() => Object.entries(nutSettings.value.server.u
 const availableActions = computed(() => ['fsd', 'instcmd', 'login', 'logout', 'master', 'monmaster', 'set', 'upsmon_primary', 'upsmon_secondary']);
 
 const availableCommands = computed(() => ['all', 'test.battery.start.quick', 'test.battery.stop', 'test.panel.start', 'test.panel.stop', 'shutdown.return', 'shutdown.stayoff', 'shutdown.stop']);
+
+// upsmon kann laut Referenzdoku auch null sein (reiner Admin-User ohne Monitor-Funktion)
+const upsmonRoleOptions = computed(() => [
+  { title: t('primary'), value: 'primary' },
+  { title: t('secondary'), value: 'secondary' },
+  { title: t('none'), value: null },
+]);
+
+// Deutsche Klartext-Labels + Farbcodierung fuer ups.status Tokens
+const statusLabels = {
+  OL: { label: t('mains power present'), color: 'success' },
+  OB: { label: t('running on battery'), color: 'warning' },
+  LB: { label: t('battery low'), color: 'error' },
+  HB: { label: t('battery high'), color: 'warning' },
+  RB: { label: t('replace battery'), color: 'error' },
+  CHRG: { label: t('battery charging'), color: 'success' },
+  DISCHRG: { label: t('battery discharging'), color: 'warning' },
+  BYPASS: { label: t('bypass active'), color: 'warning' },
+  CAL: { label: t('calibration running'), color: 'warning' },
+  OFF: { label: t('output off'), color: 'default' },
+  OVER: { label: t('overload'), color: 'error' },
+  TRIM: { label: t('voltage trim'), color: 'warning' },
+  BOOST: { label: t('voltage boost'), color: 'warning' },
+  FSD: { label: t('forced shutdown'), color: 'error' },
+  ALARM: { label: t('alarm'), color: 'error' },
+};
+
+const statusChips = computed(() => {
+  if (!nutStatus.status) return [];
+  return nutStatus.status
+    .split(' ')
+    .filter(Boolean)
+    .map((token) => ({
+      token,
+      label: statusLabels[token]?.label || token,
+      color: statusLabels[token]?.color || 'default',
+    }));
+});
+
+const hasVars = computed(() => nutStatus.vars && Object.keys(nutStatus.vars).length > 0);
+
+const statusCardColor = computed(() => {
+  if (!nutStatus.reachable) return 'error';
+  const criticalTokens = ['LB', 'RB', 'OVER', 'ALARM', 'FSD'];
+  const warningTokens = ['OB', 'HB', 'BYPASS', 'CAL', 'TRIM', 'BOOST', 'DISCHRG'];
+  if (statusChips.value.some((c) => criticalTokens.includes(c.token))) return 'error';
+  if (statusChips.value.some((c) => warningTokens.includes(c.token))) return 'warning';
+  return 'success';
+});
 
 const formatRuntime = (seconds) => {
   if (seconds == null) return '-';
@@ -486,6 +587,82 @@ const deleteExtraConfig = (key) => {
   delete nutSettings.value.server.ups.extra[key];
 };
 
+const getDockerServiceNames = async () => {
+  try {
+    const res = await fetch('/api/v1/docker/containers/json?all=true', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(`${t('docker containers could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const data = await res.json();
+    dockerServiceNames.value = [
+      ...new Set(
+        (data || [])
+          .map((container) => {
+            const name = Array.isArray(container.Names) ? container.Names[0] : container.name || container.Name || '';
+            return name.startsWith('/') ? name.slice(1) : name;
+          })
+          .filter(Boolean),
+      ),
+    ].sort((a, b) => a.localeCompare(b));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const getLxcServiceNames = async () => {
+  try {
+    const res = await fetch('/api/v1/lxc/containers', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(`${t('lxc containers could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const data = await res.json();
+    lxcServiceNames.value = [...new Set((data || []).map((container) => container.name).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const getVmServiceNames = async () => {
+  try {
+    const res = await fetch('/api/v1/vm/machines', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('authToken'),
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(`${t('vm machines could not be loaded')}|$| ${error.error || t('unknown error')}`);
+    }
+
+    const data = await res.json();
+    vmServiceNames.value = [...new Set((data || []).map((machine) => machine.name).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  } catch (e) {
+    const [userMessage, apiErrorMessage] = e.message.split('|$|');
+    showSnackbarError(userMessage, apiErrorMessage);
+  }
+};
+
+const getContainerServiceNames = async () => {
+  await Promise.all([getDockerServiceNames(), getLxcServiceNames(), getVmServiceNames()]);
+};
+
 const getNutSettings = async () => {
   try {
     const res = await fetch('/api/v1/nut/settings', {
@@ -499,7 +676,9 @@ const getNutSettings = async () => {
       try {
         const errorDetails = await res.json();
         errorMessage = errorDetails.error || errorMessage;
-      } catch (e) {}
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
       throw new Error(`${t('nut settings could not be loaded')}|$| ${errorMessage}`);
     }
 
@@ -524,7 +703,9 @@ const getNutStatus = async () => {
       try {
         const errorDetails = await res.json();
         errorMessage = errorDetails.error || errorMessage;
-      } catch (e) {}
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
       throw new Error(`${t('nut status could not be loaded')}|$| ${errorMessage}`);
     }
 
@@ -553,11 +734,14 @@ const saveNutSettings = async () => {
       try {
         const errorDetails = await res.json();
         errorMessage = errorDetails.error || errorMessage;
-      } catch (e) {}
+      } catch (e) {
+        // Ignore JSON parse errors
+      }
       throw new Error(`${t('nut settings could not be changed')}|$| ${errorMessage}`);
     }
 
     showSnackbarSuccess(t('nut settings changed successfully'));
+    // Refresh status
     await getNutStatus();
   } catch (e) {
     const [userMessage, apiErrorMessage] = e.message.split('|$|');
@@ -567,10 +751,11 @@ const saveNutSettings = async () => {
   }
 };
 
-onMounted(() => {
-  getNutSettings();
-  getNutStatus();
+onMounted(async () => {
+  await Promise.all([getNutSettings(), getNutStatus(), getContainerServiceNames()]);
+  // TODO: auf Websocket-Composable umstellen, sobald bekannt (5s-Takt laut Backend-Doku)
   const statusInterval = setInterval(getNutStatus, 5000);
+  // Cleanup interval on unmount
   return () => clearInterval(statusInterval);
 });
 </script>
