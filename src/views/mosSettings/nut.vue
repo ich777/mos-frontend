@@ -17,44 +17,50 @@
           <v-card-text>
             <!-- UPS Status -->
             <span class="text-title-medium font-weight-medium">{{ $t('ups status') }}</span>
-            <v-card class="mt-4 mb-4" :color="statusCardColor" variant="tonal">
+            <v-card v-if="isLoadingStatus" class="mt-4 mb-4" variant="tonal">
               <v-card-text>
-                <v-row>
+                <v-skeleton-loader type="article" :loading="true" class="status-skeleton"></v-skeleton-loader>
+              </v-card-text>
+            </v-card>
+
+            <v-card v-else class="mt-4 mb-4" :color="statusCardColor" variant="tonal">
+              <v-card-text>
+                <v-row class="status-grid">
                   <v-col cols="12" sm="6">
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('status') }}:</strong>
                       {{ nutStatus.reachable ? $t('reachable') : $t('unreachable') }}
                     </p>
-                    <div v-if="statusChips.length" class="mb-2 d-flex flex-wrap ga-1">
+                    <div v-if="statusChips.length" class="status-line d-flex flex-wrap ga-1">
                       <v-chip v-for="chip in statusChips" :key="chip.token" :color="chip.color" size="small" variant="flat">{{ chip.token }} — {{ chip.label }}</v-chip>
                     </div>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('ups name') }}:</strong>
                       {{ nutStatus.name || '-' }}
                     </p>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('manufacturer') }}:</strong>
                       {{ nutStatus.data?.manufacturer || '-' }}
                     </p>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('model') }}:</strong>
                       {{ nutStatus.data?.model || '-' }}
                     </p>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('load') }}:</strong>
                       {{ nutStatus.data?.load ?? '-' }}%
                     </p>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('battery charge') }}:</strong>
                       {{ nutStatus.data?.battery?.charge ?? '-' }}%
                     </p>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('battery runtime') }}:</strong>
                       {{ formatRuntime(nutStatus.data?.battery?.runtime) }}
                     </p>
-                    <p class="mb-2">
+                    <p class="status-line">
                       <strong>{{ $t('input voltage') }}:</strong>
                       {{ nutStatus.data?.input?.voltage ?? '-' }}V
                     </p>
@@ -62,19 +68,22 @@
                 </v-row>
 
                 <!-- Reported raw vars -->
-                <v-expansion-panels v-if="nutStatus.reachable && hasVars" variant="accordion" class="mt-2">
-                  <v-expansion-panel>
-                    <v-expansion-panel-title>{{ $t('reported values') }}</v-expansion-panel-title>
-                    <v-expansion-panel-text>
+                <v-card v-if="nutStatus.reachable && hasVars" variant="outlined" class="compact-report mt-2">
+                  <button type="button" class="compact-report-toggle" @click="showReportedValues = !showReportedValues">
+                    <span>{{ $t('reported values') }}</span>
+                    <v-icon :icon="showReportedValues ? 'mdi-chevron-up' : 'mdi-chevron-down'" size="small"></v-icon>
+                  </button>
+                  <v-expand-transition>
+                    <div v-show="showReportedValues" class="compact-report-content px-3 pb-3 pt-1">
                       <v-row dense>
                         <v-col cols="12" sm="6" md="4" v-for="(value, key) in nutStatus.vars" :key="key">
-                          <span class="text-caption text-medium-emphasis">{{ key }}:</span>
-                          <span class="text-caption">{{ value }}</span>
+                          <span class="compact-report-key text-medium-emphasis">{{ key }}:</span>
+                          <span class="compact-report-value">{{ value }}</span>
                         </v-col>
                       </v-row>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
+                    </div>
+                  </v-expand-transition>
+                </v-card>
 
                 <p v-if="nutStatus.error" class="mb-0 mt-2 text-caption">{{ nutStatus.error }}</p>
               </v-card-text>
@@ -88,14 +97,14 @@
             <v-alert type="info" variant="tonal" class="mt-4 mb-4" border="start">
               <div class="d-flex align-center justify-space-between flex-wrap ga-2">
                 <span>{{ $t('the main nut switch is located in the network settings') }}.</span>
-                <v-btn size="small" variant="outlined" prepend-icon="mdi-arrow-right" @click="$router.push('/mosSettings/networkServices')">
+                <v-btn color="onPrimary" size="small" variant="outlined" prepend-icon="mdi-arrow-right" @click="$router.push('/mosSettings/networkServices')">
                   {{ $t('network settings') }}
                 </v-btn>
               </div>
             </v-alert>
 
             <!-- Mode Selection -->
-            <v-select :items="['standalone', 'netclient', 'netserver']" :label="$t('mode')" v-model="nutSettings.mode" class="mt-4" @update:model-value="onModeChange"></v-select>
+            <v-select :items="['standalone', 'netclient', 'netserver']" :label="$t('mode')" v-model="nutSettings.mode" class="mt-4" @update:model-value="onModeChange" hide-details="auto"></v-select>
 
             <v-switch :label="$t('spindown disks')" color="green" inset v-model="nutSettings.spindown_disks" hide-details="auto" density="compact" class="mt-4 mb-4"></v-switch>
 
@@ -502,15 +511,15 @@ const upsmonRoleOptions = computed(() => [
 
 // Deutsche Klartext-Labels + Farbcodierung fuer ups.status Tokens
 const statusLabels = {
-  OL: { label: t('mains power present'), color: 'success' },
-  OB: { label: t('running on battery'), color: 'warning' },
+  OL: { label: t('online'), color: 'success' },
+  OB: { label: t('on battery'), color: 'warning' },
   LB: { label: t('battery low'), color: 'error' },
   HB: { label: t('battery high'), color: 'warning' },
   RB: { label: t('replace battery'), color: 'error' },
-  CHRG: { label: t('battery charging'), color: 'success' },
-  DISCHRG: { label: t('battery discharging'), color: 'warning' },
-  BYPASS: { label: t('bypass active'), color: 'warning' },
-  CAL: { label: t('calibration running'), color: 'warning' },
+  CHRG: { label: t('charging'), color: 'success' },
+  DISCHRG: { label: t('discharging'), color: 'warning' },
+  BYPASS: { label: t('bypass'), color: 'warning' },
+  CAL: { label: t('calibration'), color: 'warning' },
   OFF: { label: t('output off'), color: 'default' },
   OVER: { label: t('overload'), color: 'error' },
   TRIM: { label: t('voltage trim'), color: 'warning' },
@@ -519,11 +528,17 @@ const statusLabels = {
   ALARM: { label: t('alarm'), color: 'error' },
 };
 
+const showReportedValues = ref(false);
+const isLoadingStatus = ref(true);
+
 const statusChips = computed(() => {
-  if (!nutStatus.status) return [];
+  if (!nutStatus.status || isLoadingStatus.value) return [];
+  const ignoredTokens = ['OL', 'CHRG'];
+
   return nutStatus.status
     .split(' ')
     .filter(Boolean)
+    .filter((token) => !ignoredTokens.includes(token))
     .map((token) => ({
       token,
       label: statusLabels[token]?.label || token,
@@ -534,6 +549,7 @@ const statusChips = computed(() => {
 const hasVars = computed(() => nutStatus.vars && Object.keys(nutStatus.vars).length > 0);
 
 const statusCardColor = computed(() => {
+  if (isLoadingStatus.value) return 'grey-lighten-4';
   if (!nutStatus.reachable) return 'error';
   const criticalTokens = ['LB', 'RB', 'OVER', 'ALARM', 'FSD'];
   const warningTokens = ['OB', 'HB', 'BYPASS', 'CAL', 'TRIM', 'BOOST', 'DISCHRG'];
@@ -752,10 +768,66 @@ const saveNutSettings = async () => {
 };
 
 onMounted(async () => {
+  isLoadingStatus.value = true;
   await Promise.all([getNutSettings(), getNutStatus(), getContainerServiceNames()]);
+  isLoadingStatus.value = false;
   // TODO: auf Websocket-Composable umstellen, sobald bekannt (5s-Takt laut Backend-Doku)
-  const statusInterval = setInterval(getNutStatus, 5000);
+  const statusInterval = setInterval(async () => {
+    isLoadingStatus.value = false;
+    await getNutStatus();
+  }, 5000);
   // Cleanup interval on unmount
   return () => clearInterval(statusInterval);
 });
 </script>
+
+<style scoped>
+.status-grid {
+  margin-bottom: 0;
+}
+
+.status-line {
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+.status-skeleton {
+  min-height: 160px;
+}
+
+.compact-report {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.compact-report-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: 0;
+  color: rgb(var(--v-theme-success));
+  min-height: 40px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 1.02rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.compact-report-content {
+  font-size: 0.82rem;
+}
+
+.compact-report-key,
+.compact-report-value {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.compact-report-key {
+  margin-right: 4px;
+}
+</style>
