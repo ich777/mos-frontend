@@ -57,20 +57,21 @@
                 <v-switch :label="$t('tailscale update check')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.tailscale.update_check" :readonly="!settingsNetwork.tailscale.enabled"></v-switch>
               </v-col>
             </v-row>
-            <v-row no-gutters class="pt-2 pb-2 align-center">
-              <v-col cols="12" md="3" class="pr-2">
+            <v-row no-gutters class="pt-2 pb-2 align-center tailscale-web-row">
+              <v-col cols="12" md="3" class="tailscale-web-col tailscale-switch-col">
                 <v-switch :label="$t('tailscale web')" color="green" inset hide-details="auto" density="compact" v-model="settingsNetwork.tailscale.web.enabled" :readonly="!settingsNetwork.tailscale.enabled"></v-switch>
               </v-col>
-              <v-col cols="12" md="4" class="pr-2">
+              <v-col cols="12" md="4" class="tailscale-web-col tailscale-address-col">
                 <v-text-field :label="$t('tailscale web address')" color="green" inset hide-details="auto" v-model="settingsNetwork.tailscale.web.address" :disabled="!settingsNetwork.tailscale.web.enabled"></v-text-field>
               </v-col>
-              <v-col cols="12" md="2" class="pr-2">
+              <v-col cols="12" md="2" class="tailscale-web-col tailscale-port-col">
                 <v-text-field :label="$t('tailscale web port')" color="green" inset hide-details="auto" v-model="settingsNetwork.tailscale.web.port" :disabled="!settingsNetwork.tailscale.web.enabled"></v-text-field>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-btn 
+              <v-col cols="12" md="3" class="tailscale-web-col tailscale-button-col">
+                <v-btn
                   variant="text"
                   size="small"
+                  class="tailscale-open-btn"
                   style="color: green;"
                   @click="openTailscaleWeb()"
                   :disabled="!settingsNetwork.tailscale.web.enabled"
@@ -398,3 +399,37 @@ const createTerminalSession = async (service) => {
   }
 };
 </script>
+
+<style scoped>
+.tailscale-web-row {
+  gap: 0;
+}
+
+.tailscale-web-col {
+  padding-right: 8px;
+  padding-bottom: 8px;
+}
+
+.tailscale-switch-col,
+.tailscale-address-col,
+.tailscale-port-col,
+.tailscale-button-col {
+  min-width: 0;
+}
+
+.tailscale-open-btn {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .tailscale-web-col {
+    padding-right: 0;
+    padding-bottom: 12px;
+  }
+
+  .tailscale-open-btn {
+    justify-content: center;
+  }
+}
+</style>
