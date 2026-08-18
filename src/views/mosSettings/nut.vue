@@ -74,13 +74,11 @@
                     <v-icon :icon="showReportedValues ? 'mdi-chevron-up' : 'mdi-chevron-down'" size="small"></v-icon>
                   </button>
                   <v-expand-transition>
-                    <div v-show="showReportedValues" class="compact-report-content px-3 pb-3 pt-1">
-                      <v-row dense>
-                        <v-col cols="12" sm="6" md="4" v-for="(value, key) in nutStatus.vars" :key="key">
-                          <span class="compact-report-key text-medium-emphasis">{{ key }}:</span>
-                          <span class="compact-report-value">{{ value }}</span>
-                        </v-col>
-                      </v-row>
+                    <div v-show="showReportedValues" class="compact-report-content">
+                      <div v-for="[key, value] in reportedVars" :key="key" class="compact-report-item">
+                        <span class="compact-report-key text-medium-emphasis">{{ key }}:</span>
+                        <span class="compact-report-value">{{ value }}</span>
+                      </div>
                     </div>
                   </v-expand-transition>
                 </v-card>
@@ -547,6 +545,7 @@ const statusChips = computed(() => {
 });
 
 const hasVars = computed(() => nutStatus.vars && Object.keys(nutStatus.vars).length > 0);
+const reportedVars = computed(() => Object.entries(nutStatus.vars || {}));
 
 const statusCardColor = computed(() => {
   if (isLoadingStatus.value) return 'grey-lighten-4';
@@ -796,7 +795,7 @@ onMounted(async () => {
 }
 
 .compact-report {
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -808,23 +807,47 @@ onMounted(async () => {
   background: transparent;
   border: 0;
   color: rgb(var(--v-theme-success));
-  min-height: 40px;
-  padding: 8px 12px;
+  min-height: 34px;
+  padding: 6px 10px;
   font: inherit;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
 }
 
 .compact-report-content {
-  font-size: 0.82rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 2px;
+  padding: 0 12px 8px;
+  font-size: 0.75rem;
+  line-height: 1.1;
+}
+
+.compact-report-item {
+  display: flex;
+  align-items: center;
+  min-height: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .compact-report-content {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 2px;
+  }
 }
 
 .compact-report-key,
 .compact-report-value {
-  font-size: 0.82rem;
-  line-height: 1.5;
+  display: inline-block;
+  font-size: 0.75rem;
+  line-height: 1.1;
+  margin: 0;
 }
 
 .compact-report-key {
