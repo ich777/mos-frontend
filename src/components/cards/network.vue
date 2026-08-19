@@ -60,9 +60,9 @@
           <div class="text-body-2" :title="nic.mac" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ nic.mac }}</div>
         </v-col>
         <v-divider class="my-1" />
-        <div class="chart-wrapper">
-          <canvas ref="chartEl" aria-label="Network throughput history"></canvas>
-        </div>
+        <v-col cols="12">
+          <div ref="chartEl" class="chart-wrapper"></div>
+        </v-col>
       </template>
 
       <template v-else>
@@ -77,9 +77,13 @@
 
 <script setup>
 import { toRefs, ref, watch, onMounted, onBeforeUnmount, markRaw } from 'vue';
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend } from 'chart.js';
+import { useI18n } from 'vue-i18n';
+import { useTheme } from 'vuetify';
+import * as echarts from 'echarts';
+import { showSnackbarError } from '@/composables/snackbar';
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
+const { t } = useI18n();
+const vuetifyTheme = useTheme();
 
 const props = defineProps({
   network: { type: Object, default: () => ({ interfaces: [] }) },
@@ -93,8 +97,6 @@ const chartEl = ref(null);
 const interfaces = ref([]);
 
 let chart = null;
-let chartCanvas = null;
-let themeObserver = null;
 let labels = [];
 let seriesRx = [];
 let seriesTx = [];
@@ -132,102 +134,164 @@ function formatBytesPerSec(bytesPerSec) {
   return `${v.toFixed(v >= 100 ? 0 : v >= 10 ? 1 : 2)} ${units[i]}`;
 }
 
-function themeHost() {
-  return document.querySelector('.v-theme--dark, .v-theme--light') || document.documentElement;
-}
-function cssRgb(varName) {
-  const host = themeHost();
-  const v = getComputedStyle(host).getPropertyValue(varName);
-  return (v || '').trim() || '255,255,255';
-}
-const rgba = (rgb, a) => `rgba(${rgb}, ${a})`;
-
-function applyChartTheme() {
-  if (!chart) return;
-  const onSurface = cssRgb('--v-theme-on-surface');
-  const surface = cssRgb('--v-theme-surface');
-
-  const gridColor = rgba(onSurface, 0.16);
-  const tickColor = rgba(onSurface, 0.85);
-  const legendColor = rgba(onSurface, 0.9);
-
-  chart.options.scales.x.grid = { color: gridColor, drawBorder: false };
-  chart.options.scales.y.grid = { color: gridColor, drawBorder: false };
-
-  chart.options.scales.x.ticks = { ...(chart.options.scales.x.ticks || {}), color: tickColor };
-  chart.options.scales.y.ticks = { ...(chart.options.scales.y.ticks || {}), color: tickColor };
-
-  chart.options.plugins.legend.labels.color = legendColor;
-  chart.options.plugins.tooltip.titleColor = rgba(onSurface, 1);
-  chart.options.plugins.tooltip.bodyColor = rgba(onSurface, 0.95);
-  chart.options.plugins.tooltip.borderColor = rgba(onSurface, 0.2);
-  chart.options.plugins.tooltip.backgroundColor = rgba(surface, 0.9);
-
-  chart.update('none');
+function getThemeMode() {
+  return vuetifyTheme.global.name.value; // 'light' | 'dark'
 }
 
-function observeThemeChanges() {
-  const host = themeHost();
-  if (themeObserver) themeObserver.disconnect();
-  themeObserver = new MutationObserver(() => applyChartTheme());
-  themeObserver.observe(host, { attributes: true, attributeFilter: ['class'] });
+function getThemeColors() {
+  const isDark = getThemeMode() === 'dark';
+  return {
+    textColor: isDark ? '#f0f0f0' : '#333',
+    labelColor: isDark ? '#ffffff' : '#333',
+    labelFontSize: 13,
+    labelFontWeight: isDark ? 700 : 500,
+    gridColor: isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)',
+    areaRxColor: isDark ? '#4caf5033' : '#4caf5044',
+    areaTxColor: isDark ? '#2196f333' : '#2196f344',
+    areaTotalColor: isDark ? '#ff980033' : '#ff980044',
+    lineRxColor: isDark ? '#81c784' : '#43a047',
+    lineTxColor: isDark ? '#64b5f6' : '#1e88e5',
+    lineTotalColor: isDark ? '#ffb74d' : '#f57c00',
+  };
 }
 
 function initChart() {
   if (!chartEl.value) return;
-  if (chart && chartCanvas === chartEl.value) return;
 
   if (chart) {
-    chart.destroy();
+    chart.dispose();
     chart = null;
   }
 
-  const ctx = chartEl.value.getContext && chartEl.value.getContext('2d');
-  if (!ctx) return;
-  chartCanvas = chartEl.value;
-  chart = markRaw(
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          { label: 'RX', data: seriesRx, borderColor: '#4caf50', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 2 },
-          { label: 'TX', data: seriesTx, borderColor: '#2196f3', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 2 },
-          { label: 'Total', data: seriesTotal, borderColor: '#ff9800', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 2 },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 800, easing: 'easeOutQuart' },
-        normalized: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'line' } },
-          tooltip: {
-            borderWidth: 1,
-            callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatBytesPerSec(ctx.parsed.y)}` },
-          },
-        },
-        scales: {
-          x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
-          y: { beginAtZero: true, ticks: { callback: (v) => formatBytesPerSec(v) } },
-        },
-      },
-    }),
-  );
-  applyChartTheme();
-  observeThemeChanges();
+  chart = markRaw(echarts.init(chartEl.value, null, { renderer: 'canvas' }));
+  updateChart();
 }
 
-function syncAndUpdateChart() {
+function updateChart() {
   if (!chart) return;
-  chart.data.labels = labels;
-  chart.data.datasets[0].data = seriesRx;
-  chart.data.datasets[1].data = seriesTx;
-  chart.data.datasets[2].data = seriesTotal;
-  chart.update();
+
+  const colors = getThemeColors();
+
+  const option = {
+    color: [colors.lineRxColor, colors.lineTxColor, colors.lineTotalColor],
+    backgroundColor: 'transparent',
+    textStyle: { color: colors.textColor },
+    animation: false,
+    animationDuration: 0,
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'linear',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+      borderColor: '#fff',
+      borderWidth: 1,
+      textStyle: { color: '#fff' },
+      axisPointer: { type: 'cross', lineStyle: { color: colors.gridColor } },
+      formatter: (params) => {
+        if (!params || params.length === 0) return '';
+        const label = params[0].axisValue;
+        return (
+          `<div style="padding: 4px 0"><strong>${label}</strong></div>` +
+          params
+            .map(
+              (p) =>
+                `<div style="color: ${p.color}; padding: 2px 0">● ${p.name}: <strong>${formatBytesPerSec(p.value)}</strong></div>`,
+            )
+            .join('')
+        );
+      },
+    },
+    legend: {
+      top: 0,
+      textStyle: {
+        color: colors.labelColor,
+        fontSize: colors.labelFontSize,
+        fontWeight: colors.labelFontWeight,
+      },
+      itemGap: 20,
+    },
+    grid: {
+      left: '50px',
+      right: '20px',
+      top: '28px',
+      bottom: '40px',
+      containLabel: false,
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: labels,
+      axisLine: { lineStyle: { color: colors.gridColor } },
+      axisLabel: {
+        color: colors.labelColor,
+        fontSize: colors.labelFontSize,
+        fontWeight: colors.labelFontWeight,
+      },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: colors.gridColor } },
+      axisLabel: {
+        color: colors.labelColor,
+        fontSize: colors.labelFontSize,
+        fontWeight: colors.labelFontWeight,
+        formatter: (v) => formatBytesPerSec(v),
+      },
+      splitLine: { lineStyle: { color: colors.gridColor, type: 'dashed' } },
+    },
+    series: [
+      {
+        name: 'RX',
+        type: 'line',
+        data: seriesRx,
+        smooth: 0.4,
+        lineStyle: { width: 2.5 },
+        areaStyle: { color: colors.areaRxColor },
+        itemStyle: { borderWidth: 0 },
+        symbol: 'none',
+        emphasis: { scale: false },
+        animationDuration: 400,
+        animationEasing: 'linear',
+      },
+      {
+        name: 'TX',
+        type: 'line',
+        data: seriesTx,
+        smooth: 0.4,
+        lineStyle: { width: 2.5 },
+        areaStyle: { color: colors.areaTxColor },
+        itemStyle: { borderWidth: 0 },
+        symbol: 'none',
+        emphasis: { scale: false },
+        animationDuration: 400,
+        animationEasing: 'linear',
+      },
+      {
+        name: 'Total',
+        type: 'line',
+        data: seriesTotal,
+        smooth: 0.4,
+        lineStyle: { width: 2.5 },
+        areaStyle: { color: colors.areaTotalColor },
+        itemStyle: { borderWidth: 0 },
+        symbol: 'none',
+        emphasis: { scale: false },
+        animationDuration: 400,
+        animationEasing: 'linear',
+      },
+    ],
+  };
+
+  chart.setOption(option, { replaceMerge: ['xAxis', 'yAxis'] });
 }
+
+watch(
+  () => vuetifyTheme.global.name.value,
+  () => {
+    if (chart) updateChart();
+  },
+);
 
 watch(
   () => network.value?.interfaces,
@@ -239,7 +303,7 @@ watch(
       seriesRx = [];
       seriesTx = [];
       seriesTotal = [];
-      syncAndUpdateChart();
+      if (chart) updateChart();
       return;
     }
 
@@ -255,12 +319,12 @@ watch(
     const label = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     labels.push(label);
-    seriesRx.push(rxB ?? NaN);
-    seriesTx.push(txB ?? NaN);
-    seriesTotal.push(totalB ?? NaN);
+    seriesRx.push(rxB ?? 0);
+    seriesTx.push(txB ?? 0);
+    seriesTotal.push(totalB ?? 0);
 
     clampHistory();
-    syncAndUpdateChart();
+    if (chart) updateChart();
   },
   { immediate: true, deep: true },
 );
@@ -275,19 +339,13 @@ watch(
 
 onMounted(() => {
   getAllInterfaces();
-  initChart();
 });
 
 onBeforeUnmount(() => {
-  if (themeObserver) {
-    themeObserver.disconnect();
-    themeObserver = null;
-  }
   if (chart) {
-    chart.destroy();
+    chart.dispose();
     chart = null;
   }
-  chartCanvas = null;
 });
 
 const getAllInterfaces = async () => {
@@ -342,7 +400,7 @@ const selectInterface = (iface) => {
   seriesTotal = [];
   setNewInterface(getInterfaceName(iface));
   setSelectedNic(iface);
-  syncAndUpdateChart();
+  if (chart) updateChart();
 };
 
 </script>
@@ -351,9 +409,8 @@ const selectInterface = (iface) => {
 .chart-wrapper {
   position: relative;
   width: 100%;
-  height: 200px;
-}
-.chart-wrapper canvas {
-  background: transparent;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 </style>

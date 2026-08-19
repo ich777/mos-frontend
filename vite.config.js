@@ -9,6 +9,10 @@ const API_TARGET = 'http://mos-test.home';
 const WS_TARGET = 'ws://mos-test.home';
 
 export default defineConfig({
+  define: {
+    '__BUNDLED_DEV__': true,
+    '__SERVER_FORWARD_CONSOLE__': false,
+  },
   plugins: [
     vue(),
     federation({
