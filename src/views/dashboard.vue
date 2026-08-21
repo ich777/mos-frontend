@@ -102,6 +102,7 @@ import Power from '../components/cards/power.vue';
 import Voltage from '../components/cards/voltage.vue';
 import PSU from '../components/cards/psu.vue';
 import Other from '../components/cards/other.vue';
+import Nut from '../components/cards/nut.vue';
 
 const emit = defineEmits(['refresh-drawer', 'refresh-notifications-badge']);
 const i18n = useI18n();
@@ -120,6 +121,7 @@ const components = shallowRef({
   voltage: Voltage,
   psu: PSU,
   other: Other,
+  nut: Nut,
 });
 const pluginLabels = ref({});
 
@@ -132,14 +134,15 @@ const disks = ref(null);
 const temperature = ref(null);
 const osInfo = ref(null);
 const sensors = ref(null);
+const nut = ref(null);
 const isConnected = ref({});
 const error = ref(null);
 const left = ref([]);
 const right = ref([]);
-const BUILTIN_WIDGETS = ['os', 'processor', 'pools', 'network', 'memory', 'disks', 'fan', 'temperature', 'power', 'voltage', 'psu', 'other'];
+const BUILTIN_WIDGETS = ['os', 'processor', 'pools', 'network', 'memory', 'disks', 'fan', 'temperature', 'power', 'voltage', 'psu', 'nut', 'other'];
 const ALL_WIDGETS = ref([...BUILTIN_WIDGETS]);
 const DEFAULT_LEFT = [{ id: 'os' }, { id: 'processor' }, { id: 'pools' }, { id: 'fan' }, { id: 'voltage' }, { id: 'psu' }];
-const DEFAULT_RIGHT = [{ id: 'network' }, { id: 'memory' }, { id: 'disks' }, { id: 'temperature' }, { id: 'power' }, { id: 'other' }];
+const DEFAULT_RIGHT = [{ id: 'network' }, { id: 'memory' }, { id: 'disks' }, { id: 'temperature' }, { id: 'power' }, { id: 'nut' }, { id: 'other' }];
 const DEFAULT_VISIBILITY = {
   os: true,
   processor: true,
@@ -152,6 +155,7 @@ const DEFAULT_VISIBILITY = {
   power: false,
   voltage: false,
   psu: false,
+  nut: false,
   other: false,
 };
 const nameKeyMap = {
@@ -166,18 +170,34 @@ const nameKeyMap = {
   Power: 'power',
   Voltage: 'voltage',
   PSU: 'psu',
+  Nut: 'nut',
   Other: 'other',
 };
 const settingsDialog = ref(false);
 const visibility = ref({ ...DEFAULT_VISIBILITY });
 let socket = null;
+let nutSocket = null;
 
 onMounted(async () => {
   await loadPluginWidgets();
   await loadLayout();
   watch([left, right, visibility], saveLayout, { deep: true });
   getData();
-  getLoadWS();
+  initWebSockets();
+  watch(
+    () => visibility.value.nut,
+    (isNutVisible) => {
+      const authToken = localStorage.getItem('authToken');
+      if (nutSocket) {
+        if (isNutVisible) {
+          nutSocket.emit('subscribe-nut-status', { token: authToken });
+        } else {
+          nutSocket.emit('unsubscribe-nut-status', { token: authToken });
+        }
+      }
+    },
+    { immediate: true }
+  );
 });
 
 const loadPluginWidgets = async () => {
@@ -205,6 +225,11 @@ onUnmounted(() => {
   if (socket) {
     socket.disconnect();
     socket = null;
+  }
+  if (nutSocket) {
+    nutSocket.emit('unsubscribe-nut-status');
+    nutSocket.disconnect();
+    nutSocket = null;
   }
 });
 
@@ -344,6 +369,8 @@ const widgetProps = (id) => {
       return { pools: pools.value };
     case 'os':
       return { osInfo: osInfo.value };
+    case 'nut':
+      return { nut: nut.value };
     case 'fan':
     case 'temperature':
     case 'power':
@@ -405,7 +432,7 @@ const getData = async () => {
   }
 };
 
-const getLoadWS = () => {
+const initWebSockets = () => {
   const authToken = localStorage.getItem('authToken');
   if (!authToken) {
     error.value = 'No auth token found';
@@ -413,6 +440,7 @@ const getLoadWS = () => {
   }
 
   socket = io('/system', { path: '/api/v1/socket.io/', transports: ['websocket'], upgrade: false });
+  nutSocket = io('/nut', { path: '/api/v1/socket.io/', transports: ['websocket'], upgrade: false });
 
   socket.on('connect', () => {
     isConnected.value = true;
@@ -435,11 +463,34 @@ const getLoadWS = () => {
     if (data.pools) disks.value = pools.value = data.pools;
     if (data.sensors) sensors.value = data.sensors;
     if (data.swap) swap.value = data.swap;
+    if (data.nut) nut.value = data.nut;
   };
   socket.on('get-load', apply);
   socket.on('load-update', apply);
   socket.on('error', (err) => {
     error.value = `Socket error: ${err}`;
+  });
+
+  nutSocket.on('connect', () => {
+    if (visibility.value.nut) {
+      nutSocket.emit('subscribe-nut-status', { token: authToken });
+    }
+  });
+
+  nutSocket.on('connect_error', (err) => {
+    error.value = `NUT Connection error: ${err.message}`;
+  });
+
+  nutSocket.on('disconnect', () => {
+    // NUT socket disconnected
+  });
+
+  nutSocket.on('nut-status-update', (data) => {
+    nut.value = data;
+  });
+
+  nutSocket.on('error', (err) => {
+    error.value = `NUT Socket error: ${err}`;
   });
 };
 </script>

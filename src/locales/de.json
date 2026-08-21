@@ -1740,6 +1740,11 @@
   "nut status could not be loaded": "NUT Status konnte nicht geladen werden",
   "nut settings could not be changed": "NUT Einstellungen konnten nicht geändert werden",
   "nut settings changed successfully": "NUT Einstellungen erfolgreich geändert",
+  "no nut data available": "Keine NUT-Daten verfügbar",
+  "please configure nut in mos settings": "Bitte konfiguriere NUT in den MOS-Einstellungen",
+  "input frequency": "Eingansfrequenz",
+  "output voltage": "Ausgangsspannung",
+  "select path": "Pfad auswählen",
   "timers": "Zeiten",
   "seconds": "Sekunden"
 }

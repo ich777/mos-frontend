@@ -1740,6 +1740,11 @@
   "nut status could not be loaded": "NUT status could not be loaded",
   "nut settings could not be changed": "NUT settings could not be changed",
   "nut settings changed successfully": "NUT settings changed successfully",
+  "no nut data available": "No NUT data available",
+  "please configure nut in mos settings": "Please configure NUT in MOS settings",
+  "input frequency": "Input frequency",
+  "output voltage": "Output voltage",
+  "select path": "Select path",
   "timers": "Timers",
   "seconds": "Seconds"
 }
