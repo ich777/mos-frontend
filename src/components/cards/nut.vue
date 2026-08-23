@@ -5,7 +5,6 @@
     </template>
     <template v-else-if="nutData && nutData.reachable">
         <v-row density="compact">
-            <!-- UPS Status Section -->
             <v-col cols="6" sm="6" md="4" xl="3" v-if="nutData?.name">
                 <div class="text-caption text-medium-emphasis">
                     <strong>{{ $t('ups name') }}</strong>

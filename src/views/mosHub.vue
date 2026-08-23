@@ -275,33 +275,30 @@
   <v-dialog v-model="mosHubRepositoriesDialog.value" max-width="600px" scrollable>
     <v-card class="pa-0" :title="$t('repositories')" prepend-icon="mdi-source-repository">
       <v-card-text class="py-0" style="max-height: 60vh; overflow-y: auto">
-        <v-row class="pa-0 pt-2">
-          <v-col cols="12" v-for="(repo, index) in mosHubRepositoriesDialog.repositories" :key="index" class="d-flex align-center">
+        <v-row class="pa-0 pt-2 pb-4">
+          <v-col cols="12" v-for="(repo, index) in mosHubRepositoriesDialog.repositories" :key="index" class="d-flex align-center pa-0 gap-2">
             <v-text-field
               v-model="mosHubRepositoriesDialog.repositories[index]"
               :label="$t('repository') + ' ' + (index + 1)"
               outlined
               density="comfortable"
-              class="flex-grow-1 mr-2"
-              append-icon="mdi-delete"
-              @click:append="mosHubRepositoriesDialog.repositories.splice(index, 1)"
+              class="flex-grow-1"
               hide-details="auto"
             ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" class="d-flex flex-column gap-2 mt-0 mb-2" style="align-items: flex-end">
-            <v-btn color="primary" variant="text" prepend-icon="mdi-plus" @click="openKnownReposDialog()">
-              {{ $t('known repositories') }}
+            <v-btn color="red" size="small" density="comfortable" variant="plain" icon @click="mosHubRepositoriesDialog.repositories.splice(index, 1)">
+              <v-icon size="18">mdi-delete</v-icon>
             </v-btn>
-            <v-btn color="primary" variant="text" prepend-icon="mdi-plus" @click="mosHubRepositoriesDialog.repositories.push('')">
-              {{ $t('add repository') }}
+            <v-btn color="green" size="small" density="comfortable" variant="plain" icon @click="mosHubRepositoriesDialog.repositories.splice(index + 1, 0, '')">
+              <v-icon size="18">mdi-plus</v-icon>
             </v-btn>
           </v-col>
         </v-row>
       </v-card-text>
       <v-divider />
       <v-card-actions style="flex-shrink: 0">
+        <v-btn color="secondary" variant="text" prepend-icon="mdi-source-repository" @click="openKnownReposDialog()">
+          {{ $t('known repositories') }}
+        </v-btn>
         <v-spacer />
         <v-btn color="onPrimary" @click="mosHubRepositoriesDialog.value = false">{{ $t('cancel') }}</v-btn>
         <v-btn color="onPrimary" @click="setHubRepositories(mosHubRepositoriesDialog.repositories)">{{ $t('save') }}</v-btn>
@@ -433,7 +430,7 @@
   <v-dialog v-model="knownReposDialog.value" persistent max-width="600" scrollable>
     <v-card :title="$t('known repositories')" prepend-icon="mdi-source-repository">
       <v-card-text style="max-height: 60vh; overflow-y: auto">
-        <v-list>
+        <v-list class="pa-0">
           <v-list-item v-for="repo in knownRepos" :key="repo" @click="toggleKnownRepo(repo)">
             <template #append>
               <v-icon v-if="selectedKnownRepos.includes(repo)" color="success">mdi-check-circle</v-icon>
