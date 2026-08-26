@@ -94,7 +94,7 @@
 
             <v-alert type="info" variant="tonal" class="mt-4 mb-4" border="start">
               <div class="d-flex align-center justify-space-between flex-wrap ga-2">
-                <span>{{ $t('the main nut switch is located in the network settings') }}.</span>
+                <span>{{ $t('enabling/disabling nut service is located on the network settings page') }}.</span>
                 <v-btn color="onPrimary" size="small" variant="outlined" prepend-icon="mdi-arrow-right" @click="$router.push('/mosSettings/networkServices')">
                   {{ $t('network settings') }}
                 </v-btn>

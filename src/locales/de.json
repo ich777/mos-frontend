@@ -1746,5 +1746,6 @@
   "output voltage": "Ausgangsspannung",
   "select path": "Pfad auswählen",
   "timers": "Zeiten",
-  "seconds": "Sekunden"
+  "seconds": "Sekunden",
+  "enabling/disabling nut service is located on the network settings page": "Das Aktivieren/Deaktivieren des NUT-Dienstes befindet sich auf der Seite Netzwerkeinstellungen"
 }
