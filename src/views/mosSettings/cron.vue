@@ -23,7 +23,7 @@
             <thead>
               <tr style="background-color: rgba(0, 0, 0, 0.04)">
                 <th style="white-space: nowrap; width: 32px"></th>
-                <th style="white-space: nowrap; width: 200px; overflow: hidden; text-overflow: ellipsis">{{ $t('name') }}</th>
+                <th style="white-space: nowrap; width: 300px; overflow: hidden; text-overflow: ellipsis">{{ $t('name') }}</th>
                 <th style="white-space: nowrap">{{ $t('schedule') }}</th>
                 <th style="white-space: nowrap">{{ $t('command') }}</th>
                 <th style="white-space: nowrap">{{ $t('status') }}</th>
@@ -85,15 +85,15 @@
                   </v-menu>
                 </td>
                 <td style="max-width: 200px">
-                  <div class="d-flex align-center text-ellipsis" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
+                  <div class="d-flex align-center text-ellipsis" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis" :title="cronJob.name">
                     {{ cronJob.name }}
                     <v-chip v-if="cronJob.status === 'running'" class="ml-2" size="x-small" color="green" text-color="white" label>
                       {{ t('running') }}
                     </v-chip>
                   </div>
                 </td>
-                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ cronJob.schedule }}</td>
-                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ cronJob.command }}</td>
+                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis" :title="cronJob.schedule">{{ cronJob.schedule }}</td>
+                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis" :title="cronJob.command">{{ cronJob.command }}</td>
                 <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
                   <v-chip :color="cronJob.enabled ? 'green' : 'blue'" text-color="white" size="small" label>
                     {{ cronJob.enabled ? t('enabled') : t('disabled') }}
