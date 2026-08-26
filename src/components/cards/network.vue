@@ -102,6 +102,14 @@ let seriesRx = [];
 let seriesTx = [];
 let seriesTotal = [];
 
+let lastUpdateTs = null;
+let smoothedInterval = 2000;
+let currentAnimDuration = 900;
+const ANIM_DURATION_MIN = 800;
+const ANIM_DURATION_MAX = 2800;
+const ANIM_DURATION_FACTOR = 1.15;
+const INTERVAL_EMA_ALPHA = 0.3;
+
 function getInterfaceName(iface) {
   return iface?.interface || iface?.name || null;
 }
@@ -135,7 +143,7 @@ function formatBytesPerSec(bytesPerSec) {
 }
 
 function getThemeMode() {
-  return vuetifyTheme.global.name.value; // 'light' | 'dark'
+  return vuetifyTheme.global.name.value;
 }
 
 function getThemeColors() {
@@ -176,9 +184,9 @@ function updateChart() {
     color: [colors.lineRxColor, colors.lineTxColor, colors.lineTotalColor],
     backgroundColor: 'transparent',
     textStyle: { color: colors.textColor },
-    animation: false,
-    animationDuration: 0,
-    animationDurationUpdate: 800,
+    animation: true,
+    animationDuration: 400,
+    animationDurationUpdate: currentAnimDuration,
     animationEasingUpdate: 'linear',
     tooltip: {
       trigger: 'axis',
@@ -251,7 +259,7 @@ function updateChart() {
         itemStyle: { borderWidth: 0 },
         symbol: 'none',
         emphasis: { scale: false },
-        animationDuration: 400,
+        animationDuration: currentAnimDuration,
         animationEasing: 'linear',
       },
       {
@@ -264,7 +272,7 @@ function updateChart() {
         itemStyle: { borderWidth: 0 },
         symbol: 'none',
         emphasis: { scale: false },
-        animationDuration: 400,
+        animationDuration: currentAnimDuration,
         animationEasing: 'linear',
       },
       {
@@ -277,13 +285,13 @@ function updateChart() {
         itemStyle: { borderWidth: 0 },
         symbol: 'none',
         emphasis: { scale: false },
-        animationDuration: 400,
+        animationDuration: currentAnimDuration,
         animationEasing: 'linear',
       },
     ],
   };
 
-  chart.setOption(option, { replaceMerge: ['xAxis', 'yAxis'] });
+  chart.setOption(option);
 }
 
 watch(
@@ -303,6 +311,8 @@ watch(
       seriesRx = [];
       seriesTx = [];
       seriesTotal = [];
+      lastUpdateTs = null;
+      smoothedInterval = 2000;
       if (chart) updateChart();
       return;
     }
@@ -314,6 +324,15 @@ watch(
     let totalB = newVal?.statistics?.total?.speed_bps;
     if ((totalB == null || isNaN(totalB)) && (rxB != null || txB != null)) totalB = (rxB || 0) + (txB || 0);
     if (rxB == null && txB == null && totalB == null) return;
+
+    const now = Date.now();
+    if (lastUpdateTs != null) {
+      const delta = now - lastUpdateTs;
+      const clampedDelta = Math.min(Math.max(delta, 300), 5000);
+      smoothedInterval = smoothedInterval * (1 - INTERVAL_EMA_ALPHA) + clampedDelta * INTERVAL_EMA_ALPHA;
+      currentAnimDuration = Math.min(Math.max(smoothedInterval * ANIM_DURATION_FACTOR, ANIM_DURATION_MIN), ANIM_DURATION_MAX);
+    }
+    lastUpdateTs = now;
 
     const ts = new Date();
     const label = ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -398,6 +417,8 @@ const selectInterface = (iface) => {
   seriesRx = [];
   seriesTx = [];
   seriesTotal = [];
+  lastUpdateTs = null;
+  smoothedInterval = 2000;
   setNewInterface(getInterfaceName(iface));
   setSelectedNic(iface);
   if (chart) updateChart();

@@ -140,12 +140,10 @@
 
   <!-- Top Toaster -->
   <Toaster id="top-toaster" position="top-center" :richColors="true" :theme="theme.global.name.value === 'dark' ? 'dark' : 'light'" :expand="true" :visibleToasts="3" :offset="16" />
-
   <!-- Bottom Toaster -->
   <Toaster id="bottom-toaster" position="bottom-center" :richColors="true" :theme="theme.global.name.value === 'dark' ? 'dark' : 'light'" :expand="true" :visibleToasts="3" :offset="16" />
 
-
-
+  <!-- Logout Dialog -->
   <v-dialog v-model="logoutDialog" width="auto" min-width="400">
     <v-card max-width="400" prepend-icon="mdi-logout" :text="$t('do you want to logout?')" :title="$t('logout')">
       <template v-slot:actions>
@@ -156,9 +154,15 @@
   </v-dialog>
 
   <!-- Global Loading Overlay -->
-  <v-overlay :model-value="overlay" contained class="d-flex align-center justify-center" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex !important; align-items: center !important; justify-content: center !important;">
+  <v-overlay
+    :model-value="overlay"
+    contained
+    class="d-flex align-center justify-center"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex !important; align-items: center !important; justify-content: center !important"
+  >
     <v-progress-circular color="onPrimary" size="64" indeterminate></v-progress-circular>
   </v-overlay>
+
 </template>
 
 <script setup>
