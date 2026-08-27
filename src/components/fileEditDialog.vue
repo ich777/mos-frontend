@@ -9,14 +9,12 @@
       <v-card-subtitle>
         <v-progress-circular v-if="loading" size="20" indeterminate color="secondary" />
       </v-card-subtitle>
-      <v-card-text class="flex-grow-1 d-flex flex-column py-2 px-4" style="overflow: hidden">
+      <v-card-text class="d-flex flex-column py-2 px-4" style="flex: 1; overflow: hidden; min-height: 400px">
         <v-alert v-if="errorMessage" type="error" class="mb-3">
           {{ errorMessage }}
         </v-alert>
-        <div class="flex-grow-1" style="min-height: 400px; overflow: auto">
-          <v-textarea v-model="content" :loading="loading" :disabled="loading" :auto-grow="false" :rows="15" style="height: 100%; max-height: 100%; font-family: monospace" hide-details="auto" />
-        </div>
-        <v-checkbox v-model="createBackupFile" :label="t('create backup')" density="compact" hide-details="auto"/>
+        <div ref="editorContainer" class="editor-wrapper"></div>
+        <v-checkbox v-model="createBackupFile" :label="t('create backup')" density="compact" hide-details="auto" class="mt-2"/>
       </v-card-text>
       <v-divider />
       <v-card-actions>
@@ -33,8 +31,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useTheme } from 'vuetify';
+import { EditorView, basicSetup } from 'codemirror';
+import { EditorState } from '@codemirror/state';
+import { oneDark } from '@codemirror/theme-one-dark';
 import { showSnackbarError, showSnackbarSuccess } from '@/composables/snackbar';
 
 const props = defineProps({
@@ -47,16 +49,57 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'saved', 'cancel']);
 const { t } = useI18n();
+const theme = useTheme();
 
 const internalVisible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 });
 
+const editorContainer = ref(null);
 const loading = ref(false);
 const content = ref('');
 const errorMessage = ref('');
 const createBackupFile = ref(props.createBackup);
+let editorView = null;
+
+const createEditor = () => {
+  if (!editorContainer.value) return;
+
+  const isDark = theme.global.current.value.dark;
+
+  const extensions = [
+    basicSetup,
+    EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        const value = update.state.doc.toString();
+        content.value = value;
+      }
+    }),
+    EditorView.lineWrapping,
+  ];
+
+  if (isDark) {
+    extensions.push(oneDark);
+  }
+
+  const state = EditorState.create({
+    doc: content.value || '',
+    extensions,
+  });
+
+  editorView = new EditorView({
+    state,
+    parent: editorContainer.value,
+  });
+};
+
+const destroyEditor = () => {
+  if (editorView) {
+    editorView.destroy();
+    editorView = null;
+  }
+};
 
 const loadFile = async () => {
   loading.value = true;
@@ -76,6 +119,20 @@ const loadFile = async () => {
 
     const data = await res.json();
     content.value = data.content ?? '';
+    
+    // Update editor content after loading
+    if (editorView) {
+      const currentValue = editorView.state.doc.toString();
+      if (content.value !== currentValue) {
+        editorView.dispatch({
+          changes: {
+            from: 0,
+            to: currentValue.length,
+            insert: content.value,
+          },
+        });
+      }
+    }
   } catch (e) {
     errorMessage.value = e.message;
     showSnackbarError(t('file could not be loaded'), e.message);
@@ -115,8 +172,36 @@ const saveFile = async () => {
 
 watch(
   () => internalVisible.value,
-  (visible) => visible && loadFile()
+  async (visible) => {
+    if (visible) {
+      await nextTick();
+      if (!editorView) {
+        createEditor();
+      }
+      loadFile();
+    } else {
+      destroyEditor();
+    }
+  }
 );
+
+watch(
+  () => theme.global.current.value.dark,
+  () => {
+    if (internalVisible.value) {
+      destroyEditor();
+      createEditor();
+    }
+  }
+);
+
+onMounted(() => {
+  // Editor will be created when dialog becomes visible
+});
+
+onUnmounted(() => {
+  destroyEditor();
+});
 
 const onCancel = () => {
   internalVisible.value = false;
@@ -125,7 +210,26 @@ const onCancel = () => {
 </script>
 
 <style scoped>
-textarea {
-  font-family: monospace !important;
+.editor-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 4px;
+  overflow: auto;
+  background: rgb(var(--v-theme-surface));
+  margin-bottom: 12px;
+}
+
+.editor-wrapper :deep(.cm-editor) {
+  height: 100%;
+  overflow: auto !important;
+}
+
+.editor-wrapper :deep(.cm-scroller) {
+  font-family: Consolas, Monaco, 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
 }
 </style>
