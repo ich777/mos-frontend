@@ -211,54 +211,7 @@ const getDefaultEmailProvider = () => ({
   alert_mapping: {},
 });
 
-const templates = () => ({
-  Discord: {
-    enabled: false,
-    user: '',
-    token: '',
-    url: 'https://discord.com/api/webhooks/123456789012345678/ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: {
-      embeds: [
-        {
-          title: '{{.Title}}',
-          description: '{{.Message}}',
-          color: {
-            $number: '{{.Color}}',
-          },
-        },
-      ],
-    },
-    alert_mapping: {},
-    color_prio: {
-      normal: '5763719',
-      warning: '16776960',
-      alert: '15158332',
-    },
-  },
-  Pushbits: {
-    enabled: false,
-    user: '',
-    token: 'yourToken',
-    url: 'http://pushbits.yourserver.net/message?token={{.Token}}',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: {
-      title: '{{.Title}}',
-      message: '{{.Message}}',
-      priority: {
-        $number: '{{.Priority}}',
-      },
-    },
-    alert_mapping: {},
-    color_prio: {},
-  },
-});
+const templates = () => ({});
 
 onMounted(() => {
   getNotificationProviders();
@@ -317,9 +270,8 @@ const createNewProvider = async () => {
   }
 
   const name = newProviderName.value.trim();
-  const nameLower = name.toLowerCase();
 
-  if (providers.value[nameLower]) {
+  if (providers.value[name]) {
     showSnackbarError(t('provider already exists'));
     return;
   }
@@ -327,7 +279,7 @@ const createNewProvider = async () => {
   try {
     overlay.value = true;
     const newProvider = {
-      name: nameLower,
+      name: name,
       enabled: false,
       user: '',
       token: '',
@@ -353,16 +305,16 @@ const createNewProvider = async () => {
       throw new Error(error.error || t('unknown error'));
     }
 
-    providers.value[nameLower] = newProvider;
-    originalProviderNames.value.add(nameLower);
-    jsonEditors.value[nameLower] = {
+    providers.value[name] = newProvider;
+    originalProviderNames.value.add(name);
+    jsonEditors.value[name] = {
       headers: JSON.stringify({}, null, 2),
       body: JSON.stringify({}, null, 2),
       alert_mapping: JSON.stringify({}, null, 2),
       color_prio: JSON.stringify({}, null, 2),
     };
 
-    selectedProvider.value = nameLower;
+    selectedProvider.value = name;
     showAddProviderDialog.value = false;
     newProviderName.value = '';
     showSnackbarSuccess(t('provider created'));
@@ -472,7 +424,7 @@ const buildPayload = () => {
 
     if (invalidFields.length === 0) {
       payloads.push({
-        name: providerName.toLowerCase(),
+        name: providerName,
         enabled: provider.enabled ?? false,
         user: provider.user ?? '',
         token: provider.token ?? '',
